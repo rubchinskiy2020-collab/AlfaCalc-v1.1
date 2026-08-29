@@ -1,0 +1,2329 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AlfaCalc by Kosin</title>
+    <!-- PWA meta tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="AlfaCalc">
+    <link rel="apple-touch-icon" href="https://alfabank.servicecdn.ru/icons/icon-192x192.png">
+    
+    <style>
+        :root {
+            --alfa-red: #EF3124;
+            --alfa-red-hover: #D7281D;
+            --alfa-black: #0B0F14;
+            --alfa-bg: #F4F6F9;
+            --alfa-card: #FFFFFF;
+            --alfa-text: #262626;
+            --alfa-muted: #8C95A3;
+            --alfa-border: #E2E5EB;
+            --alfa-green: #24C17E;
+            --alfa-green-hover: #1DB06F;
+            --alfa-purple: #6A1B9A;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* СВЕТЛЫЙ ЭКРАН ЗАГРУЗКИ */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
+        }
+
+        #splash-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .splash-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .splash-logo-box {
+            position: relative;
+            margin-bottom: 14px;
+            animation: splashPulse 2s infinite ease-in-out;
+        }
+
+        .splash-icon {
+            font-size: 56px;
+            filter: drop-shadow(0 6px 16px rgba(239, 49, 36, 0.25));
+        }
+
+        .splash-title {
+            font-size: 32px;
+            font-weight: 900;
+            color: #0B0F14;
+            letter-spacing: -1px;
+            opacity: 0;
+            transform: translateY(15px);
+            animation: splashFadeUp 0.8s 0.2s forwards cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .splash-title span {
+            color: var(--alfa-red);
+        }
+
+        .splash-subtitle {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #8C95A3;
+            margin-top: 6px;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: splashFadeUp 0.8s 0.5s forwards cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .splash-loader {
+            width: 52px;
+            height: 3px;
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: 4px;
+            margin-top: 28px;
+            overflow: hidden;
+            position: relative;
+            opacity: 0;
+            animation: splashFadeUp 0.5s 0.6s forwards;
+        }
+
+        .splash-loader::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--alfa-red);
+            animation: splashLoading 1.2s infinite ease-in-out;
+        }
+
+        @keyframes splashFadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes splashPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+        }
+
+        @keyframes splashLoading {
+            0% { left: -100%; }
+            50% { left: 30%; }
+            100% { left: 100%; }
+        }
+
+        body {
+            background-color: var(--alfa-bg);
+            color: var(--alfa-text);
+            padding-bottom: 75px;
+            font-size: 15px;
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: var(--alfa-card);
+            border-bottom: 1px solid var(--alfa-border);
+            padding: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .header-container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title h1 {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--alfa-black);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-title h1 span {
+            color: var(--alfa-red);
+        }
+
+        .logo-title .subtitle {
+            font-size: 11px;
+            color: var(--alfa-muted);
+            font-weight: 500;
+            margin-top: 1px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            background: var(--alfa-bg);
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--alfa-black);
+            transition: background 0.2s;
+        }
+
+        .btn-icon:active {
+            background: var(--alfa-border);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 12px auto;
+            padding: 0 12px;
+        }
+
+        .card {
+            background: var(--alfa-card);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid var(--alfa-border);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--alfa-black);
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .profit-box {
+            background: linear-gradient(135deg, var(--alfa-red) 0%, #FF4B3E 100%);
+            color: white;
+            border: none;
+            text-align: center;
+            padding: 16px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        .profit-box .label {
+            font-size: 13px;
+            opacity: 0.85;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .profit-box .amount {
+            font-size: 28px;
+            font-weight: 800;
+            margin-top: 2px;
+        }
+
+        .btn-extra-income {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s;
+            display: inline-block;
+        }
+
+        .btn-extra-income:active {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .potential-box {
+            background: #EEEFF2;
+            color: var(--alfa-black);
+            border: 1px solid var(--alfa-border);
+            text-align: center;
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .potential-box .label {
+            font-size: 11px;
+            color: var(--alfa-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .potential-box .amount {
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 1px;
+            color: var(--alfa-text);
+        }
+
+        .status-tabs {
+            display: flex;
+            background: var(--alfa-bg);
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--alfa-muted);
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active.success {
+            background: var(--alfa-card);
+            color: var(--alfa-green);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .tab-btn.active.fail {
+            background: var(--alfa-card);
+            color: var(--alfa-red);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--alfa-black);
+            margin-bottom: 6px;
+        }
+
+        .input-text, select, textarea {
+            width: 100%;
+            background: var(--alfa-bg);
+            border: 1px solid var(--alfa-border);
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 15px;
+            color: var(--alfa-text);
+            outline: none;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+        }
+
+        .input-text:focus, select:focus, textarea:focus {
+            border-color: var(--alfa-red);
+            background: var(--alfa-card);
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .checkbox-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--alfa-bg);
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            user-select: none;
+            text-align: center;
+            border: 1px solid transparent;
+            transition: background 0.2s ease, color 0.15s ease, border-color 0.2s ease;
+        }
+
+        .checkbox-item input {
+            display: none;
+        }
+
+        .checkbox-item .checkbox-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--alfa-text);
+            transition: color 0.15s ease;
+        }
+
+        .checkbox-item:has(input:checked) {
+            background: var(--alfa-green);
+            color: #FFFFFF;
+        }
+
+        .checkbox-item:has(input:checked) .checkbox-label {
+            color: #FFFFFF;
+        }
+
+        .checkbox-item:active {
+            opacity: 0.85;
+        }
+
+        .plan-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .plan-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--alfa-bg);
+        }
+
+        .plan-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .plan-name {
+            font-weight: 500;
+        }
+
+        .counter-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-counter {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid var(--alfa-border);
+            background: var(--alfa-card);
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--alfa-black);
+        }
+
+        .btn-counter:active {
+            background: var(--alfa-bg);
+        }
+
+        .counter-value {
+            font-size: 15px;
+            font-weight: 700;
+            min-width: 35px;
+            text-align: center;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: var(--alfa-red);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(239, 49, 36, 0.2);
+            transition: background 0.2s;
+        }
+
+        .btn-primary:active {
+            background: var(--alfa-red-hover);
+        }
+
+        /* БЛОК КАЛЬКУЛЯТОРА БЕНЗИНА */
+        .fuel-calc-box {
+            background: #F4F6F9;
+            border: 1px solid var(--alfa-border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 6px;
+        }
+
+        .fuel-inputs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+        }
+
+        .fuel-field label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--alfa-muted);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .fuel-field input {
+            padding: 8px 6px;
+            font-size: 13px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .fuel-result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+            background: white;
+            padding: 10px 8px;
+            border-radius: 10px;
+            border: 1px solid var(--alfa-border);
+            text-align: center;
+        }
+
+        .fuel-stat-title {
+            font-size: 11px;
+            color: var(--alfa-muted);
+            font-weight: 600;
+        }
+
+        .fuel-stat-val {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--alfa-black);
+            margin-top: 2px;
+        }
+
+        .report-preview {
+            background: var(--alfa-bg);
+            border: 1px solid var(--alfa-border);
+            border-radius: 10px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 280px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .history-item {
+            background: var(--alfa-bg);
+            border: 1px solid var(--alfa-border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .history-client {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--alfa-black);
+        }
+
+        .history-details {
+            font-size: 12px;
+            color: var(--alfa-text);
+        }
+
+        .history-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-bottom: 2px;
+            width: fit-content;
+        }
+
+        .badge-success {
+            background: #E8F9F1;
+            color: var(--alfa-green);
+        }
+
+        .badge-fail {
+            background: #FEEBEA;
+            color: var(--alfa-red);
+        }
+
+        .btn-delete {
+            background: transparent;
+            border: none;
+            color: var(--alfa-red);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .btn-delete:active {
+            background: #FEEBEA;
+        }
+
+        .empty-history {
+            text-align: center;
+            color: var(--alfa-muted);
+            font-size: 13px;
+            padding: 15px 0;
+        }
+
+        /* МОДАЛЬНОЕ ОКНО */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 15, 20, 0.5);
+            z-index: 200;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: var(--alfa-card);
+            border-radius: 20px;
+            padding: 16px 12px;
+            max-width: 500px;
+            margin: 10px auto;
+            box-sizing: border-box;
+        }
+
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            background: var(--alfa-bg);
+            padding: 6px 8px;
+            border-radius: 10px;
+            gap: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .setting-name-input {
+            flex: 1 1 auto;
+            min-width: 0;
+            height: 34px;
+            padding: 0 8px;
+            border: 1px solid var(--alfa-border);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--alfa-text);
+            background: var(--alfa-card);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .setting-name-input:focus {
+            border-color: var(--alfa-red);
+        }
+
+        .setting-row .price-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+
+        .setting-price-input {
+            width: 58px;
+            height: 34px;
+            padding: 0 4px;
+            border: 1px solid var(--alfa-border);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 700;
+            background: var(--alfa-card);
+            color: var(--alfa-black);
+            outline: none;
+            transition: border-color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .setting-price-input:focus {
+            border-color: var(--alfa-red);
+        }
+
+        .setting-row .currency-sign {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--alfa-muted);
+            width: 8px;
+        }
+
+        .btn-remove-prod {
+            background: transparent;
+            border: none;
+            color: var(--alfa-red);
+            font-size: 15px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .btn-remove-prod:active {
+            background: #FEEBEA;
+        }
+
+        .add-product-form {
+            background: var(--alfa-bg);
+            border: 1px dashed var(--alfa-border);
+            border-radius: 12px;
+            padding: 10px;
+            margin-top: 12px;
+            margin-bottom: 12px;
+        }
+
+        .add-product-form h4 {
+            font-size: 12px;
+            color: var(--alfa-black);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .add-inline-group {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .add-inline-group input, .add-inline-group select {
+            padding: 8px;
+            font-size: 13px;
+            border-radius: 8px;
+            border: 1px solid var(--alfa-border);
+            background: white;
+            min-width: 0;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--alfa-card);
+            border-top: 1px solid var(--alfa-border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 150;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            background: none;
+            border: none;
+            color: var(--alfa-muted);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .nav-item .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-item.active {
+            color: var(--alfa-red);
+        }
+
+        /* КАЛЕНДАРЬ И ГРАФИК */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .calendar-month-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--alfa-black);
+            text-transform: capitalize;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+
+        .day-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--alfa-muted);
+            padding: 4px 0;
+        }
+
+        .day-cell {
+            background: var(--alfa-bg);
+            border-radius: 8px;
+            min-height: 52px;
+            padding: 4px 2px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            position: relative;
+            border: 2px solid transparent;
+            transition: all 0.15s ease;
+        }
+
+        .day-cell.today {
+            border-color: var(--alfa-black);
+        }
+
+        .day-cell .day-icon {
+            font-size: 9px;
+            line-height: 1;
+            margin-top: 1px;
+        }
+
+        .day-cell .day-profit-tag {
+            font-size: 8px;
+            font-weight: 800;
+            line-height: 1;
+            margin-top: 2px;
+            background: rgba(0, 0, 0, 0.35);
+            padding: 2px 3px;
+            border-radius: 4px;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .day-cell.has-custom-bg .day-profit-tag {
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+        }
+
+        .day-cell:not(.has-custom-bg) .day-profit-tag {
+            background: #dcdfe6;
+            color: var(--alfa-black);
+        }
+
+        .tax-rate-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .tax-rate-input {
+            width: 55px;
+            height: 30px;
+            padding: 0 4px;
+            background: #FFFFFF;
+            color: #0B0F14;
+            border: none;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .calendar-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            background: var(--alfa-bg);
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .stat-item .stat-value {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--alfa-black);
+        }
+
+        .stat-item .stat-label {
+            font-size: 11px;
+            color: var(--alfa-muted);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .day-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .btn-day-status {
+            width: 100%;
+            padding: 10px 6px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            text-align: center;
+        }
+
+        .plan-target-item {
+            background: var(--alfa-bg);
+            border: 1px solid var(--alfa-border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .plan-target-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .plan-target-title {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--alfa-black);
+        }
+
+        .plan-target-sub {
+            font-size: 13px;
+            color: var(--alfa-muted);
+            font-weight: 600;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 85px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(11, 15, 20, 0.95);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            opacity: 0;
+            transition: transform 0.25s ease-out, opacity 0.25s ease-out;
+            z-index: 300;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- СВЕТЛЫЙ ЭКРАН ЗАГРУЗКИ -->
+    <div id="splash-screen">
+        <div class="splash-content">
+            <div class="splash-logo-box">
+                <div class="splash-icon">🅰️</div>
+            </div>
+            <div class="splash-title">Alfa<span>Calc</span></div>
+            <div class="splash-subtitle">by Kosin</div>
+            <div class="splash-loader"></div>
+        </div>
+    </div>
+
+    <header>
+        <div class="header-container">
+            <div class="logo-title">
+                <h1>Alfa<span>Calc</span></h1>
+                <div class="subtitle">by Kosin</div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-icon" onclick="openSettings()" title="Настройки">⚙️</button>
+                <button class="btn-icon" onclick="confirmReset()" title="Сбросить день">🔄</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ВКЛАДКА 1: КАЛЬКУЛЯТОР -->
+    <div id="tab-calc" class="container">
+        
+        <div class="card profit-box">
+            <div class="label">Заработано за сегодня</div>
+            <div class="amount" id="today-profit">0 ₽</div>
+            <button class="btn-extra-income" onclick="setExtraIncome()">➕ Доп. доход: <span id="extra-income-label">0 ₽</span></button>
+        </div>
+
+        <div class="potential-box">
+            <div class="label">Потенциал на день (план)</div>
+            <div class="amount" id="potential-profit">0 ₽</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">1. Назначено</div>
+            <div class="plan-list" id="plan-container"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">2. Результат встречи</div>
+            
+            <div class="status-tabs">
+                <button id="btn-tab-success" class="tab-btn active success" onclick="setMeetingType(true)">Успешная</button>
+                <button id="btn-tab-fail" class="tab-btn fail" onclick="setMeetingType(false)">Неуспешная</button>
+            </div>
+
+            <div class="form-group">
+                <label for="client-info">ФИО / Номер клиента</label>
+                <input type="text" id="client-info" class="input-text" placeholder="Иванов И.И. / 1234">
+            </div>
+
+            <div class="form-group">
+                <label for="main-product-select">Основной продукт</label>
+                <select id="main-product-select"></select>
+            </div>
+
+            <div id="success-block">
+                <div class="form-group">
+                    <label>Кросс-продажи и опции</label>
+                    <div class="checkbox-grid" id="cross-container"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Установка приложения</label>
+                    <div class="checkbox-grid" id="apps-container"></div>
+                </div>
+            </div>
+
+            <div id="fail-block" style="display: none;">
+                <div class="form-group">
+                    <label for="fail-status-select">Статус неуспешной встречи</label>
+                    <select id="fail-status-select"></select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="meeting-comment">Комментарий</label>
+                <textarea id="meeting-comment" rows="2" placeholder="Оставьте комментарий, если нужно..."></textarea>
+            </div>
+
+            <button class="btn-primary" onclick="saveMeeting()">Сохранить и скопировать отчет встречи</button>
+        </div>
+
+        <div class="card">
+            <div class="card-title">3. История встреч за сегодня</div>
+            <div class="history-list" id="history-list-container"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">4. Итоговый отчет за день</div>
+            <div class="report-preview" id="day-report-preview">Здесь будет сформирован отчет...</div>
+            <button class="btn-primary" style="background-color: var(--alfa-black);" onclick="copyDayReport()">Скопировать отчет за день</button>
+        </div>
+
+        <!-- БЛОК 5: КАЛЬКУЛЯТОР БЕНЗИНА С ПОЛЯМИ ВВОДА -->
+        <div class="card">
+            <div class="card-title">
+                <span>5. ⛽ Расход бензина</span>
+                <span style="font-size:12px; color:var(--alfa-muted); font-weight:600;">Вычитается в графике</span>
+            </div>
+            <div class="fuel-calc-box">
+                <div class="fuel-inputs-grid">
+                    <div class="fuel-field">
+                        <label>Пробег (км)</label>
+                        <input type="number" id="fuel-km-input" class="input-text" placeholder="0" oninput="calculateFuel()">
+                    </div>
+                    <div class="fuel-field">
+                        <label>Расход л/100км</label>
+                        <input type="number" step="0.1" id="fuel-cons-input" class="input-text" placeholder="8.5" oninput="calculateFuel()">
+                    </div>
+                    <div class="fuel-field">
+                        <label>Цена ₽/литр</label>
+                        <input type="number" step="0.1" id="fuel-price-input" class="input-text" placeholder="58.0" oninput="calculateFuel()">
+                    </div>
+                </div>
+                <div class="fuel-result-grid">
+                    <div>
+                        <div class="fuel-stat-title">Потрачено топлива</div>
+                        <div class="fuel-stat-val" id="fuel-liters-val">0 л</div>
+                    </div>
+                    <div>
+                        <div class="fuel-stat-title">Расход на бензин</div>
+                        <div class="fuel-stat-val" style="color:var(--alfa-red);" id="fuel-cost-val">0 ₽</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ВКЛАДКА 2: ПЛАН НА ДЕНЬ -->
+    <div id="tab-day-plan" class="container" style="display: none;">
+        <div class="card">
+            <div class="card-title">🎯 Добавить задачу в план</div>
+            <div class="add-inline-group" style="margin-bottom: 0;">
+                <input type="text" id="target-prod-name" placeholder="Название продукта (например: КК)" style="flex: 2;">
+                <input type="number" id="target-prod-goal" placeholder="План (шт)" style="flex: 1;" min="1">
+                <button class="btn-primary" style="padding: 10px 14px; width: auto; font-size:14px; flex: 0.5;" onclick="addDayPlanTarget()">➕</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span>📋 Задачи на сегодня</span>
+                <button class="btn-delete" style="font-size:12px;" onclick="clearDayPlanTargets()">Очистить план</button>
+            </div>
+            
+            <div id="day-plan-list"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📄 Отчет по плану</div>
+            <div class="report-preview" id="plan-report-preview">План пока пуст...</div>
+            <button class="btn-primary" style="background-color: var(--alfa-black);" onclick="copyPlanReport()">Скопировать отчет План на день</button>
+        </div>
+    </div>
+
+    <!-- ВКЛАДКА 3: ГРАФИК РАБОТЫ И ДОХОД -->
+    <div id="tab-schedule" class="container" style="display: none;">
+        
+        <div class="card profit-box" style="background: linear-gradient(135deg, #1B2028 0%, #2F3642 100%);">
+            <div class="label" id="month-profit-label">Заработано в этом месяце (чистыми)</div>
+            <div class="amount" id="month-fact-profit">0 ₽</div>
+            <div id="month-gross-sub" style="font-size: 11px; opacity: 0.7; margin-top: 1px; display: none;">До вычета: 0 ₽</div>
+            
+            <div style="margin-top: 8px; font-size: 13px; opacity: 0.9;">
+                Прогноз за месяц: <b id="month-forecast-profit" style="color: var(--alfa-green);">0 ₽</b>
+            </div>
+
+            <!-- Строка для ввода процента вычета -->
+            <div class="tax-rate-box">
+                <span>Процент вычета (налог/комиссия):</span>
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <input type="number" id="tax-rate-input" class="tax-rate-input" min="0" max="100" placeholder="0" onchange="updateTaxRate(this.value)">
+                    <span style="font-weight:700;">%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="calendar-header">
+                <button class="btn-icon" onclick="changeMonth(-1)">◀</button>
+                <div class="calendar-month-title" id="calendar-title">Месяц 2026</div>
+                <button class="btn-icon" onclick="changeMonth(1)">▶</button>
+            </div>
+
+            <div class="calendar-grid" id="calendar-days-header">
+                <div class="day-name">Пн</div>
+                <div class="day-name">Вт</div>
+                <div class="day-name">Ср</div>
+                <div class="day-name">Чт</div>
+                <div class="day-name">Пт</div>
+                <div class="day-name" style="color:var(--alfa-red);">Сб</div>
+                <div class="day-name" style="color:var(--alfa-red);">Вс</div>
+            </div>
+
+            <div class="calendar-grid" id="calendar-grid" style="margin-top: 6px;"></div>
+
+            <div class="calendar-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-total-work">0</div>
+                    <div class="stat-label">Всего смен</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" style="color:var(--alfa-purple);" id="stat-trip-work">0</div>
+                    <div class="stat-label">Выездов 🚘</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-passed-work">0</div>
+                    <div class="stat-label">Отработано</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" style="color:var(--alfa-red);" id="stat-left-work">0</div>
+                    <div class="stat-label">Осталось смен</div>
+                </div>
+                <div class="stat-item" style="grid-column: span 2;">
+                    <div class="stat-value" style="color:var(--alfa-green);" id="stat-avg-work">0 ₽</div>
+                    <div class="stat-label" id="stat-avg-label">Средний чистый доход за смену</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" id="nav-calc" onclick="switchTab('calc')">
+            <span class="nav-icon">🧮</span>
+            <span>Калькулятор</span>
+        </button>
+        <button class="nav-item" id="nav-day-plan" onclick="switchTab('day-plan')">
+            <span class="nav-icon">📋</span>
+            <span>План</span>
+        </button>
+        <button class="nav-item" id="nav-schedule" onclick="switchTab('schedule')">
+            <span class="nav-icon">📅</span>
+            <span>График</span>
+        </button>
+    </nav>
+
+    <!-- Модалка управления днем -->
+    <div class="modal" id="day-modal">
+        <div class="modal-content" style="max-width: 380px;">
+            <div class="card-title" id="day-modal-title">Настройка дня</div>
+            
+            <div style="margin-bottom: 12px;">
+                <label style="font-size:12px; font-weight:700; color:var(--alfa-black);">Чистый заработок за день (₽):</label>
+                <input type="number" id="day-profit-input" class="input-text" style="margin-top:4px;" placeholder="0">
+            </div>
+
+            <p style="font-size:13px; color:var(--alfa-muted); margin-bottom:6px;">Выберите статус/категорию:</p>
+            <div class="day-actions-grid" id="day-categories-modal-grid"></div>
+
+            <button class="btn-primary" style="margin-top:12px; background:var(--alfa-black);" onclick="saveDayDetails('none')">Очистить день</button>
+            <button class="btn-delete" style="width:100%; margin-top:8px;" onclick="closeDayModal()">Отмена</button>
+        </div>
+    </div>
+
+    <!-- Модалка настроек -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="card-title">⚙️ Настройки и матрица</div>
+            
+            <div class="add-product-form">
+                <h4>➕ Добавить новый элемент</h4>
+                <div class="add-inline-group">
+                    <input type="text" id="new-item-name" placeholder="Название позиции" style="flex: 2;">
+                    <input type="number" id="new-item-price" placeholder="Цена / Бонус (₽)" style="flex: 1;">
+                </div>
+                <div class="add-inline-group">
+                    <select id="new-item-type" style="flex: 1.5;">
+                        <option value="main">Основной продукт</option>
+                        <option value="cross">Кросс-продажа</option>
+                        <option value="app">Приложение</option>
+                        <option value="fail">Статус неуспешной</option>
+                        <option value="shift_cat">Категория смены (график)</option>
+                    </select>
+                    <input type="text" id="new-item-icon" placeholder="Иконка (напр: 🏖️)" style="width:70px; display:none;">
+                    <button class="btn-primary" style="padding: 8px; width: auto; border-radius: 8px; font-size:13px; flex: 0.5;" onclick="addNewCustomItem()">ОК</button>
+                </div>
+            </div>
+
+            <div style="max-height: 360px; overflow-y: auto; margin-bottom: 16px;" id="prices-settings-list"></div>
+            <button class="btn-primary" onclick="closeSettings()">Сохранить и закрыть</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast-msg">Отчет скопирован!</div>
+
+    <script>
+        const defaultMainProducts = {
+            "main_1": { name: "ДК", price: 310, assigned: 0 },
+            "main_2": { name: "Апельсинки", price: 310, assigned: 0 },
+            "main_3": { name: "КК", price: 570, assigned: 0 },
+            "main_4": { name: "Семейный", price: 270, assigned: 0 },
+            "main_5": { name: "Зпк", price: 310, assigned: 0 },
+            "main_6": { name: "Re", price: 310, assigned: 0 },
+            "main_7": { name: "Детская", price: 470, assigned: 0 },
+            "main_8": { name: "ТЭ", price: 590, assigned: 0 },
+            "main_9": { name: "Мп", price: 310, assigned: 0 }
+        };
+
+        const defaultCrossProducts = {
+            "cross_act": { name: "Активация", price: 0 },
+            "cross_tx1": { name: "Транзакция", price: 0 },
+            "cross_smart": { name: "Смарт", price: 0 },
+            "cross_ins": { name: "Коробочное страхование", price: 0 },
+            "cross_combo": { name: "Комбо", price: 0 },
+            "cross_kids_c": { name: "Детская карта", price: 0 },
+            "cross_bs": { name: "Бс", price: 0 },
+            "cross_bs_t": { name: "Пополнение Бс", price: 0 },
+            "cross_pens": { name: "Пенсия", price: 0 },
+            "cross_kk": { name: "Кросс КК", price: 0 },
+            "cross_dk": { name: "Кросс ДК", price: 0 },
+            "cross_sticker": { name: "Кросс стикер", price: 0 },
+            "cross_kids": { name: "Кросс кидс", price: 0 },
+            "cross_qr": { name: "Кросс Апельсин по QR", price: 0 },
+            "cross_selfie_kk": { name: "Сэлфи КК", price: 0 },
+            "cross_selfie_dk": { name: "Сэлфи ДК", price: 0 },
+            "cross_cp": { name: "ЦП", price: 0 },
+            "cross_bs_deal": { name: "БС сделка/пополнение", price: 0 },
+            "cross_ns": { name: "НС/ НС Миллионер", price: 0 }
+        };
+
+        const defaultAppOptions = {
+            "app_android": { name: "Андроид", price: 0 },
+            "app_ios": { name: "iOS", price: 0 },
+            "app_x5": { name: "X5 (Пятерочка)", price: 0 }
+        };
+
+        const defaultFailStatuses = {
+            "fail_ndz": { name: "НДЗ", price: 0 },
+            "fail_resched": { name: "Перенос встречи", price: 0 },
+            "fail_bank911": { name: "Отказ банка/911", price: 0 },
+            "fail_bank_before": { name: "Отказ банка до встречи", price: 0 },
+            "fail_cl_before": { name: "Отказ клиента до встречи", price: 0 },
+            "fail_cl_meet": { name: "Отказ клиента на встрече", price: 0 },
+            "fail_cancel": { name: "Отмена встречи", price: 0 },
+            "fail_double": { name: "Дубль", price: 0 }
+        };
+
+        const defaultShiftCategories = {
+            "work": { name: "Рабочий (Офис/Город)", icon: "💼", color: "var(--alfa-red)", isWork: true },
+            "trip": { name: "Выезд в НП", icon: "🚘", color: "var(--alfa-purple)", isWork: true, isTrip: true },
+            "off": { name: "Выходной", icon: "🏖️", color: "#E2E5EB", isWork: false },
+            "vacation": { name: "Отпуск", icon: "🌴", color: "#F39C12", isWork: false },
+            "other_job": { name: "Другая работа", icon: "🛠️", color: "#34495E", isWork: false }
+        };
+
+        let state = {
+            mainProducts: JSON.parse(JSON.stringify(defaultMainProducts)),
+            crossProducts: JSON.parse(JSON.stringify(defaultCrossProducts)),
+            appOptions: JSON.parse(JSON.stringify(defaultAppOptions)),
+            failStatuses: JSON.parse(JSON.stringify(defaultFailStatuses)),
+            shiftCategories: JSON.parse(JSON.stringify(defaultShiftCategories)),
+            meetings: [],
+            schedule: {},
+            dayPlanTargets: [],
+            extraIncome: 0,
+            taxRate: 0,
+            fuelSettings: {
+                consumption: 8.5,
+                pricePerLiter: 58.0
+            },
+            todayFuel: {
+                km: 0,
+                liters: 0,
+                cost: 0
+            }
+        };
+
+        let isCurrentSuccess = true;
+        let currentCalendarDate = new Date();
+        let selectedDayKey = null;
+        let toastTimeout = null;
+        let currentCalculatedTodayProfit = 0;
+
+        document.getElementById('new-item-type').addEventListener('change', function(e) {
+            document.getElementById('new-item-icon').style.display = e.target.value === 'shift_cat' ? 'block' : 'none';
+        });
+
+        function loadState() {
+            const saved = localStorage.getItem('alfacalc_state_v21');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.mainProducts) state.mainProducts = parsed.mainProducts;
+                    if (parsed.crossProducts) state.crossProducts = parsed.crossProducts;
+                    if (parsed.appOptions) state.appOptions = parsed.appOptions;
+                    if (parsed.failStatuses) state.failStatuses = parsed.failStatuses;
+                    if (parsed.shiftCategories) state.shiftCategories = parsed.shiftCategories;
+                    if (parsed.meetings) state.meetings = parsed.meetings;
+                    if (parsed.schedule) state.schedule = parsed.schedule;
+                    if (parsed.dayPlanTargets) state.dayPlanTargets = parsed.dayPlanTargets;
+                    if (parsed.extraIncome !== undefined) state.extraIncome = parsed.extraIncome;
+                    if (parsed.taxRate !== undefined) state.taxRate = parsed.taxRate;
+                    if (parsed.fuelSettings) state.fuelSettings = parsed.fuelSettings;
+                    if (parsed.todayFuel) state.todayFuel = parsed.todayFuel;
+                } catch (e) {
+                    console.error("Ошибка загрузки данных", e);
+                }
+            }
+            document.getElementById('tax-rate-input').value = state.taxRate || '';
+            document.getElementById('fuel-km-input').value = state.todayFuel.km || '';
+            document.getElementById('fuel-cons-input').value = state.fuelSettings.consumption || 8.5;
+            document.getElementById('fuel-price-input').value = state.fuelSettings.pricePerLiter || 58.0;
+            
+            calculateFuel(false);
+            renderAll();
+            renderCalendar();
+            renderDayPlan();
+
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                if (splash) splash.classList.add('hide');
+            }, 1800);
+        }
+
+        function saveState() {
+            localStorage.setItem('alfacalc_state_v21', JSON.stringify(state));
+            renderAll();
+        }
+
+        /* КАЛЬКУЛЯТОР БЕНЗИНА */
+        function calculateFuel(triggerSave = true) {
+            const km = parseFloat(document.getElementById('fuel-km-input').value) || 0;
+            const consumption = parseFloat(document.getElementById('fuel-cons-input').value) || 8.5;
+            const price = parseFloat(document.getElementById('fuel-price-input').value) || 58.0;
+
+            state.fuelSettings.consumption = consumption;
+            state.fuelSettings.pricePerLiter = price;
+
+            const liters = (km * consumption) / 100;
+            const cost = Math.round(liters * price);
+
+            state.todayFuel = {
+                km: km,
+                liters: parseFloat(liters.toFixed(2)),
+                cost: cost
+            };
+
+            document.getElementById('fuel-liters-val').innerText = `${state.todayFuel.liters} л`;
+            document.getElementById('fuel-cost-val').innerText = `${state.todayFuel.cost} ₽`;
+
+            if (triggerSave) {
+                saveState();
+                renderCalendar();
+            }
+        }
+
+        function updateTaxRate(val) {
+            const parsed = parseFloat(val) || 0;
+            state.taxRate = Math.min(100, Math.max(0, parsed));
+            saveState();
+            renderCalendar();
+            showToast("Процент вычета сохранен!");
+        }
+
+        function setExtraIncome() {
+            const current = state.extraIncome || 0;
+            const input = prompt("Укажите дополнительный доход за сегодня (₽):", current);
+            if (input !== null) {
+                const val = parseInt(input) || 0;
+                state.extraIncome = Math.max(0, val);
+                saveState();
+                showToast("Доп. доход обновлен!");
+            }
+        }
+
+        function switchTab(tab) {
+            document.getElementById('tab-calc').style.display = tab === 'calc' ? 'block' : 'none';
+            document.getElementById('tab-day-plan').style.display = tab === 'day-plan' ? 'block' : 'none';
+            document.getElementById('tab-schedule').style.display = tab === 'schedule' ? 'block' : 'none';
+            
+            document.getElementById('nav-calc').classList.toggle('active', tab === 'calc');
+            document.getElementById('nav-day-plan').classList.toggle('active', tab === 'day-plan');
+            document.getElementById('nav-schedule').classList.toggle('active', tab === 'schedule');
+            
+            if (tab === 'schedule') renderCalendar();
+            if (tab === 'day-plan') renderDayPlan();
+        }
+
+        function renderAll() {
+            const currentIssued = {};
+            const currentFailCounts = {};
+            const currentCrossCounts = {};
+            const currentAppCounts = {};
+            
+            for (let k in state.mainProducts) currentIssued[k] = 0;
+            for (let k in state.crossProducts) currentCrossCounts[k] = 0;
+            for (let k in state.appOptions) currentAppCounts[k] = 0;
+            for (let k in state.failStatuses) currentFailCounts[k] = 0;
+
+            let totalProfit = state.extraIncome || 0;
+            let potentialProfit = 0;
+
+            state.meetings.forEach(m => {
+                if (m.isSuccess) {
+                    if (currentIssued[m.mainProductKey] !== undefined) currentIssued[m.mainProductKey]++;
+                    totalProfit += state.mainProducts[m.mainProductKey] ? state.mainProducts[m.mainProductKey].price : 0;
+                    
+                    if (m.crossKeys) {
+                        m.crossKeys.forEach(ck => {
+                            if (currentCrossCounts[ck] !== undefined) currentCrossCounts[ck]++;
+                            totalProfit += state.crossProducts[ck] ? state.crossProducts[ck].price : 0;
+                        });
+                    }
+
+                    if (m.appKeys) {
+                        m.appKeys.forEach(ak => {
+                            if (currentAppCounts[ak] !== undefined) currentAppCounts[ak]++;
+                            totalProfit += state.appOptions[ak] ? (state.appOptions[ak].price || 0) : 0;
+                        });
+                    }
+                } else {
+                    if (currentFailCounts[m.failStatusKey] !== undefined) {
+                        currentFailCounts[m.failStatusKey]++;
+                        totalProfit += state.failStatuses[m.failStatusKey] ? (state.failStatuses[m.failStatusKey].price || 0) : 0;
+                    }
+                }
+            });
+
+            for (let k in state.mainProducts) {
+                if (currentIssued[k] > state.mainProducts[k].assigned) {
+                    state.mainProducts[k].assigned = currentIssued[k];
+                }
+                potentialProfit += state.mainProducts[k].assigned * state.mainProducts[k].price;
+            }
+
+            currentCalculatedTodayProfit = totalProfit;
+
+            document.getElementById('today-profit').innerText = totalProfit + " ₽";
+            document.getElementById('extra-income-label').innerText = (state.extraIncome || 0) + " ₽";
+            document.getElementById('potential-profit').innerText = potentialProfit + " ₽";
+
+            const planContainer = document.getElementById('plan-container');
+            let planHtml = '';
+            for (let key in state.mainProducts) {
+                const p = state.mainProducts[key];
+                planHtml += `
+                    <div class="plan-item">
+                        <span class="plan-name">${p.name}</span>
+                        <div class="counter-controls">
+                            <button class="btn-counter" onclick="changeAssigned('${key}', -1)">-</button>
+                            <span class="counter-value">${p.assigned}</span>
+                            <button class="btn-counter" onclick="changeAssigned('${key}', 1)">+</button>
+                        </div>
+                    </div>`;
+            }
+            planContainer.innerHTML = planHtml;
+
+            renderSelects();
+            renderCrossCheckboxes();
+            renderAppCheckboxes();
+            renderFailStatusSelect();
+
+            const historyContainer = document.getElementById('history-list-container');
+            historyContainer.innerHTML = '';
+            if (state.meetings.length === 0) {
+                historyContainer.innerHTML = '<div class="empty-history">Встреч сегодня еще не было</div>';
+            } else {
+                [...state.meetings].reverse().forEach(m => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    let detailsText = m.isSuccess 
+                        ? `Продукт: ${state.mainProducts[m.mainProductKey]?.name || m.mainProductKey}` 
+                        : `Продукт: ${state.mainProducts[m.mainProductKey]?.name || m.mainProductKey} • Статус: ${state.failStatuses[m.failStatusKey]?.name || m.failStatusKey}`;
+                    
+                    if (m.isSuccess && m.crossKeys && m.crossKeys.length > 0) {
+                        detailsText += ` • Кроссы: ${m.crossKeys.map(ck => state.crossProducts[ck]?.name).filter(Boolean).join(', ')}`;
+                    }
+                    if (m.comment) detailsText += ` • <i>"${m.comment}"</i>`;
+
+                    item.innerHTML = `
+                        <div class="history-info">
+                            <span class="history-badge ${m.isSuccess ? 'badge-success' : 'badge-fail'}">${m.isSuccess ? 'УСПЕШНАЯ' : 'НЕУСПЕШНАЯ'}</span>
+                            <span class="history-client">${m.client}</span>
+                            <span class="history-details">${detailsText}</span>
+                        </div>
+                        <button class="btn-delete" onclick="deleteMeeting('${m.id}')">Удалить</button>
+                    `;
+                    historyContainer.appendChild(item);
+                });
+            }
+
+            const now = new Date();
+            const dateStr = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`;
+            
+            let report = `Итоговый отчет за ${dateStr}\n\nОсновные продукты\n`;
+            for (let key in state.mainProducts) {
+                report += `${state.mainProducts[key].name} назначено/выдано: ${state.mainProducts[key].assigned}/${currentIssued[key] || 0}\n`;
+            }
+
+            report += `\nСтатусы встреч\n`;
+            for (let key in state.failStatuses) {
+                report += `${state.failStatuses[key].name}: ${currentFailCounts[key] || 0}\n`;
+            }
+
+            report += `\nКросс-продажи\n`;
+            for (let key in state.crossProducts) {
+                const cp = state.crossProducts[key];
+                report += `${cp.name}: ${currentCrossCounts[key] || 0}\n`;
+            }
+
+            report += `\nУстановка приложения\n`;
+            for (let key in state.appOptions) {
+                report += `${state.appOptions[key].name}: ${currentAppCounts[key] || 0}\n`;
+            }
+
+            document.getElementById('day-report-preview').innerText = report;
+        }
+
+        function addDayPlanTarget() {
+            const nameInput = document.getElementById('target-prod-name');
+            const goalInput = document.getElementById('target-prod-goal');
+            
+            const name = nameInput.value.trim();
+            const goal = parseInt(goalInput.value) || 0;
+
+            if (!name || goal <= 0) {
+                alert("Укажите название продукта и цель продажи (больше 0)!");
+                return;
+            }
+
+            state.dayPlanTargets.push({
+                id: 'target_' + Date.now(),
+                name: name,
+                goal: goal,
+                sold: 0
+            });
+
+            nameInput.value = '';
+            goalInput.value = '';
+
+            saveState();
+            renderDayPlan();
+            showToast("Задача добавлена в план!");
+        }
+
+        function changeTargetSold(id, delta) {
+            const target = state.dayPlanTargets.find(t => t.id === id);
+            if (target) {
+                target.sold = Math.max(0, target.sold + delta);
+                saveState();
+                renderDayPlan();
+            }
+        }
+
+        function deleteDayPlanTarget(id) {
+            state.dayPlanTargets = state.dayPlanTargets.filter(t => t.id !== id);
+            saveState();
+            renderDayPlan();
+        }
+
+        function clearDayPlanTargets() {
+            if (confirm("Очистить все задачи из плана на день?")) {
+                state.dayPlanTargets = [];
+                saveState();
+                renderDayPlan();
+                showToast("План очищен!");
+            }
+        }
+
+        function renderDayPlan() {
+            const listContainer = document.getElementById('day-plan-list');
+            listContainer.innerHTML = '';
+
+            if (state.dayPlanTargets.length === 0) {
+                listContainer.innerHTML = '<div class="empty-history">Список задач пуст. Добавьте первую цель выше!</div>';
+                document.getElementById('plan-report-preview').innerText = "План на день пуст.";
+                return;
+            }
+
+            let reportText = "План на день:\n\n";
+
+            state.dayPlanTargets.forEach((t, idx) => {
+                const item = document.createElement('div');
+                item.className = 'plan-target-item';
+                item.innerHTML = `
+                    <div class="plan-target-info">
+                        <span class="plan-target-title">${t.name}</span>
+                        <span class="plan-target-sub">${t.sold}/${t.goal}</span>
+                    </div>
+                    <div class="counter-controls">
+                        <button class="btn-counter" onclick="changeTargetSold('${t.id}', -1)">-</button>
+                        <span class="counter-value">${t.sold}</span>
+                        <button class="btn-counter" onclick="changeTargetSold('${t.id}', 1)">+</button>
+                        <button class="btn-remove-prod" style="margin-left:4px;" onclick="deleteDayPlanTarget('${t.id}')">🗑️</button>
+                    </div>
+                `;
+                listContainer.appendChild(item);
+
+                reportText += `${idx + 1}. ${t.name} - ${t.sold}/${t.goal}\n`;
+            });
+
+            document.getElementById('plan-report-preview').innerText = reportText;
+        }
+
+        function copyPlanReport() {
+            copyToClipboard(document.getElementById('plan-report-preview').innerText);
+            showToast("Отчет План на день скопирован!");
+        }
+
+        function renderCalendar() {
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            
+            const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+            document.getElementById('calendar-title').innerText = `${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            
+            let startingDay = firstDay.getDay() - 1;
+            if (startingDay === -1) startingDay = 6;
+
+            const totalDays = lastDay.getDate();
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < startingDay; i++) {
+                grid.appendChild(document.createElement('div'));
+            }
+
+            const today = new Date();
+            const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+            let totalWork = 0;
+            let tripWork = 0;
+            let passedWork = 0;
+            let leftWork = 0;
+            let totalMonthProfitGross = 0;
+
+            for (let day = 1; day <= totalDays; day++) {
+                const dayDate = new Date(year, month, day);
+                const dayKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayData = state.schedule[dayKey] || { type: 'none', profit: 0, fuelCost: 0 };
+                const cat = state.shiftCategories[dayData.type];
+
+                let dayProfit = dayData.profit || 0;
+                // Для сегодняшнего дня: заработано минус бензин за сегодня
+                if (dayKey === todayKey && currentCalculatedTodayProfit > 0 && dayProfit === 0) {
+                    dayProfit = Math.max(0, currentCalculatedTodayProfit - (state.todayFuel.cost || 0));
+                }
+
+                totalMonthProfitGross += dayProfit;
+
+                const cell = document.createElement('div');
+                cell.className = 'day-cell';
+                
+                if (dayDate.toDateString() === today.toDateString()) {
+                    cell.classList.add('today');
+                }
+
+                let iconHtml = '';
+                if (cat) {
+                    cell.classList.add('has-custom-bg');
+                    cell.style.backgroundColor = cat.color;
+                    cell.style.color = cat.color === '#E2E5EB' ? 'var(--alfa-text)' : 'white';
+                    iconHtml = `<span class="day-icon">${cat.icon || ''}</span>`;
+                    
+                    if (cat.isWork) {
+                        totalWork++;
+                        if (cat.isTrip) tripWork++;
+                        if (dayDate < new Date(today.getFullYear(), today.getMonth(), today.getDate())) passedWork++;
+                        else leftWork++;
+                    }
+                }
+
+                let profitBadgeHtml = '';
+                if (dayProfit > 0) {
+                    profitBadgeHtml = `<span class="day-profit-tag">${dayProfit >= 1000 ? (dayProfit/1000).toFixed(1) + 'k' : dayProfit}</span>`;
+                }
+
+                cell.innerHTML = `<span>${day}</span>${iconHtml}${profitBadgeHtml}`;
+                cell.onclick = () => openDayModal(dayKey, day, monthNames[month]);
+                grid.appendChild(cell);
+            }
+
+            // РАСЧЕТ ДОХОДА С УЧЕТОМ ПРОЦЕНТНОЙ СТАВКИ ВЫЧЕТА
+            const rate = state.taxRate || 0;
+            const netMultiplier = (100 - rate) / 100;
+            const totalMonthProfitNet = Math.round(totalMonthProfitGross * netMultiplier);
+
+            const workedShiftsCount = passedWork + (state.schedule[todayKey] && state.shiftCategories[state.schedule[todayKey].type]?.isWork ? 1 : 0);
+            const avgDailyGross = workedShiftsCount > 0 ? Math.round(totalMonthProfitGross / workedShiftsCount) : 0;
+            const avgDailyNet = Math.round(avgDailyGross * netMultiplier);
+            const remainingShifts = Math.max(0, totalWork - workedShiftsCount);
+            
+            const projectedMonthGross = totalMonthProfitGross + (remainingShifts * avgDailyGross);
+            const projectedMonthNet = Math.round(projectedMonthGross * netMultiplier);
+
+            document.getElementById('stat-total-work').innerText = totalWork;
+            document.getElementById('stat-trip-work').innerText = tripWork;
+            document.getElementById('stat-passed-work').innerText = passedWork;
+            document.getElementById('stat-left-work').innerText = leftWork;
+            
+            if (rate > 0) {
+                document.getElementById('month-profit-label').innerText = `Заработано на руки (-${rate}%)`;
+                document.getElementById('month-fact-profit').innerText = totalMonthProfitNet.toLocaleString('ru-RU') + " ₽";
+                
+                const grossSub = document.getElementById('month-gross-sub');
+                grossSub.style.display = 'block';
+                grossSub.innerText = `До вычета: ${totalMonthProfitGross.toLocaleString('ru-RU')} ₽`;
+
+                document.getElementById('month-forecast-profit').innerText = (totalWork > 0 ? projectedMonthNet.toLocaleString('ru-RU') : totalMonthProfitNet.toLocaleString('ru-RU')) + " ₽";
+                document.getElementById('stat-avg-work').innerText = avgDailyNet.toLocaleString('ru-RU') + " ₽";
+                document.getElementById('stat-avg-label').innerText = `Средний за смену (-${rate}%)`;
+            } else {
+                document.getElementById('month-profit-label').innerText = `Заработано в этом месяце (чистыми)`;
+                document.getElementById('month-fact-profit').innerText = totalMonthProfitGross.toLocaleString('ru-RU') + " ₽";
+                document.getElementById('month-gross-sub').style.display = 'none';
+
+                document.getElementById('month-forecast-profit').innerText = (totalWork > 0 ? projectedMonthGross.toLocaleString('ru-RU') : totalMonthProfitGross.toLocaleString('ru-RU')) + " ₽";
+                document.getElementById('stat-avg-work').innerText = avgDailyGross.toLocaleString('ru-RU') + " ₽";
+                document.getElementById('stat-avg-label').innerText = `Средний чистый доход за смену`;
+            }
+        }
+
+        function changeMonth(delta) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function openDayModal(dayKey, dayNum, monthName) {
+            selectedDayKey = dayKey;
+            const dayData = state.schedule[dayKey] || { type: 'none', profit: 0 };
+            
+            document.getElementById('day-modal-title').innerText = `${dayNum} ${monthName}`;
+            
+            let defaultVal = dayData.profit;
+            if (dayKey === getTodayKey() && (!dayData.profit || dayData.profit === 0)) {
+                defaultVal = Math.max(0, currentCalculatedTodayProfit - (state.todayFuel.cost || 0));
+            }
+            document.getElementById('day-profit-input').value = defaultVal || '';
+            
+            const btnContainer = document.getElementById('day-categories-modal-grid');
+            btnContainer.innerHTML = '';
+
+            for (let key in state.shiftCategories) {
+                const cat = state.shiftCategories[key];
+                const btn = document.createElement('button');
+                btn.className = 'btn-day-status';
+                btn.style.background = cat.color;
+                btn.style.color = cat.color === '#E2E5EB' ? 'var(--alfa-black)' : 'white';
+                btn.innerHTML = `${cat.icon || ''} ${cat.name}`;
+                btn.onclick = () => saveDayDetails(key);
+                btnContainer.appendChild(btn);
+            }
+
+            document.getElementById('day-modal').style.display = 'block';
+        }
+
+        function closeDayModal() {
+            document.getElementById('day-modal').style.display = 'none';
+            selectedDayKey = null;
+        }
+
+        function saveDayDetails(status) {
+            if (!selectedDayKey) return;
+            const profitVal = parseInt(document.getElementById('day-profit-input').value) || 0;
+
+            if (status === 'none') {
+                delete state.schedule[selectedDayKey];
+            } else {
+                state.schedule[selectedDayKey] = {
+                    type: status,
+                    profit: profitVal
+                };
+            }
+            saveState();
+            renderCalendar();
+            closeDayModal();
+        }
+
+        function getTodayKey() {
+            const now = new Date();
+            return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        }
+
+        function changeAssigned(key, val) {
+            state.mainProducts[key].assigned = Math.max(0, state.mainProducts[key].assigned + val);
+            saveState();
+        }
+
+        function setMeetingType(isSuccess) {
+            isCurrentSuccess = isSuccess;
+            document.getElementById('btn-tab-success').classList.toggle('active', isSuccess);
+            document.getElementById('btn-tab-fail').classList.toggle('active', !isSuccess);
+            document.getElementById('success-block').style.display = isSuccess ? 'block' : 'none';
+            document.getElementById('fail-block').style.display = isSuccess ? 'none' : 'block';
+        }
+
+        function saveMeeting() {
+            const clientInput = document.getElementById('client-info').value.trim();
+            const client = clientInput || "Клиент без имени";
+            const mainProductKey = document.getElementById('main-product-select').value;
+            const comment = document.getElementById('meeting-comment').value.trim();
+            
+            if (!mainProductKey) {
+                alert("Добавьте продукты в матрицу!");
+                return;
+            }
+
+            const newMeeting = {
+                id: 'meet_' + Date.now() + '_' + Math.floor(Math.random()*1000),
+                client: client,
+                mainProductKey: mainProductKey,
+                comment: comment,
+                isSuccess: isCurrentSuccess,
+                crossKeys: [],
+                appKeys: []
+            };
+
+            let singleReportText = "";
+            const mainProdName = state.mainProducts[mainProductKey]?.name || mainProductKey;
+
+            if (isCurrentSuccess) {
+                singleReportText += `${mainProdName}\n${client}\n`;
+
+                for (let key in state.crossProducts) {
+                    const cb = document.getElementById(`cross-${key}`);
+                    if (cb && cb.checked) {
+                        newMeeting.crossKeys.push(key);
+                        singleReportText += `${state.crossProducts[key].name}\n`;
+                    }
+                }
+
+                for (let key in state.appOptions) {
+                    const cb = document.getElementById(`app-opt-${key}`);
+                    if (cb && cb.checked) {
+                        newMeeting.appKeys.push(key);
+                    }
+                }
+
+                if (comment) {
+                    singleReportText += `Комментарий: ${comment}`;
+                } else {
+                    if (singleReportText.endsWith('\n')) {
+                        singleReportText = singleReportText.slice(0, -1);
+                    }
+                }
+
+            } else {
+                const failStatusKey = document.getElementById('fail-status-select').value;
+                newMeeting.failStatusKey = failStatusKey;
+                const failStatusName = state.failStatuses[failStatusKey]?.name || failStatusKey;
+
+                singleReportText += `${mainProdName}\n${client}\n${failStatusName}`;
+                if (comment) {
+                    singleReportText += `\nКомментарий: ${comment}`;
+                }
+            }
+
+            state.meetings.push(newMeeting);
+            saveState();
+
+            copyToClipboard(singleReportText);
+            showToast("Отчет встречи в буфере!");
+
+            document.getElementById('client-info').value = "";
+            document.getElementById('meeting-comment').value = "";
+            for (let key in state.crossProducts) {
+                const cb = document.getElementById(`cross-${key}`);
+                if (cb) cb.checked = false;
+            }
+            for (let key in state.appOptions) {
+                const cb = document.getElementById(`app-opt-${key}`);
+                if (cb) cb.checked = false;
+            }
+        }
+
+        function deleteMeeting(id) {
+            if (confirm("Удалить встречу?")) {
+                state.meetings = state.meetings.filter(m => m.id !== id);
+                saveState();
+            }
+        }
+
+        function renderSelects() {
+            const select = document.getElementById('main-product-select');
+            const currentVal = select.value;
+            select.innerHTML = '';
+            for (let key in state.mainProducts) {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.innerText = state.mainProducts[key].name;
+                select.appendChild(opt);
+            }
+            if (state.mainProducts[currentVal]) select.value = currentVal;
+        }
+
+        function renderFailStatusSelect() {
+            const select = document.getElementById('fail-status-select');
+            const currentVal = select.value;
+            select.innerHTML = '';
+            for (let key in state.failStatuses) {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.innerText = state.failStatuses[key].name;
+                select.appendChild(opt);
+            }
+            if (state.failStatuses[currentVal]) select.value = currentVal;
+        }
+
+        function renderCrossCheckboxes() {
+            const container = document.getElementById('cross-container');
+            const checkedStates = {};
+            for (let key in state.crossProducts) {
+                const cb = document.getElementById(`cross-${key}`);
+                if (cb) checkedStates[key] = cb.checked;
+            }
+
+            container.innerHTML = '';
+            for (let key in state.crossProducts) {
+                const cp = state.crossProducts[key];
+                const label = document.createElement('label');
+                label.className = 'checkbox-item';
+                label.innerHTML = `
+                    <input type="checkbox" id="cross-${key}">
+                    <span class="checkbox-label">${cp.name}</span>
+                `;
+                container.appendChild(label);
+                
+                if (checkedStates[key]) {
+                    document.getElementById(`cross-${key}`).checked = true;
+                }
+            }
+        }
+
+        function renderAppCheckboxes() {
+            const container = document.getElementById('apps-container');
+            const checkedStates = {};
+            for (let key in state.appOptions) {
+                const cb = document.getElementById(`app-opt-${key}`);
+                if (cb) checkedStates[key] = cb.checked;
+            }
+
+            container.innerHTML = '';
+            for (let key in state.appOptions) {
+                const app = state.appOptions[key];
+                const label = document.createElement('label');
+                label.className = 'checkbox-item';
+                label.innerHTML = `
+                    <input type="checkbox" id="app-opt-${key}">
+                    <span class="checkbox-label">${app.name}</span>
+                `;
+                container.appendChild(label);
+
+                if (checkedStates[key]) {
+                    document.getElementById(`app-opt-${key}`).checked = true;
+                }
+            }
+        }
+
+        function addNewCustomItem() {
+            const name = document.getElementById('new-item-name').value.trim();
+            const price = parseInt(document.getElementById('new-item-price').value) || 0;
+            const type = document.getElementById('new-item-type').value;
+            const icon = document.getElementById('new-item-icon').value.trim() || '💼';
+
+            if (!name) {
+                alert("Введите название!");
+                return;
+            }
+
+            const generatedId = (type === 'main' ? 'main_' : type === 'cross' ? 'cross_' : type === 'app' ? 'app_' : type === 'shift_cat' ? 'shift_' : 'fail_') + Date.now();
+
+            if (type === 'main') {
+                state.mainProducts[generatedId] = { name: name, price: price, assigned: 0 };
+            } else if (type === 'cross') {
+                state.crossProducts[generatedId] = { name: name, price: price };
+            } else if (type === 'app') {
+                state.appOptions[generatedId] = { name: name, price: price };
+            } else if (type === 'fail') {
+                state.failStatuses[generatedId] = { name: name, price: price };
+            } else if (type === 'shift_cat') {
+                state.shiftCategories[generatedId] = { 
+                    name: name, 
+                    icon: icon, 
+                    color: "#4A90E2", 
+                    isWork: confirm("Считать этот статус как рабочий день (смену)?") 
+                };
+            }
+
+            document.getElementById('new-item-name').value = "";
+            document.getElementById('new-item-price').value = "";
+            document.getElementById('new-item-icon').value = "";
+
+            saveState();
+            openSettings();
+            showToast("Элемент успешно добавлен!");
+        }
+
+        function removeCustomItem(type, key) {
+            if (confirm("Удалить элемент?")) {
+                if (type === 'main') delete state.mainProducts[key];
+                else if (type === 'cross') delete state.crossProducts[key];
+                else if (type === 'app') delete state.appOptions[key];
+                else if (type === 'fail') delete state.failStatuses[key];
+                else if (type === 'shift_cat') delete state.shiftCategories[key];
+                saveState();
+                openSettings();
+            }
+        }
+
+        function copyDayReport() {
+            const reportText = document.getElementById('day-report-preview').innerText;
+            copyToClipboard(reportText);
+
+            // Автоматическое сохранение сегодняшнего заработка (минус бензин) в календарь
+            const todayKey = getTodayKey();
+            const netDayProfit = Math.max(0, currentCalculatedTodayProfit - (state.todayFuel.cost || 0));
+
+            if (!state.schedule[todayKey]) {
+                state.schedule[todayKey] = { type: 'work', profit: netDayProfit };
+            } else {
+                state.schedule[todayKey].profit = netDayProfit;
+                if (state.schedule[todayKey].type === 'none') {
+                    state.schedule[todayKey].type = 'work';
+                }
+            }
+            saveState();
+            showToast("Отчет скопирован, данные занесены в график!");
+        }
+
+        function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast("Скопировано!");
+                }).catch(() => fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast-msg');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            
+            if (toastTimeout) {
+                clearTimeout(toastTimeout);
+            }
+            
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 1500);
+        }
+
+        function openSettings() {
+            const listContainer = document.getElementById('prices-settings-list');
+
+            let html = '<h3 style="font-size:13px; margin-bottom:6px; color:var(--alfa-black);">Основные продукты:</h3>';
+            for (let key in state.mainProducts) {
+                const p = state.mainProducts[key];
+                html += `
+                    <div class="setting-row">
+                        <input type="text" class="setting-name-input" id="name-main-${key}" value="${p.name}">
+                        <div class="price-input-wrapper">
+                            <input type="number" class="setting-price-input" id="set-main-${key}" value="${p.price}">
+                            <span class="currency-sign">₽</span>
+                        </div>
+                        <button class="btn-remove-prod" onclick="removeCustomItem('main', '${key}')">🗑️</button>
+                    </div>`;
+            }
+
+            html += '<h3 style="font-size:13px; margin-top:12px; margin-bottom:6px; color:var(--alfa-black);">Кросс-продажи:</h3>';
+            for (let key in state.crossProducts) {
+                const cp = state.crossProducts[key];
+                html += `
+                    <div class="setting-row">
+                        <input type="text" class="setting-name-input" id="name-cross-${key}" value="${cp.name}">
+                        <div class="price-input-wrapper">
+                            <input type="number" class="setting-price-input" id="set-cross-${key}" value="${cp.price}">
+                            <span class="currency-sign">₽</span>
+                        </div>
+                        <button class="btn-remove-prod" onclick="removeCustomItem('cross', '${key}')">🗑️</button>
+                    </div>`;
+            }
+
+            html += '<h3 style="font-size:13px; margin-top:12px; margin-bottom:6px; color:var(--alfa-black);">Приложения:</h3>';
+            for (let key in state.appOptions) {
+                const app = state.appOptions[key];
+                html += `
+                    <div class="setting-row">
+                        <input type="text" class="setting-name-input" id="name-app-${key}" value="${app.name}">
+                        <div class="price-input-wrapper">
+                            <input type="number" class="setting-price-input" id="set-app-${key}" value="${app.price || 0}">
+                            <span class="currency-sign">₽</span>
+                        </div>
+                        <button class="btn-remove-prod" onclick="removeCustomItem('app', '${key}')">🗑️</button>
+                    </div>`;
+            }
+
+            html += '<h3 style="font-size:13px; margin-top:12px; margin-bottom:6px; color:var(--alfa-black);">Статусы неуспешных встреч:</h3>';
+            for (let key in state.failStatuses) {
+                const st = state.failStatuses[key];
+                html += `
+                    <div class="setting-row">
+                        <input type="text" class="setting-name-input" id="name-fail-${key}" value="${st.name}">
+                        <div class="price-input-wrapper">
+                            <input type="number" class="setting-price-input" id="set-fail-${key}" value="${st.price || 0}">
+                            <span class="currency-sign">₽</span>
+                        </div>
+                        <button class="btn-remove-prod" onclick="removeCustomItem('fail', '${key}')">🗑️</button>
+                    </div>`;
+            }
+
+            html += '<h3 style="font-size:13px; margin-top:12px; margin-bottom:6px; color:var(--alfa-black);">Категории смен (график):</h3>';
+            for (let key in state.shiftCategories) {
+                const cat = state.shiftCategories[key];
+                html += `
+                    <div class="setting-row">
+                        <input type="text" style="width:36px; text-align:center; padding:0;" class="setting-name-input" id="icon-cat-${key}" value="${cat.icon || '💼'}">
+                        <input type="text" class="setting-name-input" id="name-cat-${key}" value="${cat.name}">
+                        <button class="btn-remove-prod" onclick="removeCustomItem('shift_cat', '${key}')">🗑️</button>
+                    </div>`;
+            }
+
+            listContainer.innerHTML = html;
+            document.getElementById('settings-modal').style.display = 'block';
+        }
+
+        function closeSettings() {
+            for (let key in state.mainProducts) {
+                const inputName = document.getElementById(`name-main-${key}`);
+                const inputPrice = document.getElementById(`set-main-${key}`);
+                if (inputName && inputName.value.trim()) state.mainProducts[key].name = inputName.value.trim();
+                if (inputPrice) state.mainProducts[key].price = parseInt(inputPrice.value) || 0;
+            }
+            for (let key in state.crossProducts) {
+                const inputName = document.getElementById(`name-cross-${key}`);
+                const inputPrice = document.getElementById(`set-cross-${key}`);
+                if (inputName && inputName.value.trim()) state.crossProducts[key].name = inputName.value.trim();
+                if (inputPrice) state.crossProducts[key].price = parseInt(inputPrice.value) || 0;
+            }
+            for (let key in state.appOptions) {
+                const inputName = document.getElementById(`name-app-${key}`);
+                const inputPrice = document.getElementById(`set-app-${key}`);
+                if (inputName && inputName.value.trim()) state.appOptions[key].name = inputName.value.trim();
+                if (inputPrice) state.appOptions[key].price = parseInt(inputPrice.value) || 0;
+            }
+            for (let key in state.failStatuses) {
+                const inputName = document.getElementById(`name-fail-${key}`);
+                const inputPrice = document.getElementById(`set-fail-${key}`);
+                if (inputName && inputName.value.trim()) state.failStatuses[key].name = inputName.value.trim();
+                if (inputPrice) state.failStatuses[key].price = parseInt(inputPrice.value) || 0;
+            }
+            for (let key in state.shiftCategories) {
+                const inputIcon = document.getElementById(`icon-cat-${key}`);
+                const inputName = document.getElementById(`name-cat-${key}`);
+                if (inputIcon) state.shiftCategories[key].icon = inputIcon.value.trim() || '💼';
+                if (inputName && inputName.value.trim()) state.shiftCategories[key].name = inputName.value.trim();
+            }
+            document.getElementById('settings-modal').style.display = 'none';
+            saveState();
+        }
+
+        function confirmReset() {
+            if (confirm("Сбросить результаты дня? Проведенные встречи, доп. доход, пробег и счетчики плана на день обнулятся. Ваши добавленные продукты, настройки цен, сохраненный доход за прошлые дни И ГРАФИК РАБОТЫ ОСТАНУТСЯ.")) {
+                state.meetings = []; 
+                state.extraIncome = 0;
+                state.todayFuel.km = 0;
+                state.todayFuel.liters = 0;
+                state.todayFuel.cost = 0;
+                document.getElementById('fuel-km-input').value = '';
+                calculateFuel(false);
+                state.dayPlanTargets.forEach(t => t.sold = 0);
+                
+                for (let key in state.mainProducts) {
+                    state.mainProducts[key].assigned = 0;
+                }
+                
+                saveState();
+                renderDayPlan();
+                showToast("Результаты дня обнулены!");
+            }
+        }
+
+        window.onload = function() {
+            loadState();
+        };
+    </script>
+</body>
+</html>
