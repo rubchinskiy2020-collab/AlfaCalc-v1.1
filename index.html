@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AlfaCalc by Kosin</title>
-    <!-- PWA meta tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AlfaCalc">
@@ -57,15 +56,8 @@
             transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
         }
 
-        body.dark-mode #splash-screen {
-            background: #0E1217;
-        }
-
-        #splash-screen.hide {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
+        body.dark-mode #splash-screen { background: #0E1217; }
+        #splash-screen.hide { opacity: 0; visibility: hidden; pointer-events: none; }
 
         .splash-content {
             display: flex;
@@ -95,13 +87,8 @@
             animation: splashFadeUp 0.8s 0.2s forwards cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        body.dark-mode .splash-title {
-            color: #FFFFFF;
-        }
-
-        .splash-title span {
-            color: var(--alfa-red);
-        }
+        body.dark-mode .splash-title { color: #FFFFFF; }
+        .splash-title span { color: var(--alfa-red); }
 
         .splash-subtitle {
             font-size: 13px;
@@ -127,9 +114,7 @@
             animation: splashFadeUp 0.5s 0.6s forwards;
         }
 
-        body.dark-mode .splash-loader {
-            background: rgba(255, 255, 255, 0.15);
-        }
+        body.dark-mode .splash-loader { background: rgba(255, 255, 255, 0.15); }
 
         .splash-loader::after {
             content: '';
@@ -142,20 +127,9 @@
             animation: splashLoading 1.2s infinite ease-in-out;
         }
 
-        @keyframes splashFadeUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes splashPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.06); }
-        }
-
-        @keyframes splashLoading {
-            0% { left: -100%; }
-            50% { left: 30%; }
-            100% { left: 100%; }
-        }
+        @keyframes splashFadeUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes splashPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+        @keyframes splashLoading { 0% { left: -100%; } 50% { left: 30%; } 100% { left: 100%; } }
 
         body {
             background-color: var(--alfa-bg);
@@ -186,33 +160,12 @@
             align-items: center;
         }
 
-        .logo-title {
-            display: flex;
-            flex-direction: column;
-        }
+        .logo-title { display: flex; flex-direction: column; }
+        .logo-title h1 { font-size: 18px; font-weight: 800; color: var(--alfa-black); letter-spacing: -0.5px; }
+        .logo-title h1 span { color: var(--alfa-red); }
+        .logo-title .subtitle { font-size: 11px; color: var(--alfa-muted); font-weight: 500; margin-top: 1px; }
 
-        .logo-title h1 {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--alfa-black);
-            letter-spacing: -0.5px;
-        }
-
-        .logo-title h1 span {
-            color: var(--alfa-red);
-        }
-
-        .logo-title .subtitle {
-            font-size: 11px;
-            color: var(--alfa-muted);
-            font-weight: 500;
-            margin-top: 1px;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 8px;
-        }
+        .header-actions { display: flex; gap: 8px; }
 
         .btn-icon {
             background: var(--alfa-bg);
@@ -229,15 +182,8 @@
             transition: background 0.2s;
         }
 
-        .btn-icon:active {
-            background: var(--alfa-border);
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 12px auto;
-            padding: 0 12px;
-        }
+        .btn-icon:active { background: var(--alfa-border); }
+        .container { max-width: 600px; margin: 12px auto; padding: 0 12px; }
 
         .card {
             background: var(--alfa-card);
@@ -276,11 +222,7 @@
             letter-spacing: 0.5px;
         }
 
-        .profit-box .amount {
-            font-size: 28px;
-            font-weight: 800;
-            margin-top: 2px;
-        }
+        .profit-box .amount { font-size: 28px; font-weight: 800; margin-top: 2px; }
 
         .btn-extra-income {
             background: rgba(255, 255, 255, 0.2);
@@ -314,12 +256,7 @@
             letter-spacing: 0.5px;
         }
 
-        .potential-box .amount {
-            font-size: 18px;
-            font-weight: 700;
-            margin-top: 1px;
-            color: var(--alfa-text);
-        }
+        .potential-box .amount { font-size: 18px; font-weight: 700; margin-top: 1px; color: var(--alfa-text); }
 
         .date-navigator {
             display: flex;
@@ -376,10 +313,40 @@
             cursor: pointer;
         }
 
-        .form-group {
-            margin-bottom: 14px;
+        .status-tabs {
+            display: flex;
+            background: var(--alfa-bg);
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 16px;
         }
 
+        .tab-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--alfa-muted);
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active.success {
+            background: var(--alfa-card);
+            color: var(--alfa-green);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .tab-btn.active.fail {
+            background: var(--alfa-card);
+            color: var(--alfa-red);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .form-group { margin-bottom: 14px; }
         .form-group label {
             display: block;
             font-size: 13px;
@@ -413,9 +380,7 @@
             margin-top: 8px;
         }
 
-        @media (max-width: 480px) {
-            .checkbox-grid { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 480px) { .checkbox-grid { grid-template-columns: 1fr; } }
 
         .checkbox-item {
             display: flex;
@@ -432,7 +397,6 @@
         }
 
         .checkbox-item input { display: none; }
-
         .checkbox-item .checkbox-label {
             font-size: 13px;
             font-weight: 600;
@@ -446,16 +410,9 @@
             color: #FFFFFF;
         }
 
-        .checkbox-item:has(input:checked) .checkbox-label {
-            color: #FFFFFF;
-        }
+        .checkbox-item:has(input:checked) .checkbox-label { color: #FFFFFF; }
 
-        .plan-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
+        .plan-list { display: flex; flex-direction: column; gap: 10px; }
         .plan-item {
             display: flex;
             align-items: center;
@@ -463,18 +420,9 @@
             padding-bottom: 10px;
             border-bottom: 1px solid var(--alfa-border);
         }
+        .plan-item:last-child { border-bottom: none; padding-bottom: 0; }
 
-        .plan-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .counter-controls {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        .counter-controls { display: flex; align-items: center; gap: 12px; }
         .btn-counter {
             width: 32px;
             height: 32px;
@@ -490,12 +438,7 @@
             color: var(--alfa-text);
         }
 
-        .counter-value {
-            font-size: 15px;
-            font-weight: 700;
-            min-width: 35px;
-            text-align: center;
-        }
+        .counter-value { font-size: 15px; font-weight: 700; min-width: 35px; text-align: center; }
 
         .btn-primary {
             width: 100%;
@@ -553,18 +496,8 @@
             text-align: center;
         }
 
-        .fuel-stat-title {
-            font-size: 11px;
-            color: var(--alfa-muted);
-            font-weight: 600;
-        }
-
-        .fuel-stat-val {
-            font-size: 14px;
-            font-weight: 800;
-            color: var(--alfa-text);
-            margin-top: 2px;
-        }
+        .fuel-stat-title { font-size: 11px; color: var(--alfa-muted); font-weight: 600; }
+        .fuel-stat-val { font-size: 14px; font-weight: 800; color: var(--alfa-text); margin-top: 2px; }
 
         .report-preview {
             background: var(--alfa-bg);
@@ -600,23 +533,22 @@
             gap: 10px;
         }
 
-        .history-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            flex: 1;
-        }
+        .history-info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+        .history-client { font-weight: 700; font-size: 14px; color: var(--alfa-black); }
+        .history-details { font-size: 12px; color: var(--alfa-text); }
 
-        .history-client {
+        .history-badge {
+            display: inline-block;
+            font-size: 11px;
             font-weight: 700;
-            font-size: 14px;
-            color: var(--alfa-black);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-bottom: 2px;
+            width: fit-content;
         }
 
-        .history-details {
-            font-size: 12px;
-            color: var(--alfa-text);
-        }
+        .badge-success { background: #E8F9F1; color: var(--alfa-green); }
+        .badge-fail { background: #FEEBEA; color: var(--alfa-red); }
 
         .btn-delete {
             background: transparent;
@@ -630,12 +562,7 @@
             transition: background 0.2s;
         }
 
-        .empty-history {
-            text-align: center;
-            color: var(--alfa-muted);
-            font-size: 13px;
-            padding: 15px 0;
-        }
+        .empty-history { text-align: center; color: var(--alfa-muted); font-size: 13px; padding: 15px 0; }
 
         .modal {
             display: none;
@@ -750,11 +677,7 @@
             letter-spacing: 0.3px;
         }
 
-        .add-inline-group {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 6px;
-        }
+        .add-inline-group { display: flex; gap: 6px; margin-bottom: 6px; }
 
         .add-inline-group input, .add-inline-group select {
             padding: 8px;
@@ -876,11 +799,7 @@
             opacity: 0.85;
         }
 
-        .breakdown-row b {
-            font-size: 13px;
-            color: #FFFFFF;
-            margin-top: 1px;
-        }
+        .breakdown-row b { font-size: 13px; color: #FFFFFF; margin-top: 1px; }
 
         .tax-rate-box {
             display: flex;
@@ -918,18 +837,8 @@
             text-align: center;
         }
 
-        .stat-item .stat-value {
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--alfa-black);
-        }
-
-        .stat-item .stat-label {
-            font-size: 11px;
-            color: var(--alfa-muted);
-            font-weight: 600;
-            margin-top: 2px;
-        }
+        .stat-item .stat-value { font-size: 16px; font-weight: 800; color: var(--alfa-black); }
+        .stat-item .stat-label { font-size: 11px; color: var(--alfa-muted); font-weight: 600; margin-top: 2px; }
 
         .day-actions-grid {
             display: grid;
@@ -967,24 +876,9 @@
             gap: 10px;
         }
 
-        .plan-target-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            flex: 1;
-        }
-
-        .plan-target-title {
-            font-weight: 700;
-            font-size: 15px;
-            color: var(--alfa-black);
-        }
-
-        .plan-target-sub {
-            font-size: 13px;
-            color: var(--alfa-muted);
-            font-weight: 600;
-        }
+        .plan-target-info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+        .plan-target-title { font-weight: 700; font-size: 15px; color: var(--alfa-black); }
+        .plan-target-sub { font-size: 13px; color: var(--alfa-muted); font-weight: 600; }
 
         .toast {
             position: fixed;
@@ -1006,10 +900,7 @@
             pointer-events: none;
         }
 
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     </style>
 </head>
 <body>
@@ -1072,14 +963,25 @@
         <div class="card">
             <div class="card-title">2. Результат встречи</div>
 
+            <div class="status-tabs">
+                <button id="btn-tab-success" class="tab-btn active success" onclick="setMeetingType(true)">Успешная</button>
+                <button id="btn-tab-fail" class="tab-btn fail" onclick="setMeetingType(false)">Неуспешная</button>
+            </div>
+
             <div class="form-group">
                 <label for="client-info">ФИО / Номер клиента</label>
                 <input type="text" id="client-info" class="input-text" placeholder="Иванов И.И. / 1234">
             </div>
 
-            <div id="dynamic-meeting-form"></div>
+            <div id="success-block">
+                <div id="dynamic-meeting-form-success"></div>
+            </div>
 
-            <div class="form-group">
+            <div id="fail-block" style="display:none;">
+                <div id="dynamic-meeting-form-fail"></div>
+            </div>
+
+            <div class="form-group" style="margin-top: 10px;">
                 <label for="meeting-comment">Комментарий</label>
                 <textarea id="meeting-comment" rows="2" placeholder="Оставьте комментарий, если нужно..."></textarea>
             </div>
@@ -1291,9 +1193,9 @@
                 <div class="add-inline-group">
                     <input type="text" id="new-section-name" placeholder="Название раздела" style="flex: 2;">
                     <select id="new-section-type" style="flex: 1.5;">
-                        <option value="counter">План / Выдача (+/-)</option>
-                        <option value="checkbox">Чекбоксы / Опции</option>
-                        <option value="select">Выпадающий список</option>
+                        <option value="counter">Основной (План/Выдача +/-)</option>
+                        <option value="checkbox">Опция / Кросс (Чекбокс)</option>
+                        <option value="select">Статус отказа (Выпадающий список)</option>
                     </select>
                     <button class="btn-primary" style="padding: 8px; width: auto; font-size:13px; flex: 0.5;" onclick="addNewSection()">ОК</button>
                 </div>
@@ -1330,7 +1232,7 @@
         const initialSections = {
             "sec_main": { name: "Основные продукты", type: "counter", items: {} },
             "sec_cross": { name: "Кросс-продажи", type: "checkbox", items: {} },
-            "sec_statuses": { name: "Статусы встреч", type: "select", items: {} }
+            "sec_statuses": { name: "Статусы отказов", type: "select", items: {} }
         };
 
         const initialShiftCategories = {
@@ -1354,6 +1256,7 @@
         let selectedDayKey = null;
         let toastTimeout = null;
         let currentCalculatedTodayProfit = 0;
+        let isCurrentMeetingSuccess = true;
 
         function getFormattedDate(d) {
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -1377,7 +1280,7 @@
         }
 
         function loadState() {
-            const saved = localStorage.getItem('alfacalc_builder_v4');
+            const saved = localStorage.getItem('alfacalc_builder_v5');
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -1412,7 +1315,7 @@
         }
 
         function saveState() {
-            localStorage.setItem('alfacalc_builder_v4', JSON.stringify(state));
+            localStorage.setItem('alfacalc_builder_v5', JSON.stringify(state));
             renderAll();
         }
 
@@ -1430,6 +1333,14 @@
                 document.body.classList.remove('dark-mode');
                 document.getElementById('theme-toggle-btn').innerText = '🌙';
             }
+        }
+
+        function setMeetingType(isSuccess) {
+            isCurrentMeetingSuccess = isSuccess;
+            document.getElementById('btn-tab-success').classList.toggle('active', isSuccess);
+            document.getElementById('btn-tab-fail').classList.toggle('active', !isSuccess);
+            document.getElementById('success-block').style.display = isSuccess ? 'block' : 'none';
+            document.getElementById('fail-block').style.display = isSuccess ? 'none' : 'block';
         }
 
         function exportBackup() {
@@ -1585,20 +1496,30 @@
             }
 
             dayData.meetings.forEach(m => {
-                for (let sKey in m.selectValues) {
-                    const itemKey = m.selectValues[sKey];
-                    if (itemKey && issuedCounts[itemKey] !== undefined) {
-                        issuedCounts[itemKey]++;
-                        totalProfit += getItemPrice(sKey, itemKey);
-                    }
-                }
-                if (m.checkedItems) {
-                    m.checkedItems.forEach(iKey => {
-                        if (issuedCounts[iKey] !== undefined) {
-                            issuedCounts[iKey]++;
-                            totalProfit += getItemPrice(null, iKey);
+                if (!m.isSuccess) {
+                    for (let sKey in m.selectValues) {
+                        const itemKey = m.selectValues[sKey];
+                        if (itemKey && issuedCounts[itemKey] !== undefined) {
+                            issuedCounts[itemKey]++;
+                            totalProfit += getItemPrice(sKey, itemKey);
                         }
-                    });
+                    }
+                } else {
+                    for (let sKey in m.selectValues) {
+                        const itemKey = m.selectValues[sKey];
+                        if (itemKey && issuedCounts[itemKey] !== undefined) {
+                            issuedCounts[itemKey]++;
+                            totalProfit += getItemPrice(sKey, itemKey);
+                        }
+                    }
+                    if (m.checkedItems) {
+                        m.checkedItems.forEach(iKey => {
+                            if (issuedCounts[iKey] !== undefined) {
+                                issuedCounts[iKey]++;
+                                totalProfit += getItemPrice(null, iKey);
+                            }
+                        });
+                    }
                 }
             });
 
@@ -1609,7 +1530,7 @@
             document.getElementById('potential-profit').innerText = potentialProfit.toLocaleString('ru-RU') + " ₽";
 
             renderPlanCounterSection(issuedCounts);
-            renderDynamicMeetingForm();
+            renderDynamicMeetingForms();
             renderHistoryList();
             buildDayReport(issuedCounts);
         }
@@ -1677,23 +1598,20 @@
             saveState();
         }
 
-        function renderDynamicMeetingForm() {
-            const container = document.getElementById('dynamic-meeting-form');
-            const savedSelected = {};
-            const savedChecked = {};
+        function renderDynamicMeetingForms() {
+            const successContainer = document.getElementById('dynamic-meeting-form-success');
+            const failContainer = document.getElementById('dynamic-meeting-form-fail');
 
-            container.querySelectorAll('select').forEach(s => savedSelected[s.id] = s.value);
-            container.querySelectorAll('input[type="checkbox"]').forEach(c => savedChecked[c.id] = c.checked);
-
-            let html = '';
+            let successHtml = '';
+            let failHtml = '';
 
             for (let sKey in state.sections) {
                 const sec = state.sections[sKey];
                 const itemKeys = Object.keys(sec.items);
                 if (itemKeys.length === 0) continue;
 
-                if (sec.type === 'counter' || sec.type === 'select') {
-                    html += `
+                if (sec.type === 'counter') {
+                    const blockHtml = `
                         <div class="form-group">
                             <label>${sec.name}</label>
                             <select id="form-sel-${sKey}">
@@ -1702,8 +1620,10 @@
                             </select>
                         </div>
                     `;
+                    successHtml += blockHtml;
+                    failHtml += blockHtml;
                 } else if (sec.type === 'checkbox') {
-                    html += `
+                    successHtml += `
                         <div class="form-group">
                             <label>${sec.name}</label>
                             <div class="checkbox-grid">
@@ -1716,19 +1636,21 @@
                             </div>
                         </div>
                     `;
+                } else if (sec.type === 'select') {
+                    failHtml += `
+                        <div class="form-group">
+                            <label>${sec.name}</label>
+                            <select id="form-sel-fail-${sKey}">
+                                <option value="">-- Выберите статус отказа --</option>
+                                ${itemKeys.map(k => `<option value="${k}">${sec.items[k].name}</option>`).join('')}
+                            </select>
+                        </div>
+                    `;
                 }
             }
 
-            container.innerHTML = html || '<div class="empty-history" style="padding:10px;">В конструкторе еще нет разделов. Откройте ⚙️ Настройки вверху, чтобы создать разделы и позиции.</div>';
-
-            for (let id in savedSelected) {
-                const el = document.getElementById(id);
-                if (el) el.value = savedSelected[id];
-            }
-            for (let id in savedChecked) {
-                const el = document.getElementById(id);
-                if (el) el.checked = savedChecked[id];
-            }
+            successContainer.innerHTML = successHtml || '<div class="empty-history">Добавьте продукты и опции в настройках ⚙️</div>';
+            failContainer.innerHTML = failHtml || '<div class="empty-history">Добавьте статусы отказов в настройках ⚙️</div>';
         }
 
         function saveMeeting() {
@@ -1739,36 +1661,55 @@
                 id: 'meet_' + Date.now(),
                 client: client,
                 comment: comment,
+                isSuccess: isCurrentMeetingSuccess,
                 selectValues: {},
                 checkedItems: []
             };
 
             let singleReportText = `${client}\n`;
 
-            for (let sKey in state.sections) {
-                const sel = document.getElementById(`form-sel-${sKey}`);
-                if (sel && sel.value) {
-                    newMeeting.selectValues[sKey] = sel.value;
-                    singleReportText += `${state.sections[sKey].name}: ${getItemName(sel.value)}\n`;
-                }
-            }
-
-            const checkedNames = [];
-            for (let sKey in state.sections) {
-                const sec = state.sections[sKey];
-                if (sec.type === 'checkbox') {
-                    for (let iKey in sec.items) {
-                        const cb = document.getElementById(`form-check-${iKey}`);
-                        if (cb && cb.checked) {
-                            newMeeting.checkedItems.push(iKey);
-                            checkedNames.push(sec.items[iKey].name);
+            if (isCurrentMeetingSuccess) {
+                for (let sKey in state.sections) {
+                    const sec = state.sections[sKey];
+                    if (sec.type === 'counter') {
+                        const sel = document.getElementById(`form-sel-${sKey}`);
+                        if (sel && sel.value) {
+                            newMeeting.selectValues[sKey] = sel.value;
+                            singleReportText += `${getItemName(sel.value)}\n`;
                         }
                     }
                 }
-            }
 
-            if (checkedNames.length > 0) {
-                singleReportText += `Опции: ${checkedNames.join(', ')}\n`;
+                for (let sKey in state.sections) {
+                    const sec = state.sections[sKey];
+                    if (sec.type === 'checkbox') {
+                        for (let iKey in sec.items) {
+                            const cb = document.getElementById(`form-check-${iKey}`);
+                            if (cb && cb.checked) {
+                                newMeeting.checkedItems.push(iKey);
+                                singleReportText += `${sec.items[iKey].name}\n`;
+                            }
+                        }
+                    }
+                }
+            } else {
+                for (let sKey in state.sections) {
+                    const sec = state.sections[sKey];
+                    if (sec.type === 'counter') {
+                        const sel = document.getElementById(`form-sel-${sKey}`);
+                        if (sel && sel.value) {
+                            newMeeting.selectValues[sKey] = sel.value;
+                            singleReportText += `${getItemName(sel.value)}\n`;
+                        }
+                    }
+                    if (sec.type === 'select') {
+                        const selFail = document.getElementById(`form-sel-fail-${sKey}`);
+                        if (selFail && selFail.value) {
+                            newMeeting.selectValues[sKey] = selFail.value;
+                            singleReportText += `${getItemName(selFail.value)}\n`;
+                        }
+                    }
+                }
             }
 
             if (comment) singleReportText += `Комментарий: ${comment}`;
@@ -1783,8 +1724,8 @@
 
             document.getElementById('client-info').value = '';
             document.getElementById('meeting-comment').value = '';
-            document.querySelectorAll('#dynamic-meeting-form select').forEach(s => s.value = '');
-            document.querySelectorAll('#dynamic-meeting-form input[type="checkbox"]').forEach(c => c.checked = false);
+            document.querySelectorAll('#success-block select, #fail-block select').forEach(s => s.value = '');
+            document.querySelectorAll('#success-block input[type="checkbox"]').forEach(c => c.checked = false);
         }
 
         function renderHistoryList() {
@@ -1803,15 +1744,19 @@
 
                 let details = [];
                 for (let sKey in m.selectValues) {
-                    details.push(`${state.sections[sKey]?.name || ''}: <b>${getItemName(m.selectValues[sKey])}</b>`);
+                    details.push(`<b>${getItemName(m.selectValues[sKey])}</b>`);
                 }
                 if (m.checkedItems && m.checkedItems.length > 0) {
                     details.push(`Опции: ${m.checkedItems.map(k => getItemName(k)).join(', ')}`);
                 }
                 if (m.comment) details.push(`<i>"${m.comment}"</i>`);
 
+                const badgeClass = m.isSuccess ? 'badge-success' : 'badge-fail';
+                const badgeText = m.isSuccess ? 'УСПЕШНАЯ' : 'НЕУСПЕШНАЯ';
+
                 item.innerHTML = `
                     <div class="history-info">
+                        <span class="history-badge ${badgeClass}">${badgeText}</span>
                         <span class="history-client">${m.client}</span>
                         <span class="history-details">${details.join(' • ')}</span>
                     </div>
@@ -1829,6 +1774,7 @@
             }
         }
 
+        /* ИТОГОВЫЙ ОТЧЕТ: ДЛЯ ОСНОВНЫХ (COUNTER) ВЫВОДИТСЯ ВЫДАНО/НАЗНАЧЕНО (НАПР. 1/1) */
         function buildDayReport(issuedCounts) {
             const dayData = getActiveDayData();
             let report = `Итоговый отчет за ${formatDateDisplay(currentActiveDateKey)}\n`;
@@ -1845,7 +1791,8 @@
                         const planCount = (dayData.plans && dayData.plans[sKey] && dayData.plans[sKey][k] !== undefined)
                             ? dayData.plans[sKey][k]
                             : (it.assigned || 0);
-                        report += `${it.name} (план/факт): ${planCount}/${issuedCounts[k] || 0}\n`;
+                        const issued = issuedCounts[k] || 0;
+                        report += `${it.name}: ${issued}/${planCount}\n`;
                     } else {
                         report += `${it.name}: ${issuedCounts[k] || 0}\n`;
                     }
@@ -1915,7 +1862,7 @@
                     dayGross = dD.extraIncome || 0;
                     dD.meetings.forEach(m => {
                         for (let s in m.selectValues) dayGross += getItemPrice(s, m.selectValues[s]);
-                        if (m.checkedItems) m.checkedItems.forEach(k => dayGross += getItemPrice(null, k));
+                        if (m.isSuccess && m.checkedItems) m.checkedItems.forEach(k => dayGross += getItemPrice(null, k));
                     });
                     dayFuelCost = dD.fuel?.cost || 0;
                 } else if (dayData.profit > 0) {
