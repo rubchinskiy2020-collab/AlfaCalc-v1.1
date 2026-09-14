@@ -630,6 +630,19 @@
             flex-shrink: 0;
         }
 
+        .setting-unit-select {
+            height: 34px;
+            padding: 0 4px;
+            border: 1px solid var(--alfa-border);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--alfa-card);
+            color: var(--alfa-text);
+            outline: none;
+            flex-shrink: 0;
+        }
+
         .color-picker-btn {
             width: 28px;
             height: 28px;
@@ -1201,12 +1214,17 @@
                 </div>
             </div>
 
-            <div class="add-product-form" style="background:var(--alfa-bg);">
+            <div class="add-product-form">
                 <h4>➕ 2. Добавить позицию в раздел</h4>
                 <div class="add-inline-group">
-                    <select id="item-target-section" style="flex: 1.5;"></select>
-                    <input type="text" id="new-item-name" placeholder="Название позиции" style="flex: 2;">
-                    <input type="number" id="new-item-price" placeholder="Цена (₽)" style="flex: 1;">
+                    <select id="item-target-section" style="flex: 1.2;"></select>
+                    <input type="text" id="new-item-name" placeholder="Название" style="flex: 1.8;">
+                    <input type="number" id="new-item-price" placeholder="Цена (₽)" style="flex: 0.8;">
+                    <select id="new-item-unit" style="flex: 0.8;">
+                        <option value="num">Число (1)</option>
+                        <option value="percent">Процент (%)</option>
+                        <option value="rub">Рубли (₽)</option>
+                    </select>
                     <button class="btn-primary" style="padding: 8px; width: auto; font-size:13px; flex: 0.5;" onclick="addNewItemToSection()">ОК</button>
                 </div>
             </div>
@@ -1280,8 +1298,7 @@
         }
 
         function loadState() {
-            // Мягкая миграция: проверяем v6, затем v5, затем v4
-            let saved = localStorage.getItem('alfacalc_builder_v6') || localStorage.getItem('alfacalc_builder_v5') || localStorage.getItem('alfacalc_builder_v4');
+            let saved = localStorage.getItem('alfacalc_builder_v7') || localStorage.getItem('alfacalc_builder_v6') || localStorage.getItem('alfacalc_builder_v5');
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -1295,7 +1312,6 @@
                     if (parsed.fuelSettings) state.fuelSettings = parsed.fuelSettings;
                     if (parsed.darkMode !== undefined) state.darkMode = parsed.darkMode;
 
-                    // Если globalPlans пустой, инициализируем его из существующих секций
                     if (Object.keys(state.globalPlans).length === 0) {
                         for (let sKey in state.sections) {
                             if (state.sections[sKey].type === 'counter') {
@@ -1330,7 +1346,7 @@
         }
 
         function saveState() {
-            localStorage.setItem('alfacalc_builder_v6', JSON.stringify(state));
+            localStorage.setItem('alfacalc_builder_v7', JSON.stringify(state));
             renderAll();
         }
 
@@ -1571,7 +1587,6 @@
             return iKey;
         }
 
-        /* БЛОК 1: ПЛАН НАЗНАЧЕНО (ПОСТОЯННЫЙ ДЛЯ ВСЕХ ДНЕЙ) */
         function renderPlanCounterSection() {
             const container = document.getElementById('plan-container');
             if (!state.globalPlans) state.globalPlans = {};
@@ -1794,6 +1809,13 @@
             }
         }
 
+        /* ФОРМИРОВАНИЕ ОТЧЕТА С УЧЕТОМ НАСТРОЙКИ ФОРМАТА (ЕДИНИЦЫ ИЗМЕРЕНИЯ) */
+        function formatItemOutput(val, unit) {
+            if (unit === 'percent') return `${val}%`;
+            if (unit === 'rub') return `${val} ₽`;
+            return `${val}`;
+        }
+
         function buildDayReport(issuedCounts) {
             let report = `Итоговый отчет за ${formatDateDisplay(currentActiveDateKey)}\n`;
 
@@ -1805,15 +1827,9 @@
                 report += `\n${sec.name}\n`;
                 iKeys.forEach(k => {
                     const it = sec.items[k];
-                    if (sec.type === 'counter') {
-                        const planCount = (state.globalPlans && state.globalPlans[sKey] && state.globalPlans[sKey][k] !== undefined)
-                            ? state.globalPlans[sKey][k]
-                            : (it.assigned || 0);
-                        const issued = issuedCounts[k] || 0;
-                        report += `${it.name}: ${issued}/${planCount}\n`;
-                    } else {
-                        report += `${it.name}: ${issuedCounts[k] || 0}\n`;
-                    }
+                    const count = issuedCounts[k] || 0;
+                    const formattedVal = formatItemOutput(count, it.unit || 'num');
+                    report += `${it.name} - ${formattedVal}\n`;
                 });
             }
 
@@ -2002,7 +2018,6 @@
             closeDayModal();
         }
 
-        /* ПОСТОЯННЫЙ ПЛАН НА ДЕНЬ */
         function addDayPlanTarget() {
             const nameInput = document.getElementById('target-prod-name');
             const goalInput = document.getElementById('target-prod-goal');
@@ -2084,7 +2099,6 @@
             showToast("Отчет План на день скопирован!");
         }
 
-        /* КОНСТРУКТОР */
         function addNewSection() {
             const name = document.getElementById('new-section-name').value.trim();
             const type = document.getElementById('new-section-type').value;
@@ -2111,12 +2125,13 @@
             const secKey = document.getElementById('item-target-section').value;
             const name = document.getElementById('new-item-name').value.trim();
             const price = parseInt(document.getElementById('new-item-price').value) || 0;
+            const unit = document.getElementById('new-item-unit').value || 'num';
 
             if (!secKey) return alert("Сначала создайте раздел!");
             if (!name) return alert("Введите название позиции!");
 
             const itemKey = 'item_' + Date.now();
-            state.sections[secKey].items[itemKey] = { name: name, price: price, assigned: 0 };
+            state.sections[secKey].items[itemKey] = { name: name, price: price, assigned: 0, unit: unit };
             if (state.sections[secKey].type === 'counter') {
                 if (!state.globalPlans) state.globalPlans = {};
                 if (!state.globalPlans[secKey]) state.globalPlans[secKey] = {};
@@ -2189,6 +2204,7 @@
 
                 for (let iKey in sec.items) {
                     const it = sec.items[iKey];
+                    const unit = it.unit || 'num';
                     html += `
                         <div class="setting-row">
                             <input type="text" class="setting-name-input" id="item-name-${sKey}-${iKey}" value="${it.name}">
@@ -2196,6 +2212,11 @@
                                 <input type="number" class="setting-price-input" id="item-price-${sKey}-${iKey}" value="${it.price || 0}">
                                 <span style="font-size:12px; font-weight:700; color:var(--alfa-muted);">₽</span>
                             </div>
+                            <select class="setting-unit-select" id="item-unit-${sKey}-${iKey}">
+                                <option value="num" ${unit === 'num' ? 'selected' : ''}>1</option>
+                                <option value="percent" ${unit === 'percent' ? 'selected' : ''}>%</option>
+                                <option value="rub" ${unit === 'rub' ? 'selected' : ''}>₽</option>
+                            </select>
                             <button class="btn-remove-prod" onclick="removeItemFromSection('${sKey}', '${iKey}')">🗑️</button>
                         </div>
                     `;
@@ -2234,8 +2255,10 @@
                 for (let iKey in state.sections[sKey].items) {
                     const nameInput = document.getElementById(`item-name-${sKey}-${iKey}`);
                     const priceInput = document.getElementById(`item-price-${sKey}-${iKey}`);
+                    const unitInput = document.getElementById(`item-unit-${sKey}-${iKey}`);
                     if (nameInput && nameInput.value.trim()) state.sections[sKey].items[iKey].name = nameInput.value.trim();
                     if (priceInput) state.sections[sKey].items[iKey].price = parseInt(priceInput.value) || 0;
+                    if (unitInput) state.sections[sKey].items[iKey].unit = unitInput.value;
                 }
             }
 
@@ -2253,7 +2276,7 @@
         }
 
         function confirmReset() {
-            if (confirm(`Сбросить результаты за ${formatDateDisplay(currentActiveDateKey)}? Встречи, бензин и доп. доход обнулятся. План и настройки останутся.`)) {
+            if (confirm(`Сбросить данные только за выбранный день (${formatDateDisplay(currentActiveDateKey)})? Встречи, бензин и доп. доход обнулятся. План и настройки останутся.`)) {
                 delete state.daysData[currentActiveDateKey];
                 loadActiveDayToUI();
                 saveState();
