@@ -1048,7 +1048,7 @@
 
         <div class="card">
             <div class="card-title">
-                <span>📋 Задачи на выбранный день</span>
+                <span>📋 Задачи плана (постоянные)</span>
                 <button class="btn-delete" style="font-size:12px;" onclick="clearDayPlanTargets()">Очистить план</button>
             </div>
             <div id="day-plan-list"></div>
@@ -1246,6 +1246,8 @@
             shiftCategories: JSON.parse(JSON.stringify(initialShiftCategories)),
             schedule: {},
             daysData: {},
+            globalPlans: {},
+            dayPlanTargets: [],
             taxRate: 0,
             fuelSettings: { consumption: 8.5, pricePerLiter: 58.0 },
             darkMode: false
@@ -1267,9 +1269,7 @@
                 state.daysData[dKey] = {
                     meetings: [],
                     extraIncome: 0,
-                    fuel: { km: 0, liters: 0, cost: 0 },
-                    targets: [],
-                    plans: {}
+                    fuel: { km: 0, liters: 0, cost: 0 }
                 };
             }
             return state.daysData[dKey];
@@ -1280,7 +1280,8 @@
         }
 
         function loadState() {
-            const saved = localStorage.getItem('alfacalc_builder_v5');
+            // Мягкая миграция: проверяем v6, затем v5, затем v4
+            let saved = localStorage.getItem('alfacalc_builder_v6') || localStorage.getItem('alfacalc_builder_v5') || localStorage.getItem('alfacalc_builder_v4');
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -1288,9 +1289,23 @@
                     if (parsed.shiftCategories) state.shiftCategories = parsed.shiftCategories;
                     if (parsed.schedule) state.schedule = parsed.schedule;
                     if (parsed.daysData) state.daysData = parsed.daysData;
+                    if (parsed.globalPlans) state.globalPlans = parsed.globalPlans;
+                    if (parsed.dayPlanTargets) state.dayPlanTargets = parsed.dayPlanTargets;
                     if (parsed.taxRate !== undefined) state.taxRate = parsed.taxRate;
                     if (parsed.fuelSettings) state.fuelSettings = parsed.fuelSettings;
                     if (parsed.darkMode !== undefined) state.darkMode = parsed.darkMode;
+
+                    // Если globalPlans пустой, инициализируем его из существующих секций
+                    if (Object.keys(state.globalPlans).length === 0) {
+                        for (let sKey in state.sections) {
+                            if (state.sections[sKey].type === 'counter') {
+                                state.globalPlans[sKey] = {};
+                                for (let iKey in state.sections[sKey].items) {
+                                    state.globalPlans[sKey][iKey] = state.sections[sKey].items[iKey].assigned || 0;
+                                }
+                            }
+                        }
+                    }
                 } catch (e) {
                     console.error("Ошибка загрузки данных", e);
                 }
@@ -1315,7 +1330,7 @@
         }
 
         function saveState() {
-            localStorage.setItem('alfacalc_builder_v5', JSON.stringify(state));
+            localStorage.setItem('alfacalc_builder_v6', JSON.stringify(state));
             renderAll();
         }
 
@@ -1364,8 +1379,10 @@
             reader.onload = function(e) {
                 try {
                     const parsed = JSON.parse(e.target.result);
-                    if (parsed.sections && parsed.daysData) {
+                    if (parsed.sections && (parsed.daysData || parsed.schedule)) {
                         state = parsed;
+                        if (!state.globalPlans) state.globalPlans = {};
+                        if (!state.dayPlanTargets) state.dayPlanTargets = [];
                         applyThemeUI();
                         saveState();
                         loadActiveDayToUI();
@@ -1482,14 +1499,18 @@
             let totalProfit = dayData.extraIncome || 0;
             let potentialProfit = 0;
 
+            if (!state.globalPlans) state.globalPlans = {};
+
             for (let sKey in state.sections) {
                 const sec = state.sections[sKey];
+                if (!state.globalPlans[sKey]) state.globalPlans[sKey] = {};
                 for (let iKey in sec.items) {
                     issuedCounts[iKey] = 0;
                     if (sec.type === 'counter') {
-                        const planCount = (dayData.plans && dayData.plans[sKey] && dayData.plans[sKey][iKey] !== undefined)
-                            ? dayData.plans[sKey][iKey]
-                            : (sec.items[iKey].assigned || 0);
+                        if (state.globalPlans[sKey][iKey] === undefined) {
+                            state.globalPlans[sKey][iKey] = sec.items[iKey].assigned || 0;
+                        }
+                        const planCount = state.globalPlans[sKey][iKey];
                         potentialProfit += planCount * (sec.items[iKey].price || 0);
                     }
                 }
@@ -1529,7 +1550,7 @@
             document.getElementById('extra-income-label').innerText = (dayData.extraIncome || 0) + " ₽";
             document.getElementById('potential-profit').innerText = potentialProfit.toLocaleString('ru-RU') + " ₽";
 
-            renderPlanCounterSection(issuedCounts);
+            renderPlanCounterSection();
             renderDynamicMeetingForms();
             renderHistoryList();
             buildDayReport(issuedCounts);
@@ -1550,10 +1571,10 @@
             return iKey;
         }
 
-        function renderPlanCounterSection(issuedCounts) {
+        /* БЛОК 1: ПЛАН НАЗНАЧЕНО (ПОСТОЯННЫЙ ДЛЯ ВСЕХ ДНЕЙ) */
+        function renderPlanCounterSection() {
             const container = document.getElementById('plan-container');
-            const dayData = getActiveDayData();
-            if (!dayData.plans) dayData.plans = {};
+            if (!state.globalPlans) state.globalPlans = {};
 
             let html = '';
             let count = 0;
@@ -1561,14 +1582,14 @@
             for (let sKey in state.sections) {
                 const sec = state.sections[sKey];
                 if (sec.type === 'counter') {
-                    if (!dayData.plans[sKey]) dayData.plans[sKey] = {};
+                    if (!state.globalPlans[sKey]) state.globalPlans[sKey] = {};
                     for (let iKey in sec.items) {
                         count++;
                         const item = sec.items[iKey];
-                        if (dayData.plans[sKey][iKey] === undefined) {
-                            dayData.plans[sKey][iKey] = item.assigned || 0;
+                        if (state.globalPlans[sKey][iKey] === undefined) {
+                            state.globalPlans[sKey][iKey] = item.assigned || 0;
                         }
-                        const currentVal = dayData.plans[sKey][iKey];
+                        const currentVal = state.globalPlans[sKey][iKey];
 
                         html += `
                             <div class="plan-item">
@@ -1577,9 +1598,9 @@
                                     <span style="font-size:12px; color:var(--alfa-muted); margin-left:6px;">(${item.price || 0} ₽)</span>
                                 </div>
                                 <div class="counter-controls">
-                                    <button class="btn-counter" onclick="changeDayCounterPlan('${sKey}', '${iKey}', -1)">-</button>
+                                    <button class="btn-counter" onclick="changeGlobalCounterPlan('${sKey}', '${iKey}', -1)">-</button>
                                     <span class="counter-value">${currentVal}</span>
-                                    <button class="btn-counter" onclick="changeDayCounterPlan('${sKey}', '${iKey}', 1)">+</button>
+                                    <button class="btn-counter" onclick="changeGlobalCounterPlan('${sKey}', '${iKey}', 1)">+</button>
                                 </div>
                             </div>
                         `;
@@ -1590,11 +1611,10 @@
             container.innerHTML = count > 0 ? html : '<div class="empty-history">Добавьте позиции в разделы типа «План / Назначено» через ⚙️</div>';
         }
 
-        function changeDayCounterPlan(sKey, iKey, delta) {
-            const dayData = getActiveDayData();
-            if (!dayData.plans[sKey]) dayData.plans[sKey] = {};
-            const cur = dayData.plans[sKey][iKey] || 0;
-            dayData.plans[sKey][iKey] = Math.max(0, cur + delta);
+        function changeGlobalCounterPlan(sKey, iKey, delta) {
+            if (!state.globalPlans[sKey]) state.globalPlans[sKey] = {};
+            const cur = state.globalPlans[sKey][iKey] || 0;
+            state.globalPlans[sKey][iKey] = Math.max(0, cur + delta);
             saveState();
         }
 
@@ -1774,9 +1794,7 @@
             }
         }
 
-        /* ИТОГОВЫЙ ОТЧЕТ: ДЛЯ ОСНОВНЫХ (COUNTER) ВЫВОДИТСЯ ВЫДАНО/НАЗНАЧЕНО (НАПР. 1/1) */
         function buildDayReport(issuedCounts) {
-            const dayData = getActiveDayData();
             let report = `Итоговый отчет за ${formatDateDisplay(currentActiveDateKey)}\n`;
 
             for (let sKey in state.sections) {
@@ -1788,8 +1806,8 @@
                 iKeys.forEach(k => {
                     const it = sec.items[k];
                     if (sec.type === 'counter') {
-                        const planCount = (dayData.plans && dayData.plans[sKey] && dayData.plans[sKey][k] !== undefined)
-                            ? dayData.plans[sKey][k]
+                        const planCount = (state.globalPlans && state.globalPlans[sKey] && state.globalPlans[sKey][k] !== undefined)
+                            ? state.globalPlans[sKey][k]
                             : (it.assigned || 0);
                         const issued = issuedCounts[k] || 0;
                         report += `${it.name}: ${issued}/${planCount}\n`;
@@ -1984,7 +2002,7 @@
             closeDayModal();
         }
 
-        /* ПЛАН НА ДЕНЬ */
+        /* ПОСТОЯННЫЙ ПЛАН НА ДЕНЬ */
         function addDayPlanTarget() {
             const nameInput = document.getElementById('target-prod-name');
             const goalInput = document.getElementById('target-prod-goal');
@@ -1992,11 +2010,9 @@
             const goal = parseInt(goalInput.value) || 0;
 
             if (!name || goal <= 0) return alert("Укажите название и план > 0!");
+            if (!state.dayPlanTargets) state.dayPlanTargets = [];
 
-            const dayData = getActiveDayData();
-            if (!dayData.targets) dayData.targets = [];
-
-            dayData.targets.push({ id: 'target_' + Date.now(), name: name, goal: goal, sold: 0 });
+            state.dayPlanTargets.push({ id: 'target_' + Date.now(), name: name, goal: goal, sold: 0 });
             nameInput.value = ''; goalInput.value = '';
             saveState();
             renderDayPlan();
@@ -2004,8 +2020,8 @@
         }
 
         function changeTargetSold(id, delta) {
-            const dayData = getActiveDayData();
-            const target = dayData.targets.find(t => t.id === id);
+            if (!state.dayPlanTargets) state.dayPlanTargets = [];
+            const target = state.dayPlanTargets.find(t => t.id === id);
             if (target) {
                 target.sold = Math.max(0, target.sold + delta);
                 saveState();
@@ -2014,16 +2030,15 @@
         }
 
         function deleteDayPlanTarget(id) {
-            const dayData = getActiveDayData();
-            dayData.targets = dayData.targets.filter(t => t.id !== id);
+            if (!state.dayPlanTargets) state.dayPlanTargets = [];
+            state.dayPlanTargets = state.dayPlanTargets.filter(t => t.id !== id);
             saveState();
             renderDayPlan();
         }
 
         function clearDayPlanTargets() {
-            if (confirm("Очистить задачи плана на выбранный день?")) {
-                const dayData = getActiveDayData();
-                dayData.targets = [];
+            if (confirm("Очистить все постоянные задачи плана?")) {
+                state.dayPlanTargets = [];
                 saveState();
                 renderDayPlan();
                 showToast("План очищен!");
@@ -2033,16 +2048,16 @@
         function renderDayPlan() {
             const list = document.getElementById('day-plan-list');
             list.innerHTML = '';
-            const dayData = getActiveDayData();
+            if (!state.dayPlanTargets) state.dayPlanTargets = [];
 
-            if (!dayData.targets || dayData.targets.length === 0) {
+            if (state.dayPlanTargets.length === 0) {
                 list.innerHTML = '<div class="empty-history">План задач пуст. Добавьте первую цель выше!</div>';
                 document.getElementById('plan-report-preview').innerText = "План на день пуст.";
                 return;
             }
 
-            let report = `План на ${formatDateDisplay(currentActiveDateKey)}:\n\n`;
-            dayData.targets.forEach((t, idx) => {
+            let report = "План на день:\n\n";
+            state.dayPlanTargets.forEach((t, idx) => {
                 const item = document.createElement('div');
                 item.className = 'plan-target-item';
                 item.innerHTML = `
@@ -2086,6 +2101,7 @@
         function removeSection(secKey) {
             if (confirm("Удалить этот раздел со всеми его позициями?")) {
                 delete state.sections[secKey];
+                if (state.globalPlans && state.globalPlans[secKey]) delete state.globalPlans[secKey];
                 saveState();
                 openSettings();
             }
@@ -2101,6 +2117,11 @@
 
             const itemKey = 'item_' + Date.now();
             state.sections[secKey].items[itemKey] = { name: name, price: price, assigned: 0 };
+            if (state.sections[secKey].type === 'counter') {
+                if (!state.globalPlans) state.globalPlans = {};
+                if (!state.globalPlans[secKey]) state.globalPlans[secKey] = {};
+                state.globalPlans[secKey][itemKey] = 0;
+            }
             document.getElementById('new-item-name').value = '';
             document.getElementById('new-item-price').value = '';
             saveState();
@@ -2111,6 +2132,9 @@
         function removeItemFromSection(secKey, iKey) {
             if (confirm("Удалить позицию?")) {
                 delete state.sections[secKey].items[iKey];
+                if (state.globalPlans && state.globalPlans[secKey] && state.globalPlans[secKey][iKey] !== undefined) {
+                    delete state.globalPlans[secKey][iKey];
+                }
                 saveState();
                 openSettings();
             }
@@ -2229,11 +2253,11 @@
         }
 
         function confirmReset() {
-            if (confirm(`Сбросить данные только за выбранный день (${formatDateDisplay(currentActiveDateKey)})? Встречи, бензин и доп. доход обнулятся.`)) {
+            if (confirm(`Сбросить результаты за ${formatDateDisplay(currentActiveDateKey)}? Встречи, бензин и доп. доход обнулятся. План и настройки останутся.`)) {
                 delete state.daysData[currentActiveDateKey];
                 loadActiveDayToUI();
                 saveState();
-                showToast("Выбранный день сброшен!");
+                showToast("Результаты дня обнулены!");
             }
         }
 
