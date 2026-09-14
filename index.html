@@ -422,7 +422,7 @@
         }
         .plan-item:last-child { border-bottom: none; padding-bottom: 0; }
 
-        .counter-controls { display: flex; align-items: center; gap: 12px; }
+        .counter-controls { display: flex; align-items: center; gap: 6px; }
         .btn-counter {
             width: 32px;
             height: 32px;
@@ -436,9 +436,35 @@
             justify-content: center;
             cursor: pointer;
             color: var(--alfa-text);
+            user-select: none;
         }
 
         .counter-value { font-size: 15px; font-weight: 700; min-width: 35px; text-align: center; }
+
+        /* Поле ввода внутри счетчика плана */
+        .counter-input {
+            width: 48px;
+            height: 32px;
+            padding: 2px 4px;
+            border: 1px solid var(--alfa-border);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 700;
+            background: var(--alfa-card);
+            color: var(--alfa-text);
+            outline: none;
+            -moz-appearance: textfield;
+            transition: border-color 0.2s;
+        }
+        .counter-input::-webkit-outer-spin-button,
+        .counter-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .counter-input:focus {
+            border-color: var(--alfa-red);
+        }
 
         .btn-primary {
             width: 100%;
@@ -1284,7 +1310,12 @@
         }
 
         function loadState() {
-            let saved = localStorage.getItem('alfacalc_builder_v9') || localStorage.getItem('alfacalc_builder_v8') || localStorage.getItem('alfacalc_builder_v7') || localStorage.getItem('alfacalc_builder_v6') || localStorage.getItem('alfacalc_builder_v5');
+            let saved = localStorage.getItem('alfacalc_builder_v10') || 
+                        localStorage.getItem('alfacalc_builder_v9') || 
+                        localStorage.getItem('alfacalc_builder_v8') || 
+                        localStorage.getItem('alfacalc_builder_v7') || 
+                        localStorage.getItem('alfacalc_builder_v6') || 
+                        localStorage.getItem('alfacalc_builder_v5');
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -1333,7 +1364,9 @@
         }
 
         function saveState() {
-            localStorage.setItem('alfacalc_builder_v9', JSON.stringify(state));
+            const data = JSON.stringify(state);
+            localStorage.setItem('alfacalc_builder_v10', data);
+            localStorage.setItem('alfacalc_builder_v9', data); // Сохраняем в обе версии для гарантии сохранности данных
             renderAll();
         }
 
@@ -1796,7 +1829,6 @@
             }
         }
 
-        /* ИТОГОВЫЙ ОТЧЕТ: ВСЕ ПОЗИЦИИ В ШТУКАХ (1, 2...) */
         function buildDayReport(issuedCounts) {
             let report = `Итоговый отчет за ${formatDateDisplay(currentActiveDateKey)}\n`;
 
@@ -1998,7 +2030,7 @@
             closeDayModal();
         }
 
-        /* ПОСТОЯННЫЙ ПЛАН: ВЫБОР ЕДИНИЦ (ШТУКИ ИЛИ %) */
+        /* ПОСТОЯННЫЙ ПЛАН: ВЫБОР ЕДИНИЦ (ШТУКИ ИЛИ %) И РУЧНОЙ ВВОД */
         function addDayPlanTarget() {
             const nameInput = document.getElementById('target-prod-name');
             const goalInput = document.getElementById('target-prod-goal');
@@ -2023,6 +2055,18 @@
             const target = state.dayPlanTargets.find(t => t.id === id);
             if (target) {
                 target.sold = Math.max(0, target.sold + delta);
+                saveState();
+                renderDayPlan();
+            }
+        }
+
+        function setTargetSoldDirectly(id, value) {
+            if (!state.dayPlanTargets) state.dayPlanTargets = [];
+            const target = state.dayPlanTargets.find(t => t.id === id);
+            if (target) {
+                let parsed = parseInt(value, 10);
+                if (isNaN(parsed) || parsed < 0) parsed = 0;
+                target.sold = parsed;
                 saveState();
                 renderDayPlan();
             }
@@ -2067,7 +2111,12 @@
                     </div>
                     <div class="counter-controls">
                         <button class="btn-counter" onclick="changeTargetSold('${t.id}', -1)">-</button>
-                        <span class="counter-value">${t.sold}</span>
+                        <input type="number" 
+                               class="counter-input" 
+                               value="${t.sold}" 
+                               min="0"
+                               onchange="setTargetSoldDirectly('${t.id}', this.value)"
+                               onkeydown="if(event.key==='Enter'){ this.blur(); }">
                         <button class="btn-counter" onclick="changeTargetSold('${t.id}', 1)">+</button>
                         <button class="btn-remove-prod" style="margin-left:4px;" onclick="deleteDayPlanTarget('${t.id}')">🗑️</button>
                     </div>
