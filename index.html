@@ -441,7 +441,6 @@
 
         .counter-value { font-size: 15px; font-weight: 700; min-width: 35px; text-align: center; }
 
-        /* Поле ввода внутри счетчика плана */
         .counter-input {
             width: 48px;
             height: 32px;
@@ -1366,7 +1365,7 @@
         function saveState() {
             const data = JSON.stringify(state);
             localStorage.setItem('alfacalc_builder_v10', data);
-            localStorage.setItem('alfacalc_builder_v9', data); // Сохраняем в обе версии для гарантии сохранности данных
+            localStorage.setItem('alfacalc_builder_v9', data);
             renderAll();
         }
 
@@ -1829,6 +1828,7 @@
             }
         }
 
+        /* ИТОГОВЫЙ ОТЧЕТ: ОСНОВНЫЕ ПРОДУКТЫ В ФОРМАТЕ ВЫДАНО/НАЗНАЧЕНО (3/5) */
         function buildDayReport(issuedCounts) {
             let report = `Итоговый отчет за ${formatDateDisplay(currentActiveDateKey)}\n`;
 
@@ -1841,7 +1841,15 @@
                 iKeys.forEach(k => {
                     const it = sec.items[k];
                     const count = issuedCounts[k] || 0;
-                    report += `${it.name} - ${count}\n`;
+
+                    if (sec.type === 'counter') {
+                        const assigned = (state.globalPlans && state.globalPlans[sKey] && state.globalPlans[sKey][k] !== undefined)
+                            ? state.globalPlans[sKey][k]
+                            : (it.assigned || 0);
+                        report += `${it.name} - ${count}/${assigned}\n`;
+                    } else {
+                        report += `${it.name} - ${count}\n`;
+                    }
                 });
             }
 
