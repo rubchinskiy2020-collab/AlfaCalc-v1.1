@@ -442,7 +442,7 @@
         .counter-value { font-size: 15px; font-weight: 700; min-width: 35px; text-align: center; }
 
         .counter-input {
-            width: 48px;
+            width: 52px;
             height: 32px;
             padding: 2px 4px;
             border: 1px solid var(--alfa-border);
@@ -1060,10 +1060,10 @@
 
     </div>
 
-    <!-- ВКЛАДКА 2: ПЛАН НА ДЕНЬ (С ВЫБОРОМ: ШТУКИ ИЛИ ПРОЦЕНТЫ) -->
+    <!-- ВКЛАДКА 2: ПЛАН НА ДЕНЬ + ПЛАН НА МЕСЯЦ -->
     <div id="tab-day-plan" class="container" style="display: none;">
         <div class="card">
-            <div class="card-title">🎯 Добавить задачу в план</div>
+            <div class="card-title">🎯 Добавить задачу в план на день</div>
             <div class="add-inline-group" style="margin-bottom: 0;">
                 <input type="text" id="target-prod-name" placeholder="Название (Кредитка, БС...)" style="flex: 2;">
                 <input type="number" id="target-prod-goal" placeholder="Цель" style="flex: 1;" min="1">
@@ -1077,16 +1077,30 @@
 
         <div class="card">
             <div class="card-title">
-                <span>📋 Задачи плана (постоянные)</span>
-                <button class="btn-delete" style="font-size:12px;" onclick="clearDayPlanTargets()">Очистить план</button>
+                <span id="day-plan-card-title">📋 Задачи плана на день</span>
+                <button class="btn-delete" style="font-size:12px;" onclick="clearDayPlanTargets()">Очистить день</button>
             </div>
             <div id="day-plan-list"></div>
         </div>
 
         <div class="card">
-            <div class="card-title">📄 Отчет по плану</div>
+            <div class="card-title">📄 Отчет по плану на день</div>
             <div class="report-preview" id="plan-report-preview">План пока пуст...</div>
             <button class="btn-primary" style="background-color: var(--alfa-red);" onclick="copyPlanReport()">Скопировать отчет План на день</button>
+        </div>
+
+        <!-- ОТЧЕТ ПО ПЛАНУ ЗА МЕСЯЦ (ВКЛЮЧАЕТ ВСЕ ДОБАВЛЕННЫЕ И ДАЖЕ УДАЛЕННЫЕ ЗА МЕСЯЦ ПОКАЗАТЕЛИ) -->
+        <div class="card">
+            <div class="card-title">
+                <span>📅 Отчет по плану за месяц</span>
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <button class="btn-icon" style="width:30px; height:30px; font-size:12px;" onclick="changePlanMonth(-1)">◀</button>
+                    <span id="plan-month-title" style="font-size:13px; font-weight:800; text-transform:capitalize;">Октябрь 2026</span>
+                    <button class="btn-icon" style="width:30px; height:30px; font-size:12px;" onclick="changePlanMonth(1)">▶</button>
+                </div>
+            </div>
+            <div class="report-preview" id="month-plan-report-preview">Данных по плану за этот месяц нет...</div>
+            <button class="btn-primary" style="background-color: var(--alfa-card); color: var(--alfa-text); border: 1px solid var(--alfa-border);" onclick="copyMonthPlanReport()">Скопировать отчет по плану за месяц</button>
         </div>
     </div>
 
@@ -1276,7 +1290,9 @@
             schedule: {},
             daysData: {},
             globalPlans: {},
-            dayPlanTargets: [],
+            dayPlanTemplate: [],   // Шаблоны задач (названия, цели, единицы)
+            dailyPlans: {},        // Задачи по конкретным дням { "YYYY-MM-DD": [ { id, name, goal, sold, unit } ] }
+            monthPlanHistory: {},  // Месячные итоги { "YYYY-MM": { "id_or_name": { name, goal, sold, unit } } }
             taxRate: 0,
             fuelSettings: { consumption: 8.5, pricePerLiter: 58.0 },
             darkMode: false
@@ -1284,6 +1300,7 @@
 
         let currentActiveDateKey = getFormattedDate(new Date());
         let currentCalendarDate = new Date();
+        let currentPlanMonthDate = new Date();
         let selectedDayKey = null;
         let toastTimeout = null;
         let currentCalculatedTodayProfit = 0;
@@ -1291,6 +1308,10 @@
 
         function getFormattedDate(d) {
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function getYearMonthKey(d) {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         }
 
         function ensureDayData(dKey) {
@@ -1308,8 +1329,46 @@
             return ensureDayData(currentActiveDateKey);
         }
 
+        // Инициализация плана на день (если для этой даты еще нет списка, копируем из шаблона)
+        function getDayPlanList(dKey) {
+            if (!state.dailyPlans) state.dailyPlans = {};
+            if (!state.dailyPlans[dKey]) {
+                state.dailyPlans[dKey] = (state.dayPlanTemplate || []).map(t => ({
+                    id: t.id,
+                    name: t.name,
+                    goal: t.goal,
+                    sold: 0,
+                    unit: t.unit || 'шт'
+                }));
+            }
+            return state.dailyPlans[dKey];
+        }
+
+        // Сохранение показателя в сквозную историю месяца (сохраняются даже удаленные показатели)
+        function syncTargetToMonthArchive(target, dKey) {
+            if (!state.monthPlanHistory) state.monthPlanHistory = {};
+            const ym = dKey ? dKey.substring(0, 7) : getYearMonthKey(new Date());
+            if (!state.monthPlanHistory[ym]) state.monthPlanHistory[ym] = {};
+            
+            const key = target.id || ('k_' + target.name);
+            if (!state.monthPlanHistory[ym][key]) {
+                state.monthPlanHistory[ym][key] = {
+                    name: target.name,
+                    goal: target.goal || 0,
+                    sold: 0,
+                    unit: target.unit || 'шт'
+                };
+            } else {
+                state.monthPlanHistory[ym][key].name = target.name;
+                state.monthPlanHistory[ym][key].unit = target.unit || 'шт';
+                if (target.goal > 0) state.monthPlanHistory[ym][key].goal = target.goal;
+            }
+        }
+
         function loadState() {
-            let saved = localStorage.getItem('alfacalc_builder_v10') || 
+            let saved = localStorage.getItem('alfacalc_builder_v12') ||
+                        localStorage.getItem('alfacalc_builder_v11') ||
+                        localStorage.getItem('alfacalc_builder_v10') || 
                         localStorage.getItem('alfacalc_builder_v9') || 
                         localStorage.getItem('alfacalc_builder_v8') || 
                         localStorage.getItem('alfacalc_builder_v7') || 
@@ -1323,10 +1382,23 @@
                     if (parsed.schedule) state.schedule = parsed.schedule;
                     if (parsed.daysData) state.daysData = parsed.daysData;
                     if (parsed.globalPlans) state.globalPlans = parsed.globalPlans;
-                    if (parsed.dayPlanTargets) state.dayPlanTargets = parsed.dayPlanTargets;
                     if (parsed.taxRate !== undefined) state.taxRate = parsed.taxRate;
                     if (parsed.fuelSettings) state.fuelSettings = parsed.fuelSettings;
                     if (parsed.darkMode !== undefined) state.darkMode = parsed.darkMode;
+                    if (parsed.dailyPlans) state.dailyPlans = parsed.dailyPlans;
+                    if (parsed.monthPlanHistory) state.monthPlanHistory = parsed.monthPlanHistory;
+
+                    // Миграция старых задач плана
+                    if (parsed.dayPlanTemplate) {
+                        state.dayPlanTemplate = parsed.dayPlanTemplate;
+                    } else if (parsed.dayPlanTargets && Array.isArray(parsed.dayPlanTargets)) {
+                        state.dayPlanTemplate = parsed.dayPlanTargets.map(t => ({
+                            id: t.id || ('target_' + Date.now()),
+                            name: t.name,
+                            goal: t.goal,
+                            unit: t.unit || 'шт'
+                        }));
+                    }
 
                     if (!state.globalPlans || Object.keys(state.globalPlans).length === 0) {
                         state.globalPlans = {};
@@ -1338,6 +1410,11 @@
                                 }
                             }
                         }
+                    }
+
+                    // Синхронизация текущих шаблонов в месяц
+                    if (state.dayPlanTemplate) {
+                        state.dayPlanTemplate.forEach(t => syncTargetToMonthArchive(t, currentActiveDateKey));
                     }
                 } catch (e) {
                     console.error("Ошибка загрузки данных", e);
@@ -1364,9 +1441,12 @@
 
         function saveState() {
             const data = JSON.stringify(state);
+            localStorage.setItem('alfacalc_builder_v12', data);
+            localStorage.setItem('alfacalc_builder_v11', data);
             localStorage.setItem('alfacalc_builder_v10', data);
-            localStorage.setItem('alfacalc_builder_v9', data);
             renderAll();
+            renderDayPlan();
+            renderMonthPlanReport();
         }
 
         function toggleTheme() {
@@ -1417,7 +1497,9 @@
                     if (parsed.sections && (parsed.daysData || parsed.schedule)) {
                         state = parsed;
                         if (!state.globalPlans) state.globalPlans = {};
-                        if (!state.dayPlanTargets) state.dayPlanTargets = [];
+                        if (!state.dayPlanTemplate) state.dayPlanTemplate = [];
+                        if (!state.dailyPlans) state.dailyPlans = {};
+                        if (!state.monthPlanHistory) state.monthPlanHistory = {};
                         applyThemeUI();
                         saveState();
                         loadActiveDayToUI();
@@ -1465,6 +1547,7 @@
             document.getElementById('fuel-km-input').value = dayData.fuel.km || '';
             calculateFuel(false);
             renderDayPlan();
+            renderMonthPlanReport();
             
             const isToday = currentActiveDateKey === getFormattedDate(new Date());
             document.getElementById('profit-box-label').innerText = isToday ? "Заработано за сегодня" : `Заработано за ${formatDateDisplay(currentActiveDateKey)}`;
@@ -1485,7 +1568,10 @@
             document.getElementById('nav-schedule').classList.toggle('active', tab === 'schedule');
             
             if (tab === 'schedule') renderCalendar();
-            if (tab === 'day-plan') renderDayPlan();
+            if (tab === 'day-plan') {
+                renderDayPlan();
+                renderMonthPlanReport();
+            }
         }
 
         function calculateFuel(triggerSave = true) {
@@ -1828,7 +1914,7 @@
             }
         }
 
-        /* ИТОГОВЫЙ ОТЧЕТ: ОСНОВНЫЕ ПРОДУКТЫ В ФОРМАТЕ ВЫДАНО/НАЗНАЧЕНО (3/5) */
+        /* ИТОГОВЫЙ ОТЧЕТ: ВЫДАНО / НАЗНАЧЕНО (3/5) */
         function buildDayReport(issuedCounts) {
             let report = `Итоговый отчет за ${formatDateDisplay(currentActiveDateKey)}\n`;
 
@@ -2038,7 +2124,9 @@
             closeDayModal();
         }
 
-        /* ПОСТОЯННЫЙ ПЛАН: ВЫБОР ЕДИНИЦ (ШТУКИ ИЛИ %) И РУЧНОЙ ВВОД */
+        /* ==========================================================================
+           ПЛАН НА ДЕНЬ (ИНДИВИДУАЛЬНЫЙ ДЛЯ ВЫБРАННОГО ДНЯ)
+           ========================================================================== */
         function addDayPlanTarget() {
             const nameInput = document.getElementById('target-prod-name');
             const goalInput = document.getElementById('target-prod-goal');
@@ -2049,66 +2137,88 @@
             const unit = unitSelect ? unitSelect.value : 'шт';
 
             if (!name || goal <= 0) return alert("Укажите название и цель > 0!");
-            if (!state.dayPlanTargets) state.dayPlanTargets = [];
+            if (!state.dayPlanTemplate) state.dayPlanTemplate = [];
 
-            state.dayPlanTargets.push({ id: 'target_' + Date.now(), name: name, goal: goal, sold: 0, unit: unit });
+            const newId = 'target_' + Date.now();
+            const newTpl = { id: newId, name: name, goal: goal, unit: unit };
+            state.dayPlanTemplate.push(newTpl);
+
+            // Добавляем показатель в текущий открытый день
+            const dayList = getDayPlanList(currentActiveDateKey);
+            dayList.push({ id: newId, name: name, goal: goal, sold: 0, unit: unit });
+
+            // Фиксируем в сквозном месячном реестре
+            syncTargetToMonthArchive(newTpl, currentActiveDateKey);
+
             nameInput.value = ''; goalInput.value = '';
             saveState();
-            renderDayPlan();
             showToast("Задача добавлена в план!");
         }
 
         function changeTargetSold(id, delta) {
-            if (!state.dayPlanTargets) state.dayPlanTargets = [];
-            const target = state.dayPlanTargets.find(t => t.id === id);
+            const dayList = getDayPlanList(currentActiveDateKey);
+            const target = dayList.find(t => t.id === id);
             if (target) {
                 target.sold = Math.max(0, target.sold + delta);
+                syncTargetToMonthArchive(target, currentActiveDateKey);
                 saveState();
-                renderDayPlan();
             }
         }
 
         function setTargetSoldDirectly(id, value) {
-            if (!state.dayPlanTargets) state.dayPlanTargets = [];
-            const target = state.dayPlanTargets.find(t => t.id === id);
+            const dayList = getDayPlanList(currentActiveDateKey);
+            const target = dayList.find(t => t.id === id);
             if (target) {
                 let parsed = parseInt(value, 10);
                 if (isNaN(parsed) || parsed < 0) parsed = 0;
                 target.sold = parsed;
+                syncTargetToMonthArchive(target, currentActiveDateKey);
                 saveState();
-                renderDayPlan();
             }
         }
 
         function deleteDayPlanTarget(id) {
-            if (!state.dayPlanTargets) state.dayPlanTargets = [];
-            state.dayPlanTargets = state.dayPlanTargets.filter(t => t.id !== id);
+            const dayList = getDayPlanList(currentActiveDateKey);
+            const target = dayList.find(t => t.id === id);
+            if (target) {
+                // Фиксируем перед удалением из дня, чтобы в месячном плане показатель сохранился
+                syncTargetToMonthArchive(target, currentActiveDateKey);
+            }
+            state.dailyPlans[currentActiveDateKey] = dayList.filter(t => t.id !== id);
+            // Если удаляем и из глобального шаблона будущих дней
+            if (state.dayPlanTemplate) {
+                state.dayPlanTemplate = state.dayPlanTemplate.filter(t => t.id !== id);
+            }
             saveState();
-            renderDayPlan();
         }
 
         function clearDayPlanTargets() {
-            if (confirm("Очистить все постоянные задачи плана?")) {
-                state.dayPlanTargets = [];
+            if (confirm(`Очистить план на ${formatDateDisplay(currentActiveDateKey)}? Показатели за месяц останутся сохранены.`)) {
+                state.dailyPlans[currentActiveDateKey] = [];
                 saveState();
-                renderDayPlan();
-                showToast("План очищен!");
+                showToast("План на день очищен!");
             }
         }
 
         function renderDayPlan() {
             const list = document.getElementById('day-plan-list');
+            if (!list) return;
             list.innerHTML = '';
-            if (!state.dayPlanTargets) state.dayPlanTargets = [];
 
-            if (state.dayPlanTargets.length === 0) {
-                list.innerHTML = '<div class="empty-history">План задач пуст. Добавьте первую цель выше!</div>';
-                document.getElementById('plan-report-preview').innerText = "План на день пуст.";
+            const dayList = getDayPlanList(currentActiveDateKey);
+            const titleEl = document.getElementById('day-plan-card-title');
+            if (titleEl) {
+                titleEl.innerText = `📋 Задачи плана на ${formatDateDisplay(currentActiveDateKey)}`;
+            }
+
+            if (dayList.length === 0) {
+                list.innerHTML = '<div class="empty-history">На этот день задач нет. Добавьте первую цель выше!</div>';
+                document.getElementById('plan-report-preview').innerText = `План на ${formatDateDisplay(currentActiveDateKey)} пуст.`;
                 return;
             }
 
-            let report = "План на день:\n\n";
-            state.dayPlanTargets.forEach((t, idx) => {
+            let report = `План на ${formatDateDisplay(currentActiveDateKey)}:\n\n`;
+            dayList.forEach((t, idx) => {
                 const item = document.createElement('div');
                 item.className = 'plan-target-item';
                 const u = t.unit || 'шт';
@@ -2133,12 +2243,88 @@
                 report += `${idx + 1}. ${t.name} - ${t.sold}/${t.goal} ${u}\n`;
             });
 
-            document.getElementById('plan-report-preview').innerText = report;
+            document.getElementById('plan-report-preview').innerText = report.trim();
         }
 
         function copyPlanReport() {
             copyToClipboard(document.getElementById('plan-report-preview').innerText);
             showToast("Отчет План на день скопирован!");
+        }
+
+        /* ==========================================================================
+           ПЛАН НА МЕСЯЦ (СКВОЗНОЙ ОТЧЕТ СО ВСЕМИ ПОКАЗАТЕЛЯМИ, ВКЛЮЧАЯ УДАЛЕННЫЕ)
+           ========================================================================== */
+        function changePlanMonth(delta) {
+            currentPlanMonthDate.setMonth(currentPlanMonthDate.getMonth() + delta);
+            renderMonthPlanReport();
+        }
+
+        function renderMonthPlanReport() {
+            const ym = getYearMonthKey(currentPlanMonthDate);
+            const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+            const year = currentPlanMonthDate.getFullYear();
+            const month = currentPlanMonthDate.getMonth();
+
+            const titleEl = document.getElementById('plan-month-title');
+            if (titleEl) titleEl.innerText = `${monthNames[month]} ${year}`;
+
+            // Сбор всех показателей месяца:
+            // 1. Из архива monthPlanHistory (где живут все созданные и даже удаленные)
+            const monthAggregated = {};
+
+            if (state.monthPlanHistory && state.monthPlanHistory[ym]) {
+                for (let k in state.monthPlanHistory[ym]) {
+                    const item = state.monthPlanHistory[ym][k];
+                    monthAggregated[k] = {
+                        name: item.name,
+                        goal: item.goal || 0,
+                        sold: 0,
+                        unit: item.unit || 'шт'
+                    };
+                }
+            }
+
+            // 2. Суммируем факт за все дни этого месяца из dailyPlans
+            if (state.dailyPlans) {
+                for (let dKey in state.dailyPlans) {
+                    if (dKey.startsWith(ym)) {
+                        state.dailyPlans[dKey].forEach(t => {
+                            const k = t.id || ('k_' + t.name);
+                            if (!monthAggregated[k]) {
+                                monthAggregated[k] = {
+                                    name: t.name,
+                                    goal: t.goal || 0,
+                                    sold: 0,
+                                    unit: t.unit || 'шт'
+                                };
+                            }
+                            monthAggregated[k].sold += (t.sold || 0);
+                        });
+                    }
+                }
+            }
+
+            const keys = Object.keys(monthAggregated);
+            const previewEl = document.getElementById('month-plan-report-preview');
+
+            if (keys.length === 0) {
+                previewEl.innerText = `План за ${monthNames[month]} ${year} пуст.`;
+                return;
+            }
+
+            let report = `Отчет по плану за ${monthNames[month]} ${year}:\n\n`;
+            keys.forEach((k, idx) => {
+                const item = monthAggregated[k];
+                report += `${idx + 1}. ${item.name} - ${item.sold}/${item.goal} ${item.unit}\n`;
+            });
+
+            previewEl.innerText = report.trim();
+        }
+
+        function copyMonthPlanReport() {
+            const text = document.getElementById('month-plan-report-preview').innerText;
+            copyToClipboard(text);
+            showToast("Отчет по плану за месяц скопирован!");
         }
 
         /* КОНСТРУКТОР */
