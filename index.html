@@ -968,7 +968,7 @@
     <div id="splash-screen">
         <div class="splash-content">
             <div class="splash-logo-box">
-                <div class="splash-icon">🅰️️</div>
+                <div class="splash-icon">🅰️</div>
             </div>
             <div class="splash-title">Alfa<span>Calc</span></div>
             <div class="splash-subtitle">by Kosin</div>
@@ -1073,11 +1073,11 @@
                     </div>
                     <div class="fuel-field">
                         <label>Расход л/100км</label>
-                        <input type="number" step="0.1" id="fuel-cons-input" class="input-text" placeholder="8.5" oninput="calculateFuel()">
+                        <input type="number" step="0.1" id="fuel-cons-input" class="input-text" placeholder="10.0" oninput="calculateFuel()">
                     </div>
                     <div class="fuel-field">
                         <label>Цена ₽/литр</label>
-                        <input type="number" step="0.1" id="fuel-price-input" class="input-text" placeholder="58.0" oninput="calculateFuel()">
+                        <input type="number" step="0.1" id="fuel-price-input" class="input-text" placeholder="64.0" oninput="calculateFuel()">
                     </div>
                 </div>
                 <div class="fuel-result-grid">
@@ -1167,7 +1167,7 @@
             <div class="tax-rate-box">
                 <span>Процент вычета (налог/комиссия):</span>
                 <div style="display:flex; align-items:center; gap:4px;">
-                    <input type="number" id="tax-rate-input" class="tax-rate-input" min="0" max="100" placeholder="0" onchange="updateTaxRate(this.value)">
+                    <input type="number" id="tax-rate-input" class="tax-rate-input" min="0" max="100" placeholder="13" onchange="updateTaxRate(this.value)">
                     <span style="font-weight:700;">%</span>
                 </div>
             </div>
@@ -1251,9 +1251,7 @@
         </div>
     </div>
 
-    <!-- ==============================================
-         УПРОЩЕННАЯ МОДАЛКА НАСТРОЕК (ПО ШАГАМ)
-         ============================================== -->
+    <!-- МОДАЛКА НАСТРОЕК -->
     <div class="modal" id="settings-modal">
         <div class="modal-content">
             <div class="card-title" style="margin-bottom: 10px;">
@@ -1261,7 +1259,6 @@
                 <button class="btn-delete" style="font-size: 18px; padding: 0 4px;" onclick="closeSettings()">✕</button>
             </div>
 
-            <!-- Вкладки настроек -->
             <div class="settings-nav-tabs">
                 <button class="settings-nav-btn active" id="set-tab-prod" onclick="switchSettingsTab('prod')">💳 Продукты</button>
                 <button class="settings-nav-btn" id="set-tab-fails" onclick="switchSettingsTab('fails')">❌ Отказы</button>
@@ -1272,20 +1269,21 @@
             <!-- 1. ПРОДУКТЫ И ЦЕНЫ -->
             <div id="set-pane-prod">
                 <div class="quick-preset-banner">
-                    <p style="font-size:12px; font-weight:700; color:var(--alfa-black); margin-bottom:4px;">Быстрый старт</p>
-                    <p style="font-size:11px; color:var(--alfa-muted); margin-bottom:8px;">Заполнить готовым списком карт и услуг выездного банкира</p>
-                    <button class="btn-primary" style="padding: 8px 12px; font-size:12px; width:auto;" onclick="applyBankerPreset()">🪄 Загрузить стандартный набор</button>
+                    <p style="font-size:12px; font-weight:700; color:var(--alfa-black); margin-bottom:4px;">Ваш персональный набор</p>
+                    <p style="font-size:11px; color:var(--alfa-muted); margin-bottom:8px;">Загрузить стандартную сетку: DK/ZPC, X5, CC, Кредиты, Сим, Кросс и Приложения</p>
+                    <button class="btn-primary" style="padding: 8px 12px; font-size:12px; width:auto;" onclick="applyBankerPreset()">🪄 Восстановить мой стандартный набор</button>
                 </div>
 
                 <div class="simple-card-box">
                     <h4>➕ Добавить продукт или услугу</h4>
                     <div style="display:flex; flex-direction:column; gap:6px;">
-                        <input type="text" id="simple-prod-name" class="input-text" placeholder="Название (например: Дебетовая карта, БС...)">
+                        <input type="text" id="simple-prod-name" class="input-text" placeholder="Название (например: DK / ZPC / RE)">
                         <div style="display:flex; gap:6px;">
                             <input type="number" id="simple-prod-price" class="input-text" placeholder="Оплата за шт (₽)" style="flex:1;">
                             <select id="simple-prod-type" class="input-text" style="flex:1.4;">
                                 <option value="counter">Основной (встречи + план)</option>
                                 <option value="checkbox">Опция (галочка/допродажа)</option>
+                                <option value="apps">Приложения (галочка)</option>
                             </select>
                         </div>
                         <button class="btn-primary" style="padding:10px; font-size:13px; margin-top:2px;" onclick="addSimpleProduct()">Добавить в калькулятор</button>
@@ -1293,7 +1291,7 @@
                 </div>
 
                 <div class="settings-hint-box">
-                    💡 <b>Основные продукты</b> учитываются в плане смены (3/5), а <b>опции</b> выбираются галочками при успешной встрече.
+                    💡 <b>Основные продукты</b> учитываются в плане смены (3/5), а <b>опции</b> выбираются галочками при оформлении встречи.
                 </div>
 
                 <div id="settings-products-list" style="max-height: 260px; overflow-y: auto;"></div>
@@ -1303,14 +1301,17 @@
             <div id="set-pane-fails" style="display: none;">
                 <div class="simple-card-box">
                     <h4>➕ Новая причина отказа</h4>
-                    <div style="display:flex; gap:6px;">
-                        <input type="text" id="simple-fail-name" class="input-text" placeholder="Например: Не взял трубку, Отказ..." style="flex:2;">
-                        <button class="btn-primary" style="flex:1; padding:8px; font-size:13px;" onclick="addSimpleFailReason()">Добавить</button>
+                    <div style="display:flex; gap:6px; flex-direction:column;">
+                        <div style="display:flex; gap:6px;">
+                            <input type="text" id="simple-fail-name" class="input-text" placeholder="Причина (например: Отказ банка/911)" style="flex:2;">
+                            <input type="number" id="simple-fail-price" class="input-text" placeholder="Оплата (₽)" style="flex:1;">
+                        </div>
+                        <button class="btn-primary" style="padding:8px; font-size:13px;" onclick="addSimpleFailReason()">Добавить причину</button>
                     </div>
                 </div>
 
                 <div class="settings-hint-box">
-                    💡 Эти причины появляются в выпадающем списке при выборе кнопки <b>«Неуспешная встреча»</b>.
+                    💡 Причины появляются в выпадающем списке при выборе <b>«Неуспешная встреча»</b>. Если за отказ есть оплата (например, 911), укажите цену.
                 </div>
 
                 <div id="settings-fails-list" style="max-height: 280px; overflow-y: auto;"></div>
@@ -1334,12 +1335,12 @@
                 <div id="settings-shifts-list" style="max-height: 280px; overflow-y: auto;"></div>
             </div>
 
-            <!-- 4. РЕЗЕРВНАЯ КОПИЯ (IPHONE + ANDROID) -->
+            <!-- 4. РЕЗЕРВНАЯ КОПИЯ -->
             <div id="set-pane-backup" style="display: none;">
                 <div class="simple-card-box">
                     <h4>🛡 Резервное копирование</h4>
                     <p style="font-size:12px; color:var(--alfa-muted); margin-bottom:12px;">
-                        Нажмите «Сохранить в Файлы», чтобы появилось системное меню iPhone, или просто скопируйте резервную копию как текст.
+                        Нажмите «Сохранить в Файлы», чтобы появилось системное меню iPhone, или скопируйте всю базу как текст.
                     </p>
                     <div style="display:flex; flex-direction:column; gap:8px;">
                         <button class="btn-primary" style="background:var(--alfa-green); padding:12px; font-size:13px;" onclick="exportBackup()">
@@ -1370,29 +1371,91 @@
     <div class="toast" id="toast-msg">Отчет скопирован!</div>
 
     <script>
-        const initialSections = {
-            "sec_main": { name: "Основные продукты", type: "counter", items: {} },
-            "sec_cross": { name: "Кросс-продажи", type: "checkbox", items: {} },
-            "sec_statuses": { name: "Статусы отказов", type: "select", items: {} }
+        // Встроенный эталонный набор пользователя по умолчанию
+        const defaultUserSections = {
+            "sec_main": {
+                "name": "Основные продукты",
+                "type": "counter",
+                "items": {
+                    "item_dk": { "name": "DK / ZPC / RE", "price": 330, "assigned": 0 },
+                    "item_x5": { "name": "X5", "price": 330, "assigned": 0 },
+                    "item_cc": { "name": "CC", "price": 570, "assigned": 0 },
+                    "item_ipoteka": { "name": "Ипотека", "price": 450, "assigned": 0 },
+                    "item_mp": { "name": "МП", "price": 330, "assigned": 0 },
+                    "item_credit": { "name": "Кредит наличными", "price": 600, "assigned": 0 },
+                    "item_sim": { "name": "SIM", "price": 330, "assigned": 0 },
+                    "item_simao": { "name": "SIM AO", "price": 450, "assigned": 0 },
+                    "item_semeyniy": { "name": "Семейный", "price": 270, "assigned": 0 },
+                    "item_dk_nerez": { "name": "ДК нерез.", "price": 570, "assigned": 0 },
+                    "item_kids": { "name": "Кидс", "price": 430, "assigned": 0 }
+                }
+            },
+            "sec_cross": {
+                "name": "Кросс-продажи",
+                "type": "checkbox",
+                "items": {
+                    "item_act": { "name": "Активация", "price": 0, "assigned": 0 },
+                    "item_smart": { "name": "Смарт", "price": 30, "assigned": 0 },
+                    "item_combo": { "name": "Комбо", "price": 600, "assigned": 0 },
+                    "item_bs": { "name": "БС", "price": 270, "assigned": 0 },
+                    "item_cross_dk": { "name": "ДК", "price": 270, "assigned": 0 },
+                    "item_cross_kids_new": { "name": "Кидс (new)", "price": 430, "assigned": 0 },
+                    "item_cross_kids": { "name": "Кидс", "price": 270, "assigned": 0 },
+                    "item_cross_sim": { "name": "SIM", "price": 430, "assigned": 0 },
+                    "item_cp": { "name": "ЦП", "price": 20, "assigned": 0 },
+                    "item_pens": { "name": "Пенсия", "price": 270, "assigned": 0 },
+                    "item_box": { "name": "Коробка", "price": 100, "assigned": 0 }
+                }
+            },
+            "sec_statuses": {
+                "name": "Статусы отказов",
+                "type": "select",
+                "items": {
+                    "item_ndz": { "name": "НДЗ", "price": 0, "assigned": 0 },
+                    "item_perenos": { "name": "Перенос", "price": 0, "assigned": 0 },
+                    "item_otkaz911": { "name": "Отказ банка/911", "price": 250, "assigned": 0 },
+                    "item_otkaz_before": { "name": "Отказ клиента до встречи", "price": 0, "assigned": 0 },
+                    "item_otkaz_on": { "name": "Отказ клиента на встрече", "price": 100, "assigned": 0 },
+                    "item_dubl": { "name": "Дубль", "price": 0, "assigned": 0 }
+                }
+            },
+            "sec_apps": {
+                "name": "Приложения",
+                "type": "checkbox",
+                "items": {
+                    "item_ios": { "name": "IOS", "price": 0, "assigned": 0 },
+                    "item_android": { "name": "Android", "price": 0, "assigned": 0 },
+                    "item_app_x5": { "name": "X5", "price": 0, "assigned": 0 }
+                }
+            }
         };
 
-        const initialShiftCategories = {
-            "work": { name: "Рабочий (Город/Офис)", icon: "💼", color: "#EF3124", isWork: true },
-            "trip": { name: "Выезд в область", icon: "🚘", color: "#6A1B9A", isWork: true, isTrip: true },
-            "off": { name: "Выходной", icon: "🏖️", color: "#2E3846", isWork: false }
+        const defaultShiftCategories = {
+            "work": { "name": "Рабочий (Офис/Город)", "icon": "💼", "color": "#ef3124", "isWork": true },
+            "trip": { "name": "Выезд в НП", "icon": "🚘", "color": "#6a1b9a", "isWork": true, "isTrip": true },
+            "off": { "name": "Выходной", "icon": "🏖️", "color": "#2e3846", "isWork": false }
         };
+
+        const defaultDayPlanTemplate = [
+            { "id": "target_combo", "name": "Комбо", "goal": 2, "unit": "шт" },
+            { "id": "target_bs", "name": "БС", "goal": 1, "unit": "шт" },
+            { "id": "target_kids", "name": "Детская", "goal": 1, "unit": "шт" },
+            { "id": "target_smart", "name": "Смарт", "goal": 100, "unit": "%" },
+            { "id": "target_pens", "name": "Пенсия", "goal": 1, "unit": "шт" },
+            { "id": "target_selfie", "name": "Селфи ДК", "goal": 1, "unit": "шт" }
+        ];
 
         let state = {
-            sections: JSON.parse(JSON.stringify(initialSections)),
-            shiftCategories: JSON.parse(JSON.stringify(initialShiftCategories)),
+            sections: JSON.parse(JSON.stringify(defaultUserSections)),
+            shiftCategories: JSON.parse(JSON.stringify(defaultShiftCategories)),
             schedule: {},
             daysData: {},
             globalPlans: {},
-            dayPlanTemplate: [],
+            dayPlanTemplate: JSON.parse(JSON.stringify(defaultDayPlanTemplate)),
             dailyPlans: {},
             monthPlanHistory: {},
-            taxRate: 0,
-            fuelSettings: { consumption: 8.5, pricePerLiter: 58.0 },
+            taxRate: 13,
+            fuelSettings: { consumption: 10, pricePerLiter: 64 },
             darkMode: false
         };
 
@@ -1462,7 +1525,8 @@
         }
 
         function loadState() {
-            let saved = localStorage.getItem('alfacalc_builder_v14') ||
+            let saved = localStorage.getItem('alfacalc_builder_v15') ||
+                        localStorage.getItem('alfacalc_builder_v14') ||
                         localStorage.getItem('alfacalc_builder_v13') ||
                         localStorage.getItem('alfacalc_builder_v12') ||
                         localStorage.getItem('alfacalc_builder_v11') ||
@@ -1475,7 +1539,7 @@
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
-                    if (parsed.sections) state.sections = parsed.sections;
+                    if (parsed.sections && Object.keys(parsed.sections).length > 0) state.sections = parsed.sections;
                     if (parsed.shiftCategories) state.shiftCategories = parsed.shiftCategories;
                     if (parsed.schedule) state.schedule = parsed.schedule;
                     if (parsed.daysData) state.daysData = parsed.daysData;
@@ -1486,7 +1550,7 @@
                     if (parsed.dailyPlans) state.dailyPlans = parsed.dailyPlans;
                     if (parsed.monthPlanHistory) state.monthPlanHistory = parsed.monthPlanHistory;
 
-                    if (parsed.dayPlanTemplate) {
+                    if (parsed.dayPlanTemplate && parsed.dayPlanTemplate.length > 0) {
                         state.dayPlanTemplate = parsed.dayPlanTemplate;
                     } else if (parsed.dayPlanTargets && Array.isArray(parsed.dayPlanTargets)) {
                         state.dayPlanTemplate = parsed.dayPlanTargets.map(t => ({
@@ -1517,17 +1581,13 @@
                 }
             }
 
-            if (!state.sections.sec_main) state.sections.sec_main = { name: "Основные продукты", type: "counter", items: {} };
-            if (!state.sections.sec_cross) state.sections.sec_cross = { name: "Кросс-продажи", type: "checkbox", items: {} };
-            if (!state.sections.sec_statuses) state.sections.sec_statuses = { name: "Статусы отказов", type: "select", items: {} };
-
             applyThemeUI();
 
             currentActiveDateKey = getFormattedDate(new Date());
             document.getElementById('selected-date-input').value = currentActiveDateKey;
-            document.getElementById('tax-rate-input').value = state.taxRate || '';
-            document.getElementById('fuel-cons-input').value = state.fuelSettings.consumption || 8.5;
-            document.getElementById('fuel-price-input').value = state.fuelSettings.pricePerLiter || 58.0;
+            document.getElementById('tax-rate-input').value = state.taxRate !== undefined ? state.taxRate : 13;
+            document.getElementById('fuel-cons-input').value = state.fuelSettings.consumption || 10.0;
+            document.getElementById('fuel-price-input').value = state.fuelSettings.pricePerLiter || 64.0;
 
             loadActiveDayToUI();
             renderAll();
@@ -1541,6 +1601,7 @@
 
         function saveState() {
             const data = JSON.stringify(state);
+            localStorage.setItem('alfacalc_builder_v15', data);
             localStorage.setItem('alfacalc_builder_v14', data);
             localStorage.setItem('alfacalc_builder_v13', data);
             localStorage.setItem('alfacalc_builder_v12', data);
@@ -1576,14 +1637,12 @@
             document.getElementById('fail-block').style.display = isSuccess ? 'none' : 'block';
         }
 
-        // УНИВЕРСАЛЬНЫЙ ЭКСПОРТ ДЛЯ IPHONE И ANDROID
         async function exportBackup() {
             const now = new Date();
             const dateStr = `${now.getFullYear()}_${String(now.getMonth()+1).padStart(2,'0')}_${String(now.getDate()).padStart(2,'0')}`;
             const fileName = `AlfaCalc_backup_${dateStr}.json`;
             const jsonText = JSON.stringify(state, null, 2);
 
-            // 1. Попытка открыть системное меню iOS (Сохранить в Файлы / AirDrop / Telegram)
             if (navigator.share && navigator.canShare) {
                 try {
                     const file = new File([jsonText], fileName, { type: 'application/json' });
@@ -1601,7 +1660,6 @@
                 }
             }
 
-            // 2. Стандартный метод скачивания через Blob
             try {
                 const blob = new Blob([jsonText], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
@@ -1616,7 +1674,6 @@
                 }, 200);
                 showToast("Запрос на скачивание отправлен!");
             } catch (err) {
-                // 3. Резервный способ в буфер
                 copyBackupToClipboard();
             }
         }
@@ -1624,7 +1681,7 @@
         function copyBackupToClipboard() {
             const jsonText = JSON.stringify(state);
             copyToClipboard(jsonText);
-            alert("Код резервной копии скопирован в буфер обмена! Вы можете вставить его в Заметки или отправить себе в Telegram.");
+            alert("Код резервной копии скопирован в буфер обмена! Вы можете сохранить его в Заметках или отправить в Telegram.");
         }
 
         function importBackupFromClipboard() {
@@ -1742,8 +1799,8 @@
 
         function calculateFuel(triggerSave = true) {
             const km = parseFloat(document.getElementById('fuel-km-input').value) || 0;
-            const consumption = parseFloat(document.getElementById('fuel-cons-input').value) || 8.5;
-            const price = parseFloat(document.getElementById('fuel-price-input').value) || 58.0;
+            const consumption = parseFloat(document.getElementById('fuel-cons-input').value) || 10.0;
+            const price = parseFloat(document.getElementById('fuel-price-input').value) || 64.0;
 
             state.fuelSettings.consumption = consumption;
             state.fuelSettings.pricePerLiter = price;
@@ -1823,7 +1880,7 @@
                     if (m.checkedItems) {
                         m.checkedItems.forEach(iKey => {
                             if (issuedCounts[iKey] !== undefined) {
-                                issuedCounts[itemKey]++;
+                                issuedCounts[iKey]++;
                                 totalProfit += getItemPrice(null, iKey);
                             }
                         });
@@ -1894,7 +1951,7 @@
                 }
             }
 
-            container.innerHTML = count > 0 ? html : '<div class="empty-history">Добавьте основные продукты в настройках ⚙️</div>';
+            container.innerHTML = count > 0 ? html : '<div class="empty-history">Добавьте основные продукты в настройках ⚙️️</div>';
         }
 
         function changeGlobalCounterPlan(sKey, iKey, delta) {
@@ -1948,7 +2005,7 @@
                             <label>${sec.name}</label>
                             <select id="form-sel-fail-${sKey}">
                                 <option value="">-- Выберите причину отказа --</option>
-                                ${itemKeys.map(k => `<option value="${k}">${sec.items[k].name}</option>`).join('')}
+                                ${itemKeys.map(k => `<option value="${k}">${sec.items[k].name} ${sec.items[k].price ? `(+${sec.items[k].price} ₽)` : ''}</option>`).join('')}
                             </select>
                         </div>
                     `;
@@ -1956,7 +2013,7 @@
             }
 
             successContainer.innerHTML = successHtml || '<div class="empty-history">Добавьте продукты в настройках ⚙️</div>';
-            failContainer.innerHTML = failHtml || '<div class="empty-history">Добавьте причины отказов в настройках ⚙️️</div>';
+            failContainer.innerHTML = failHtml || '<div class="empty-history">Добавьте причины отказов в настройках ⚙️</div>';
         }
 
         function saveMeeting() {
@@ -2530,8 +2587,13 @@
                 return block;
             };
 
-            phtml += renderItemsOfSec('sec_main', 'Основные (выдача карт и услуг)');
-            phtml += renderItemsOfSec('sec_cross', 'Опции и кросс (галочки)');
+            phtml += renderItemsOfSec('sec_main', 'Основные (выдача карт и кредитов)');
+            phtml += renderItemsOfSec('sec_cross', 'Кросс-продажи (допуслуги)');
+            if (state.sections.sec_apps) {
+                phtml += renderItemsOfSec('sec_apps', 'Приложения (галочки)');
+            } else if (state.sections.sec_1788700380704) {
+                phtml += renderItemsOfSec('sec_1788700380704', 'Приложения (галочки)');
+            }
 
             prodList.innerHTML = phtml || '<div class="empty-history">Список пуст. Добавьте первый продукт выше!</div>';
 
@@ -2540,9 +2602,12 @@
             const failSec = state.sections.sec_statuses;
             if (failSec && Object.keys(failSec.items).length > 0) {
                 for (let k in failSec.items) {
+                    const item = failSec.items[k];
                     fhtml += `
                         <div class="setting-row">
-                            <input type="text" class="setting-name-input" id="fail-name-${k}" value="${failSec.items[k].name}">
+                            <input type="text" class="setting-name-input" id="fail-name-${k}" value="${item.name}">
+                            <input type="number" class="setting-price-input" id="fail-price-${k}" value="${item.price || 0}">
+                            <span style="font-size:12px; font-weight:700; color:var(--alfa-muted);">₽</span>
                             <button class="btn-remove-prod" onclick="removeSimpleItem('sec_statuses', '${k}')">🗑️</button>
                         </div>
                     `;
@@ -2559,7 +2624,7 @@
                         <input type="color" class="color-picker-btn" id="cat-color-${cKey}" value="${cat.color || '#EF3124'}">
                         <input type="text" style="width:36px; text-align:center;" class="setting-name-input" id="cat-icon-${cKey}" value="${cat.icon || '💼'}">
                         <input type="text" class="setting-name-input" id="cat-name-${cKey}" value="${cat.name}">
-                        <button class="btn-remove-prod" onclick="removeSimpleShift('${cKey}')">🗑️️</button>
+                        <button class="btn-remove-prod" onclick="removeSimpleShift('${cKey}')">🗑️</button>
                     </div>
                 `;
             }
@@ -2578,7 +2643,9 @@
             if (state.sections.sec_statuses) {
                 for (let k in state.sections.sec_statuses.items) {
                     const fEl = document.getElementById(`fail-name-${k}`);
+                    const fpEl = document.getElementById(`fail-price-${k}`);
                     if (fEl && fEl.value.trim()) state.sections.sec_statuses.items[k].name = fEl.value.trim();
+                    if (fpEl) state.sections.sec_statuses.items[k].price = parseInt(fpEl.value) || 0;
                 }
             }
             for (let cKey in state.shiftCategories) {
@@ -2599,11 +2666,16 @@
 
             if (!name) return alert("Введите название продукта!");
 
-            const targetSecKey = (type === 'counter') ? 'sec_main' : 'sec_cross';
+            let targetSecKey = 'sec_main';
+            if (type === 'checkbox') targetSecKey = 'sec_cross';
+            if (type === 'apps') {
+                targetSecKey = state.sections.sec_apps ? 'sec_apps' : (state.sections.sec_1788700380704 ? 'sec_1788700380704' : 'sec_apps');
+            }
+
             if (!state.sections[targetSecKey]) {
                 state.sections[targetSecKey] = { 
-                    name: type === 'counter' ? "Основные продукты" : "Кросс-продажи", 
-                    type: type, 
+                    name: type === 'counter' ? "Основные продукты" : (type === 'apps' ? "Приложения" : "Кросс-продажи"), 
+                    type: type === 'counter' ? 'counter' : 'checkbox', 
                     items: {} 
                 };
             }
@@ -2637,6 +2709,7 @@
         function addSimpleFailReason() {
             saveCurrentSimpleInputs();
             const name = document.getElementById('simple-fail-name').value.trim();
+            const price = parseInt(document.getElementById('simple-fail-price').value) || 0;
             if (!name) return alert("Введите причину отказа!");
 
             if (!state.sections.sec_statuses) {
@@ -2644,8 +2717,9 @@
             }
 
             const key = 'item_' + Date.now();
-            state.sections.sec_statuses.items[key] = { name: name, price: 0 };
+            state.sections.sec_statuses.items[key] = { name: name, price: price };
             document.getElementById('simple-fail-name').value = '';
+            document.getElementById('simple-fail-price').value = '';
             renderSimpleSettingsLists();
             showToast("Причина отказа добавлена!");
         }
@@ -2675,50 +2749,21 @@
             }
         }
 
+        // Кнопка восстановления персонального эталонного набора
         function applyBankerPreset() {
-            if (!confirm("Загрузить стандартный набор банковских продуктов и отказов? Существующие данные не удалятся, а добавятся.")) return;
+            if (!confirm("Восстановить ваш персональный набор продуктов, кросс-продаж и отказов? Существующие расписания и доходы не сбросятся.")) return;
 
             saveCurrentSimpleInputs();
 
-            const mainItems = [
-                { name: "Дебетовая карта", price: 200 },
-                { name: "Кредитная карта", price: 600 },
-                { name: "Сим-карта", price: 150 },
-                { name: "Платежный стикер", price: 250 }
-            ];
-
-            const crossItems = [
-                { name: "Накопительный счет / Вклад", price: 100 },
-                { name: "Автоплатеж / СПБ", price: 50 },
-                { name: "Биометрия", price: 50 },
-                { name: "Альфа-Чек (смс)", price: 50 }
-            ];
-
-            const failItems = [
-                "Не вышел на связь / Сбросил",
-                "Отказ от встречи / Передумал",
-                "Нет паспорта / Просрочен",
-                "Клиент не на месте / Перенос",
-                "Техническая ошибка ПО"
-            ];
-
-            mainItems.forEach(it => {
-                const k = 'item_' + Math.random().toString(36).substr(2, 9);
-                state.sections.sec_main.items[k] = { name: it.name, price: it.price, assigned: 0 };
-            });
-
-            crossItems.forEach(it => {
-                const k = 'item_' + Math.random().toString(36).substr(2, 9);
-                state.sections.sec_cross.items[k] = { name: it.name, price: it.price };
-            });
-
-            failItems.forEach(name => {
-                const k = 'item_' + Math.random().toString(36).substr(2, 9);
-                state.sections.sec_statuses.items[k] = { name: name, price: 0 };
-            });
+            state.sections = JSON.parse(JSON.stringify(defaultUserSections));
+            state.shiftCategories = JSON.parse(JSON.stringify(defaultShiftCategories));
+            state.dayPlanTemplate = JSON.parse(JSON.stringify(defaultDayPlanTemplate));
+            state.fuelSettings = { consumption: 10, pricePerLiter: 64 };
+            state.taxRate = 13;
 
             renderSimpleSettingsLists();
-            showToast("Стандартный набор успешно загружен!");
+            saveState();
+            showToast("Ваш персональный набор восстановлен!");
         }
 
         function confirmReset() {
