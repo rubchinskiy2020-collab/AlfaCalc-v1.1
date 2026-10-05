@@ -439,8 +439,6 @@
             user-select: none;
         }
 
-        .counter-value { font-size: 15px; font-weight: 700; min-width: 35px; text-align: center; }
-
         .counter-input {
             width: 52px;
             height: 32px;
@@ -605,11 +603,70 @@
         .modal-content {
             background: var(--alfa-card);
             border-radius: 20px;
-            padding: 16px 12px;
+            padding: 16px 14px;
             max-width: 500px;
             margin: 10px auto;
             box-sizing: border-box;
             border: 1px solid var(--alfa-border);
+        }
+
+        .settings-nav-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 14px;
+            background: var(--alfa-bg);
+            padding: 4px;
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+
+        .settings-nav-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 8px 6px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 8px;
+            color: var(--alfa-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .settings-nav-btn.active {
+            background: var(--alfa-card);
+            color: var(--alfa-red);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .settings-hint-box {
+            background: var(--alfa-bg);
+            border-left: 3px solid var(--alfa-red);
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--alfa-text);
+            margin-bottom: 12px;
+            line-height: 1.35;
+        }
+
+        .simple-card-box {
+            background: var(--alfa-bg);
+            border: 1px solid var(--alfa-border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .simple-card-box h4 {
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: var(--alfa-black);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .setting-row {
@@ -617,12 +674,11 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 6px;
-            background: var(--alfa-bg);
+            background: var(--alfa-card);
             padding: 6px 8px;
             border-radius: 10px;
             gap: 6px;
             width: 100%;
-            box-sizing: border-box;
             border: 1px solid var(--alfa-border);
         }
 
@@ -636,12 +692,12 @@
             font-size: 13px;
             font-weight: 600;
             color: var(--alfa-text);
-            background: var(--alfa-card);
+            background: var(--alfa-bg);
             outline: none;
         }
 
         .setting-price-input {
-            width: 58px;
+            width: 65px;
             height: 34px;
             padding: 0 4px;
             border: 1px solid var(--alfa-border);
@@ -649,7 +705,7 @@
             text-align: center;
             font-size: 13px;
             font-weight: 700;
-            background: var(--alfa-card);
+            background: var(--alfa-bg);
             color: var(--alfa-text);
             outline: none;
             flex-shrink: 0;
@@ -667,7 +723,6 @@
             flex-shrink: 0;
             -webkit-appearance: none;
         }
-
         .color-picker-btn::-webkit-color-swatch-wrapper { padding: 0; }
         .color-picker-btn::-webkit-color-swatch { border: none; border-radius: 50%; }
 
@@ -685,33 +740,13 @@
             flex-shrink: 0;
         }
 
-        .add-product-form {
-            background: var(--alfa-bg);
-            border: 1px dashed var(--alfa-border);
+        .quick-preset-banner {
+            background: linear-gradient(135deg, rgba(239, 49, 36, 0.08) 0%, rgba(239, 49, 36, 0.02) 100%);
+            border: 1px dashed var(--alfa-red);
             border-radius: 12px;
             padding: 10px;
-            margin-top: 12px;
+            text-align: center;
             margin-bottom: 12px;
-        }
-
-        .add-product-form h4 {
-            font-size: 12px;
-            color: var(--alfa-black);
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        .add-inline-group { display: flex; gap: 6px; margin-bottom: 6px; }
-
-        .add-inline-group input, .add-inline-group select {
-            padding: 8px;
-            font-size: 13px;
-            border-radius: 8px;
-            border: 1px solid var(--alfa-border);
-            background: var(--alfa-card);
-            color: var(--alfa-text);
-            min-width: 0;
         }
 
         .bottom-nav {
@@ -933,7 +968,7 @@
     <div id="splash-screen">
         <div class="splash-content">
             <div class="splash-logo-box">
-                <div class="splash-icon">🅰️</div>
+                <div class="splash-icon">🅰️️</div>
             </div>
             <div class="splash-title">Alfa<span>Calc</span></div>
             <div class="splash-subtitle">by Kosin</div>
@@ -949,7 +984,7 @@
             </div>
             <div class="header-actions">
                 <button class="btn-icon" id="theme-toggle-btn" onclick="toggleTheme()" title="Сменить тему">🌙</button>
-                <button class="btn-icon" onclick="openSettings()" title="Конструктор разделов">⚙️</button>
+                <button class="btn-icon" onclick="openSettings()" title="Простые настройки">⚙️</button>
                 <button class="btn-icon" onclick="confirmReset()" title="Сбросить выбранный день">🔄</button>
             </div>
         </div>
@@ -981,7 +1016,7 @@
         <div class="card" id="plan-section-card">
             <div class="card-title">1. Назначено на смену</div>
             <div class="plan-list" id="plan-container">
-                <div class="empty-history">Добавьте продукты типа «План / Назначено» в настройках ⚙️</div>
+                <div class="empty-history">Добавьте основные продукты в настройках ⚙️</div>
             </div>
         </div>
 
@@ -1064,10 +1099,10 @@
     <div id="tab-day-plan" class="container" style="display: none;">
         <div class="card">
             <div class="card-title">🎯 Добавить задачу в план на день</div>
-            <div class="add-inline-group" style="margin-bottom: 0;">
-                <input type="text" id="target-prod-name" placeholder="Название (Кредитка, БС...)" style="flex: 2;">
-                <input type="number" id="target-prod-goal" placeholder="Цель" style="flex: 1;" min="1">
-                <select id="target-prod-unit" style="flex: 1.2;">
+            <div class="add-inline-group" style="display:flex; gap:6px;">
+                <input type="text" id="target-prod-name" class="input-text" placeholder="Название (Кредитка, БС...)" style="flex: 2;">
+                <input type="number" id="target-prod-goal" class="input-text" placeholder="Цель" style="flex: 1;" min="1">
+                <select id="target-prod-unit" class="input-text" style="flex: 1.2;">
                     <option value="шт">Шт (1)</option>
                     <option value="%">% (100%)</option>
                 </select>
@@ -1089,7 +1124,6 @@
             <button class="btn-primary" style="background-color: var(--alfa-red);" onclick="copyPlanReport()">Скопировать отчет План на день</button>
         </div>
 
-        <!-- ОТЧЕТ ПО ПЛАНУ ЗА МЕСЯЦ (ВКЛЮЧАЕТ ВСЕ ДОБАВЛЕННЫЕ И ДАЖЕ УДАЛЕННЫЕ ЗА МЕСЯЦ ПОКАЗАТЕЛИ) -->
         <div class="card">
             <div class="card-title">
                 <span>📅 Отчет по плану за месяц</span>
@@ -1217,55 +1251,119 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА КОНСТРУКТОРА НАСТРОЕК -->
+    <!-- ==============================================
+         УПРОЩЕННАЯ МОДАЛКА НАСТРОЕК (ПО ШАГАМ)
+         ============================================== -->
     <div class="modal" id="settings-modal">
         <div class="modal-content">
-            <div class="card-title">⚙️ Конструктор категорий и разделов</div>
-            
-            <div class="add-product-form" style="background:var(--alfa-bg);">
-                <h4 style="color:var(--alfa-green);">🛡️ Резервное копирование базы</h4>
-                <div style="display:flex; gap:8px;">
-                    <button class="btn-primary" style="flex:1; background:var(--alfa-green); padding:10px; font-size:13px;" onclick="exportBackup()">📥 Скачать бэкап</button>
-                    <button class="btn-primary" style="flex:1; background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border); padding:10px; font-size:13px;" onclick="document.getElementById('backup-file-input').click()">📤 Восстановить</button>
-                    <input type="file" id="backup-file-input" style="display:none;" accept=".json" onchange="importBackup(event)">
+            <div class="card-title" style="margin-bottom: 10px;">
+                <span>⚙️ Настройки калькулятора</span>
+                <button class="btn-delete" style="font-size: 18px; padding: 0 4px;" onclick="closeSettings()">✕</button>
+            </div>
+
+            <!-- Вкладки настроек -->
+            <div class="settings-nav-tabs">
+                <button class="settings-nav-btn active" id="set-tab-prod" onclick="switchSettingsTab('prod')">💳 Продукты</button>
+                <button class="settings-nav-btn" id="set-tab-fails" onclick="switchSettingsTab('fails')">❌ Отказы</button>
+                <button class="settings-nav-btn" id="set-tab-shifts" onclick="switchSettingsTab('shifts')">📅 График</button>
+                <button class="settings-nav-btn" id="set-tab-backup" onclick="switchSettingsTab('backup')">💾 Бэкап</button>
+            </div>
+
+            <!-- 1. ПРОДУКТЫ И ЦЕНЫ -->
+            <div id="set-pane-prod">
+                <div class="quick-preset-banner">
+                    <p style="font-size:12px; font-weight:700; color:var(--alfa-black); margin-bottom:4px;">Быстрый старт</p>
+                    <p style="font-size:11px; color:var(--alfa-muted); margin-bottom:8px;">Заполнить готовым списком карт и услуг выездного банкира</p>
+                    <button class="btn-primary" style="padding: 8px 12px; font-size:12px; width:auto;" onclick="applyBankerPreset()">🪄 Загрузить стандартный набор</button>
+                </div>
+
+                <div class="simple-card-box">
+                    <h4>➕ Добавить продукт или услугу</h4>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <input type="text" id="simple-prod-name" class="input-text" placeholder="Название (например: Дебетовая карта, БС...)">
+                        <div style="display:flex; gap:6px;">
+                            <input type="number" id="simple-prod-price" class="input-text" placeholder="Оплата за шт (₽)" style="flex:1;">
+                            <select id="simple-prod-type" class="input-text" style="flex:1.4;">
+                                <option value="counter">Основной (встречи + план)</option>
+                                <option value="checkbox">Опция (галочка/допродажа)</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary" style="padding:10px; font-size:13px; margin-top:2px;" onclick="addSimpleProduct()">Добавить в калькулятор</button>
+                    </div>
+                </div>
+
+                <div class="settings-hint-box">
+                    💡 <b>Основные продукты</b> учитываются в плане смены (3/5), а <b>опции</b> выбираются галочками при успешной встрече.
+                </div>
+
+                <div id="settings-products-list" style="max-height: 260px; overflow-y: auto;"></div>
+            </div>
+
+            <!-- 2. СТАТУСЫ ОТКАЗОВ -->
+            <div id="set-pane-fails" style="display: none;">
+                <div class="simple-card-box">
+                    <h4>➕ Новая причина отказа</h4>
+                    <div style="display:flex; gap:6px;">
+                        <input type="text" id="simple-fail-name" class="input-text" placeholder="Например: Не взял трубку, Отказ..." style="flex:2;">
+                        <button class="btn-primary" style="flex:1; padding:8px; font-size:13px;" onclick="addSimpleFailReason()">Добавить</button>
+                    </div>
+                </div>
+
+                <div class="settings-hint-box">
+                    💡 Эти причины появляются в выпадающем списке при выборе кнопки <b>«Неуспешная встреча»</b>.
+                </div>
+
+                <div id="settings-fails-list" style="max-height: 280px; overflow-y: auto;"></div>
+            </div>
+
+            <!-- 3. СТАТУСЫ ГРАФИКА СМЕН -->
+            <div id="set-pane-shifts" style="display: none;">
+                <div class="simple-card-box">
+                    <h4>➕ Добавить тип смены</h4>
+                    <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                        <input type="color" id="simple-shift-color" value="#EF3124" class="color-picker-btn" title="Цвет на календаре">
+                        <input type="text" id="simple-shift-icon" class="input-text" placeholder="🏖️" style="width:48px; text-align:center;">
+                        <input type="text" id="simple-shift-name" class="input-text" placeholder="Название смены" style="flex:1;">
+                    </div>
+                    <label style="font-size:12px; display:flex; align-items:center; gap:6px; margin-bottom:8px; cursor:pointer;">
+                        <input type="checkbox" id="simple-shift-iswork" checked> Считать как рабочий день в статистике
+                    </label>
+                    <button class="btn-primary" style="padding:10px; font-size:13px;" onclick="addSimpleShift()">Добавить смену</button>
+                </div>
+
+                <div id="settings-shifts-list" style="max-height: 280px; overflow-y: auto;"></div>
+            </div>
+
+            <!-- 4. РЕЗЕРВНАЯ КОПИЯ (IPHONE + ANDROID) -->
+            <div id="set-pane-backup" style="display: none;">
+                <div class="simple-card-box">
+                    <h4>🛡 Резервное копирование</h4>
+                    <p style="font-size:12px; color:var(--alfa-muted); margin-bottom:12px;">
+                        Нажмите «Сохранить в Файлы», чтобы появилось системное меню iPhone, или просто скопируйте резервную копию как текст.
+                    </p>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <button class="btn-primary" style="background:var(--alfa-green); padding:12px; font-size:13px;" onclick="exportBackup()">
+                            📥 Сохранить в Файлы (меню iPhone)
+                        </button>
+
+                        <button class="btn-primary" style="background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border); padding:10px; font-size:13px;" onclick="copyBackupToClipboard()">
+                            📋 Скопировать бэкап как текст в буфер
+                        </button>
+
+                        <div style="display:flex; gap:6px; margin-top:6px;">
+                            <button class="btn-primary" style="flex:1; background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border); padding:10px; font-size:12px;" onclick="document.getElementById('backup-file-input').click()">
+                                📤 Из файла .json
+                            </button>
+                            <button class="btn-primary" style="flex:1; background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border); padding:10px; font-size:12px;" onclick="importBackupFromClipboard()">
+                                📋 Вставить текст
+                            </button>
+                        </div>
+                        <input type="file" id="backup-file-input" style="display:none;" accept=".json" onchange="importBackup(event)">
+                    </div>
                 </div>
             </div>
 
-            <div class="add-product-form" style="background:var(--alfa-bg);">
-                <h4 style="color:var(--alfa-red);">📁 1. Добавить новый раздел</h4>
-                <div class="add-inline-group">
-                    <input type="text" id="new-section-name" placeholder="Название раздела" style="flex: 2;">
-                    <select id="new-section-type" style="flex: 1.5;">
-                        <option value="counter">Основной (План/Выдача +/-)</option>
-                        <option value="checkbox">Опция / Кросс (Чекбокс)</option>
-                        <option value="select">Статус отказа (Выпадающий список)</option>
-                    </select>
-                    <button class="btn-primary" style="padding: 8px; width: auto; font-size:13px; flex: 0.5;" onclick="addNewSection()">ОК</button>
-                </div>
-            </div>
-
-            <div class="add-product-form">
-                <h4>➕ 2. Добавить позицию в раздел</h4>
-                <div class="add-inline-group">
-                    <select id="item-target-section" style="flex: 1.5;"></select>
-                    <input type="text" id="new-item-name" placeholder="Название позиции" style="flex: 2;">
-                    <input type="number" id="new-item-price" placeholder="Цена (₽)" style="flex: 1;">
-                    <button class="btn-primary" style="padding: 8px; width: auto; font-size:13px; flex: 0.5;" onclick="addNewItemToSection()">ОК</button>
-                </div>
-            </div>
-
-            <div class="add-product-form" style="background:var(--alfa-bg);">
-                <h4 style="color:var(--alfa-red);">📅 3. Добавить статус смены в график</h4>
-                <div class="add-inline-group" style="align-items:center;">
-                    <input type="color" id="new-shift-color" value="#EF3124" class="color-picker-btn" title="Выберите цвет смены">
-                    <input type="text" id="new-shift-icon" placeholder="Иконка (🏖️)" style="width:55px; text-align:center;">
-                    <input type="text" id="new-shift-name" placeholder="Название смены" style="flex:2;">
-                    <button class="btn-primary" style="padding: 8px; width: auto; font-size:13px; flex: 0.5;" onclick="addNewShiftCat()">ОК</button>
-                </div>
-            </div>
-
-            <div style="max-height: 340px; overflow-y: auto; margin-bottom: 16px;" id="settings-constructor-tree"></div>
-            <button class="btn-primary" onclick="closeSettings()">Сохранить и закрыть</button>
+            <button class="btn-primary" style="margin-top: 14px;" onclick="closeSettings()">Готово (Сохранить)</button>
         </div>
     </div>
 
@@ -1279,8 +1377,8 @@
         };
 
         const initialShiftCategories = {
-            "work": { name: "Рабочий (Офис/Город)", icon: "💼", color: "#EF3124", isWork: true },
-            "trip": { name: "Выезд в НП", icon: "🚘", color: "#6A1B9A", isWork: true, isTrip: true },
+            "work": { name: "Рабочий (Город/Офис)", icon: "💼", color: "#EF3124", isWork: true },
+            "trip": { name: "Выезд в область", icon: "🚘", color: "#6A1B9A", isWork: true, isTrip: true },
             "off": { name: "Выходной", icon: "🏖️", color: "#2E3846", isWork: false }
         };
 
@@ -1290,9 +1388,9 @@
             schedule: {},
             daysData: {},
             globalPlans: {},
-            dayPlanTemplate: [],   // Шаблоны задач (названия, цели, единицы)
-            dailyPlans: {},        // Задачи по конкретным дням { "YYYY-MM-DD": [ { id, name, goal, sold, unit } ] }
-            monthPlanHistory: {},  // Месячные итоги { "YYYY-MM": { "id_or_name": { name, goal, sold, unit } } }
+            dayPlanTemplate: [],
+            dailyPlans: {},
+            monthPlanHistory: {},
             taxRate: 0,
             fuelSettings: { consumption: 8.5, pricePerLiter: 58.0 },
             darkMode: false
@@ -1329,7 +1427,6 @@
             return ensureDayData(currentActiveDateKey);
         }
 
-        // Инициализация плана на день (если для этой даты еще нет списка, копируем из шаблона)
         function getDayPlanList(dKey) {
             if (!state.dailyPlans) state.dailyPlans = {};
             if (!state.dailyPlans[dKey]) {
@@ -1344,7 +1441,6 @@
             return state.dailyPlans[dKey];
         }
 
-        // Сохранение показателя в сквозную историю месяца (сохраняются даже удаленные показатели)
         function syncTargetToMonthArchive(target, dKey) {
             if (!state.monthPlanHistory) state.monthPlanHistory = {};
             const ym = dKey ? dKey.substring(0, 7) : getYearMonthKey(new Date());
@@ -1366,13 +1462,15 @@
         }
 
         function loadState() {
-            let saved = localStorage.getItem('alfacalc_builder_v12') ||
+            let saved = localStorage.getItem('alfacalc_builder_v14') ||
+                        localStorage.getItem('alfacalc_builder_v13') ||
+                        localStorage.getItem('alfacalc_builder_v12') ||
                         localStorage.getItem('alfacalc_builder_v11') ||
                         localStorage.getItem('alfacalc_builder_v10') || 
-                        localStorage.getItem('alfacalc_builder_v9') || 
-                        localStorage.getItem('alfacalc_builder_v8') || 
-                        localStorage.getItem('alfacalc_builder_v7') || 
-                        localStorage.getItem('alfacalc_builder_v6') || 
+                        localStorage.getItem('alfacalc_builder_v9')  || 
+                        localStorage.getItem('alfacalc_builder_v8')  || 
+                        localStorage.getItem('alfacalc_builder_v7')  || 
+                        localStorage.getItem('alfacalc_builder_v6')  || 
                         localStorage.getItem('alfacalc_builder_v5');
             if (saved) {
                 try {
@@ -1388,7 +1486,6 @@
                     if (parsed.dailyPlans) state.dailyPlans = parsed.dailyPlans;
                     if (parsed.monthPlanHistory) state.monthPlanHistory = parsed.monthPlanHistory;
 
-                    // Миграция старых задач плана
                     if (parsed.dayPlanTemplate) {
                         state.dayPlanTemplate = parsed.dayPlanTemplate;
                     } else if (parsed.dayPlanTargets && Array.isArray(parsed.dayPlanTargets)) {
@@ -1412,7 +1509,6 @@
                         }
                     }
 
-                    // Синхронизация текущих шаблонов в месяц
                     if (state.dayPlanTemplate) {
                         state.dayPlanTemplate.forEach(t => syncTargetToMonthArchive(t, currentActiveDateKey));
                     }
@@ -1420,6 +1516,10 @@
                     console.error("Ошибка загрузки данных", e);
                 }
             }
+
+            if (!state.sections.sec_main) state.sections.sec_main = { name: "Основные продукты", type: "counter", items: {} };
+            if (!state.sections.sec_cross) state.sections.sec_cross = { name: "Кросс-продажи", type: "checkbox", items: {} };
+            if (!state.sections.sec_statuses) state.sections.sec_statuses = { name: "Статусы отказов", type: "select", items: {} };
 
             applyThemeUI();
 
@@ -1441,9 +1541,12 @@
 
         function saveState() {
             const data = JSON.stringify(state);
+            localStorage.setItem('alfacalc_builder_v14', data);
+            localStorage.setItem('alfacalc_builder_v13', data);
             localStorage.setItem('alfacalc_builder_v12', data);
             localStorage.setItem('alfacalc_builder_v11', data);
             localStorage.setItem('alfacalc_builder_v10', data);
+            localStorage.setItem('alfacalc_builder_v9', data);
             renderAll();
             renderDayPlan();
             renderMonthPlanReport();
@@ -1473,17 +1576,80 @@
             document.getElementById('fail-block').style.display = isSuccess ? 'none' : 'block';
         }
 
-        function exportBackup() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-            const downloadAnchor = document.createElement('a');
+        // УНИВЕРСАЛЬНЫЙ ЭКСПОРТ ДЛЯ IPHONE И ANDROID
+        async function exportBackup() {
             const now = new Date();
             const dateStr = `${now.getFullYear()}_${String(now.getMonth()+1).padStart(2,'0')}_${String(now.getDate()).padStart(2,'0')}`;
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `AlfaCalc_backup_${dateStr}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-            showToast("Бэкап сохранен в файлы!");
+            const fileName = `AlfaCalc_backup_${dateStr}.json`;
+            const jsonText = JSON.stringify(state, null, 2);
+
+            // 1. Попытка открыть системное меню iOS (Сохранить в Файлы / AirDrop / Telegram)
+            if (navigator.share && navigator.canShare) {
+                try {
+                    const file = new File([jsonText], fileName, { type: 'application/json' });
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: 'Резервная копия AlfaCalc',
+                            text: 'Резервная копия данных AlfaCalc'
+                        });
+                        showToast("Файл передан!");
+                        return;
+                    }
+                } catch (e) {
+                    if (e.name !== 'AbortError') console.log("WebShare error:", e);
+                }
+            }
+
+            // 2. Стандартный метод скачивания через Blob
+            try {
+                const blob = new Blob([jsonText], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 200);
+                showToast("Запрос на скачивание отправлен!");
+            } catch (err) {
+                // 3. Резервный способ в буфер
+                copyBackupToClipboard();
+            }
+        }
+
+        function copyBackupToClipboard() {
+            const jsonText = JSON.stringify(state);
+            copyToClipboard(jsonText);
+            alert("Код резервной копии скопирован в буфер обмена! Вы можете вставить его в Заметки или отправить себе в Telegram.");
+        }
+
+        function importBackupFromClipboard() {
+            const text = prompt("Вставьте скопированный текст бэкапа сюда:");
+            if (!text) return;
+            try {
+                const parsed = JSON.parse(text.trim());
+                if (parsed.sections && (parsed.daysData || parsed.schedule)) {
+                    state = parsed;
+                    if (!state.globalPlans) state.globalPlans = {};
+                    if (!state.dayPlanTemplate) state.dayPlanTemplate = [];
+                    if (!state.dailyPlans) state.dailyPlans = {};
+                    if (!state.monthPlanHistory) state.monthPlanHistory = {};
+                    applyThemeUI();
+                    saveState();
+                    loadActiveDayToUI();
+                    renderCalendar();
+                    closeSettings();
+                    alert("Данные успешно восстановлены!");
+                } else {
+                    alert("Некорректный формат данных!");
+                }
+            } catch (e) {
+                alert("Ошибка распознавания текста: " + e.message);
+            }
         }
 
         function importBackup(event) {
@@ -1657,7 +1823,7 @@
                     if (m.checkedItems) {
                         m.checkedItems.forEach(iKey => {
                             if (issuedCounts[iKey] !== undefined) {
-                                issuedCounts[iKey]++;
+                                issuedCounts[itemKey]++;
                                 totalProfit += getItemPrice(null, iKey);
                             }
                         });
@@ -1728,7 +1894,7 @@
                 }
             }
 
-            container.innerHTML = count > 0 ? html : '<div class="empty-history">Добавьте позиции в разделы типа «План / Назначено» через ⚙️</div>';
+            container.innerHTML = count > 0 ? html : '<div class="empty-history">Добавьте основные продукты в настройках ⚙️</div>';
         }
 
         function changeGlobalCounterPlan(sKey, iKey, delta) {
@@ -1781,7 +1947,7 @@
                         <div class="form-group">
                             <label>${sec.name}</label>
                             <select id="form-sel-fail-${sKey}">
-                                <option value="">-- Выберите статус отказа --</option>
+                                <option value="">-- Выберите причину отказа --</option>
                                 ${itemKeys.map(k => `<option value="${k}">${sec.items[k].name}</option>`).join('')}
                             </select>
                         </div>
@@ -1789,8 +1955,8 @@
                 }
             }
 
-            successContainer.innerHTML = successHtml || '<div class="empty-history">Добавьте продукты и опции в настройках ⚙️</div>';
-            failContainer.innerHTML = failHtml || '<div class="empty-history">Добавьте статусы отказов в настройках ⚙️</div>';
+            successContainer.innerHTML = successHtml || '<div class="empty-history">Добавьте продукты в настройках ⚙️</div>';
+            failContainer.innerHTML = failHtml || '<div class="empty-history">Добавьте причины отказов в настройках ⚙️️</div>';
         }
 
         function saveMeeting() {
@@ -1914,7 +2080,6 @@
             }
         }
 
-        /* ИТОГОВЫЙ ОТЧЕТ: ВЫДАНО / НАЗНАЧЕНО (3/5) */
         function buildDayReport(issuedCounts) {
             let report = `Итоговый отчет за ${formatDateDisplay(currentActiveDateKey)}\n`;
 
@@ -2124,9 +2289,7 @@
             closeDayModal();
         }
 
-        /* ==========================================================================
-           ПЛАН НА ДЕНЬ (ИНДИВИДУАЛЬНЫЙ ДЛЯ ВЫБРАННОГО ДНЯ)
-           ========================================================================== */
+        /* ПЛАН НА ДЕНЬ */
         function addDayPlanTarget() {
             const nameInput = document.getElementById('target-prod-name');
             const goalInput = document.getElementById('target-prod-goal');
@@ -2143,11 +2306,9 @@
             const newTpl = { id: newId, name: name, goal: goal, unit: unit };
             state.dayPlanTemplate.push(newTpl);
 
-            // Добавляем показатель в текущий открытый день
             const dayList = getDayPlanList(currentActiveDateKey);
             dayList.push({ id: newId, name: name, goal: goal, sold: 0, unit: unit });
 
-            // Фиксируем в сквозном месячном реестре
             syncTargetToMonthArchive(newTpl, currentActiveDateKey);
 
             nameInput.value = ''; goalInput.value = '';
@@ -2181,11 +2342,9 @@
             const dayList = getDayPlanList(currentActiveDateKey);
             const target = dayList.find(t => t.id === id);
             if (target) {
-                // Фиксируем перед удалением из дня, чтобы в месячном плане показатель сохранился
                 syncTargetToMonthArchive(target, currentActiveDateKey);
             }
             state.dailyPlans[currentActiveDateKey] = dayList.filter(t => t.id !== id);
-            // Если удаляем и из глобального шаблона будущих дней
             if (state.dayPlanTemplate) {
                 state.dayPlanTemplate = state.dayPlanTemplate.filter(t => t.id !== id);
             }
@@ -2193,7 +2352,7 @@
         }
 
         function clearDayPlanTargets() {
-            if (confirm(`Очистить план на ${formatDateDisplay(currentActiveDateKey)}? Показатели за месяц останутся сохранены.`)) {
+            if (confirm(`Очистить план на ${formatDateDisplay(currentActiveDateKey)}? Показатели за месяц сохранятся.`)) {
                 state.dailyPlans[currentActiveDateKey] = [];
                 saveState();
                 showToast("План на день очищен!");
@@ -2212,7 +2371,7 @@
             }
 
             if (dayList.length === 0) {
-                list.innerHTML = '<div class="empty-history">На этот день задач нет. Добавьте первую цель выше!</div>';
+                list.innerHTML = '<div class="empty-history">На этот день задач нет. Добавьте цель выше!</div>';
                 document.getElementById('plan-report-preview').innerText = `План на ${formatDateDisplay(currentActiveDateKey)} пуст.`;
                 return;
             }
@@ -2251,9 +2410,6 @@
             showToast("Отчет План на день скопирован!");
         }
 
-        /* ==========================================================================
-           ПЛАН НА МЕСЯЦ (СКВОЗНОЙ ОТЧЕТ СО ВСЕМИ ПОКАЗАТЕЛЯМИ, ВКЛЮЧАЯ УДАЛЕННЫЕ)
-           ========================================================================== */
         function changePlanMonth(delta) {
             currentPlanMonthDate.setMonth(currentPlanMonthDate.getMonth() + delta);
             renderMonthPlanReport();
@@ -2268,8 +2424,6 @@
             const titleEl = document.getElementById('plan-month-title');
             if (titleEl) titleEl.innerText = `${monthNames[month]} ${year}`;
 
-            // Сбор всех показателей месяца:
-            // 1. Из архива monthPlanHistory (где живут все созданные и даже удаленные)
             const monthAggregated = {};
 
             if (state.monthPlanHistory && state.monthPlanHistory[ym]) {
@@ -2284,7 +2438,6 @@
                 }
             }
 
-            // 2. Суммируем факт за все дни этого месяца из dailyPlans
             if (state.dailyPlans) {
                 for (let dKey in state.dailyPlans) {
                     if (dKey.startsWith(ym)) {
@@ -2327,172 +2480,245 @@
             showToast("Отчет по плану за месяц скопирован!");
         }
 
-        /* КОНСТРУКТОР */
-        function addNewSection() {
-            const name = document.getElementById('new-section-name').value.trim();
-            const type = document.getElementById('new-section-type').value;
-            if (!name) return alert("Введите название раздела!");
+        /* ПРОСТЫЕ НАСТРОЙКИ (UI) */
+        function switchSettingsTab(tab) {
+            document.getElementById('set-pane-prod').style.display = tab === 'prod' ? 'block' : 'none';
+            document.getElementById('set-pane-fails').style.display = tab === 'fails' ? 'block' : 'none';
+            document.getElementById('set-pane-shifts').style.display = tab === 'shifts' ? 'block' : 'none';
+            document.getElementById('set-pane-backup').style.display = tab === 'backup' ? 'block' : 'none';
 
-            const secKey = 'sec_' + Date.now();
-            state.sections[secKey] = { name: name, type: type, items: {} };
-            document.getElementById('new-section-name').value = '';
-            saveState();
-            openSettings();
-            showToast("Раздел создан!");
-        }
-
-        function removeSection(secKey) {
-            if (confirm("Удалить этот раздел со всеми его позициями?")) {
-                delete state.sections[secKey];
-                if (state.globalPlans && state.globalPlans[secKey]) delete state.globalPlans[secKey];
-                saveState();
-                openSettings();
-            }
-        }
-
-        function addNewItemToSection() {
-            const secKey = document.getElementById('item-target-section').value;
-            const name = document.getElementById('new-item-name').value.trim();
-            const price = parseInt(document.getElementById('new-item-price').value) || 0;
-
-            if (!secKey) return alert("Сначала создайте раздел!");
-            if (!name) return alert("Введите название позиции!");
-
-            const itemKey = 'item_' + Date.now();
-            state.sections[secKey].items[itemKey] = { name: name, price: price, assigned: 0 };
-            if (state.sections[secKey].type === 'counter') {
-                if (!state.globalPlans) state.globalPlans = {};
-                if (!state.globalPlans[secKey]) state.globalPlans[secKey] = {};
-                state.globalPlans[secKey][itemKey] = 0;
-            }
-            document.getElementById('new-item-name').value = '';
-            document.getElementById('new-item-price').value = '';
-            saveState();
-            openSettings();
-            showToast("Позиция добавлена!");
-        }
-
-        function removeItemFromSection(secKey, iKey) {
-            if (confirm("Удалить позицию?")) {
-                delete state.sections[secKey].items[iKey];
-                if (state.globalPlans && state.globalPlans[secKey] && state.globalPlans[secKey][iKey] !== undefined) {
-                    delete state.globalPlans[secKey][iKey];
-                }
-                saveState();
-                openSettings();
-            }
-        }
-
-        function addNewShiftCat() {
-            const name = document.getElementById('new-shift-name').value.trim();
-            const icon = document.getElementById('new-shift-icon').value.trim() || '💼';
-            const color = document.getElementById('new-shift-color').value || '#EF3124';
-            if (!name) return alert("Введите название статуса смены!");
-
-            const key = 'shift_' + Date.now();
-            const isWork = confirm("Считать этот статус как рабочую смену?");
-            state.shiftCategories[key] = { name: name, icon: icon, color: color, isWork: isWork };
-            document.getElementById('new-shift-name').value = '';
-            document.getElementById('new-shift-icon').value = '';
-            saveState();
-            openSettings();
-            showToast("Смена добавлена!");
-        }
-
-        function removeShiftCat(key) {
-            if (confirm("Удалить эту категорию смены?")) {
-                delete state.shiftCategories[key];
-                saveState();
-                openSettings();
-            }
+            document.getElementById('set-tab-prod').classList.toggle('active', tab === 'prod');
+            document.getElementById('set-tab-fails').classList.toggle('active', tab === 'fails');
+            document.getElementById('set-tab-shifts').classList.toggle('active', tab === 'shifts');
+            document.getElementById('set-tab-backup').classList.toggle('active', tab === 'backup');
         }
 
         function openSettings() {
-            const secSelect = document.getElementById('item-target-section');
-            secSelect.innerHTML = '';
-            for (let sKey in state.sections) {
-                const opt = document.createElement('option');
-                opt.value = sKey;
-                opt.innerText = state.sections[sKey].name;
-                secSelect.appendChild(opt);
-            }
-
-            const container = document.getElementById('settings-constructor-tree');
-            let html = '';
-
-            for (let sKey in state.sections) {
-                const sec = state.sections[sKey];
-                html += `
-                    <div style="background:var(--alfa-card); border:1px solid var(--alfa-border); border-radius:10px; padding:10px; margin-bottom:12px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                            <input type="text" class="setting-name-input" id="sec-title-${sKey}" value="${sec.name}" style="font-weight:800; color:var(--alfa-black);">
-                            <button class="btn-delete" style="font-size:11px;" onclick="removeSection('${sKey}')">Удалить раздел</button>
-                        </div>
-                `;
-
-                for (let iKey in sec.items) {
-                    const it = sec.items[iKey];
-                    html += `
-                        <div class="setting-row">
-                            <input type="text" class="setting-name-input" id="item-name-${sKey}-${iKey}" value="${it.name}">
-                            <div class="price-input-wrapper">
-                                <input type="number" class="setting-price-input" id="item-price-${sKey}-${iKey}" value="${it.price || 0}">
-                                <span style="font-size:12px; font-weight:700; color:var(--alfa-muted);">₽</span>
-                            </div>
-                            <button class="btn-remove-prod" onclick="removeItemFromSection('${sKey}', '${iKey}')">🗑️</button>
-                        </div>
-                    `;
-                }
-
-                if (Object.keys(sec.items).length === 0) {
-                    html += '<div style="font-size:12px; color:var(--alfa-muted); text-align:center; padding:4px;">Пока нет позиций в этом разделе</div>';
-                }
-
-                html += `</div>`;
-            }
-
-            html += `<h4 style="font-size:13px; margin:10px 0 6px 2px; color:var(--alfa-black);">Статусы графика смен (цвет, иконка, имя):</h4>`;
-            for (let cKey in state.shiftCategories) {
-                const cat = state.shiftCategories[cKey];
-                const catColor = cat.color || '#EF3124';
-                html += `
-                    <div class="setting-row" style="gap:4px;">
-                        <input type="color" class="color-picker-btn" id="cat-color-${cKey}" value="${catColor}">
-                        <input type="text" style="width:34px; text-align:center;" class="setting-name-input" id="cat-icon-${cKey}" value="${cat.icon || '💼'}">
-                        <input type="text" class="setting-name-input" id="cat-name-${cKey}" value="${cat.name}">
-                        <button class="btn-remove-prod" onclick="removeShiftCat('${cKey}')">🗑️</button>
-                    </div>
-                `;
-            }
-
-            container.innerHTML = html;
+            renderSimpleSettingsLists();
+            switchSettingsTab('prod');
             document.getElementById('settings-modal').style.display = 'block';
         }
 
         function closeSettings() {
-            for (let sKey in state.sections) {
-                const secTitle = document.getElementById(`sec-title-${sKey}`);
-                if (secTitle && secTitle.value.trim()) state.sections[sKey].name = secTitle.value.trim();
-
-                for (let iKey in state.sections[sKey].items) {
-                    const nameInput = document.getElementById(`item-name-${sKey}-${iKey}`);
-                    const priceInput = document.getElementById(`item-price-${sKey}-${iKey}`);
-                    if (nameInput && nameInput.value.trim()) state.sections[sKey].items[iKey].name = nameInput.value.trim();
-                    if (priceInput) state.sections[sKey].items[iKey].price = parseInt(priceInput.value) || 0;
-                }
-            }
-
-            for (let cKey in state.shiftCategories) {
-                const iconInput = document.getElementById(`cat-icon-${cKey}`);
-                const nameInput = document.getElementById(`cat-name-${cKey}`);
-                const colorInput = document.getElementById(`cat-color-${cKey}`);
-                if (iconInput) state.shiftCategories[cKey].icon = iconInput.value.trim() || '💼';
-                if (nameInput && nameInput.value.trim()) state.shiftCategories[cKey].name = nameInput.value.trim();
-                if (colorInput) state.shiftCategories[cKey].color = colorInput.value;
-            }
-
+            saveCurrentSimpleInputs();
             document.getElementById('settings-modal').style.display = 'none';
             saveState();
+        }
+
+        function renderSimpleSettingsLists() {
+            const prodList = document.getElementById('settings-products-list');
+            let phtml = '';
+
+            const renderItemsOfSec = (sKey, label) => {
+                const sec = state.sections[sKey];
+                if (!sec) return '';
+                const iKeys = Object.keys(sec.items);
+                if (iKeys.length === 0) return '';
+
+                let block = `<div style="font-size:12px; font-weight:800; color:var(--alfa-muted); margin:8px 0 4px 4px;">${label}:</div>`;
+                iKeys.forEach(k => {
+                    const item = sec.items[k];
+                    block += `
+                        <div class="setting-row">
+                            <input type="text" class="setting-name-input" id="item-name-${sKey}-${k}" value="${item.name}">
+                            <input type="number" class="setting-price-input" id="item-price-${sKey}-${k}" value="${item.price || 0}">
+                            <span style="font-size:12px; font-weight:700; color:var(--alfa-muted);">₽</span>
+                            <button class="btn-remove-prod" onclick="removeSimpleItem('${sKey}', '${k}')">🗑️</button>
+                        </div>
+                    `;
+                });
+                return block;
+            };
+
+            phtml += renderItemsOfSec('sec_main', 'Основные (выдача карт и услуг)');
+            phtml += renderItemsOfSec('sec_cross', 'Опции и кросс (галочки)');
+
+            prodList.innerHTML = phtml || '<div class="empty-history">Список пуст. Добавьте первый продукт выше!</div>';
+
+            const failList = document.getElementById('settings-fails-list');
+            let fhtml = '';
+            const failSec = state.sections.sec_statuses;
+            if (failSec && Object.keys(failSec.items).length > 0) {
+                for (let k in failSec.items) {
+                    fhtml += `
+                        <div class="setting-row">
+                            <input type="text" class="setting-name-input" id="fail-name-${k}" value="${failSec.items[k].name}">
+                            <button class="btn-remove-prod" onclick="removeSimpleItem('sec_statuses', '${k}')">🗑️</button>
+                        </div>
+                    `;
+                }
+            }
+            failList.innerHTML = fhtml || '<div class="empty-history">Причин отказов пока нет</div>';
+
+            const shiftList = document.getElementById('settings-shifts-list');
+            let shtml = '';
+            for (let cKey in state.shiftCategories) {
+                const cat = state.shiftCategories[cKey];
+                shtml += `
+                    <div class="setting-row" style="gap:4px;">
+                        <input type="color" class="color-picker-btn" id="cat-color-${cKey}" value="${cat.color || '#EF3124'}">
+                        <input type="text" style="width:36px; text-align:center;" class="setting-name-input" id="cat-icon-${cKey}" value="${cat.icon || '💼'}">
+                        <input type="text" class="setting-name-input" id="cat-name-${cKey}" value="${cat.name}">
+                        <button class="btn-remove-prod" onclick="removeSimpleShift('${cKey}')">🗑️️</button>
+                    </div>
+                `;
+            }
+            shiftList.innerHTML = shtml;
+        }
+
+        function saveCurrentSimpleInputs() {
+            for (let sKey in state.sections) {
+                for (let iKey in state.sections[sKey].items) {
+                    const nEl = document.getElementById(`item-name-${sKey}-${iKey}`);
+                    const pEl = document.getElementById(`item-price-${sKey}-${iKey}`);
+                    if (nEl && nEl.value.trim()) state.sections[sKey].items[iKey].name = nEl.value.trim();
+                    if (pEl) state.sections[sKey].items[iKey].price = parseInt(pEl.value) || 0;
+                }
+            }
+            if (state.sections.sec_statuses) {
+                for (let k in state.sections.sec_statuses.items) {
+                    const fEl = document.getElementById(`fail-name-${k}`);
+                    if (fEl && fEl.value.trim()) state.sections.sec_statuses.items[k].name = fEl.value.trim();
+                }
+            }
+            for (let cKey in state.shiftCategories) {
+                const colEl = document.getElementById(`cat-color-${cKey}`);
+                const icEl = document.getElementById(`cat-icon-${cKey}`);
+                const nEl = document.getElementById(`cat-name-${cKey}`);
+                if (colEl) state.shiftCategories[cKey].color = colEl.value;
+                if (icEl) state.shiftCategories[cKey].icon = icEl.value.trim() || '💼';
+                if (nEl && nEl.value.trim()) state.shiftCategories[cKey].name = nEl.value.trim();
+            }
+        }
+
+        function addSimpleProduct() {
+            saveCurrentSimpleInputs();
+            const name = document.getElementById('simple-prod-name').value.trim();
+            const price = parseInt(document.getElementById('simple-prod-price').value) || 0;
+            const type = document.getElementById('simple-prod-type').value;
+
+            if (!name) return alert("Введите название продукта!");
+
+            const targetSecKey = (type === 'counter') ? 'sec_main' : 'sec_cross';
+            if (!state.sections[targetSecKey]) {
+                state.sections[targetSecKey] = { 
+                    name: type === 'counter' ? "Основные продукты" : "Кросс-продажи", 
+                    type: type, 
+                    items: {} 
+                };
+            }
+
+            const iKey = 'item_' + Date.now();
+            state.sections[targetSecKey].items[iKey] = { name: name, price: price, assigned: 0 };
+            
+            if (type === 'counter') {
+                if (!state.globalPlans) state.globalPlans = {};
+                if (!state.globalPlans[targetSecKey]) state.globalPlans[targetSecKey] = {};
+                state.globalPlans[targetSecKey][iKey] = 0;
+            }
+
+            document.getElementById('simple-prod-name').value = '';
+            document.getElementById('simple-prod-price').value = '';
+            renderSimpleSettingsLists();
+            showToast("Продукт добавлен!");
+        }
+
+        function removeSimpleItem(sKey, iKey) {
+            saveCurrentSimpleInputs();
+            if (confirm("Удалить эту позицию?")) {
+                if (state.sections[sKey]?.items[iKey]) {
+                    delete state.sections[sKey].items[iKey];
+                    if (state.globalPlans && state.globalPlans[sKey]) delete state.globalPlans[sKey][iKey];
+                    renderSimpleSettingsLists();
+                }
+            }
+        }
+
+        function addSimpleFailReason() {
+            saveCurrentSimpleInputs();
+            const name = document.getElementById('simple-fail-name').value.trim();
+            if (!name) return alert("Введите причину отказа!");
+
+            if (!state.sections.sec_statuses) {
+                state.sections.sec_statuses = { name: "Статусы отказов", type: "select", items: {} };
+            }
+
+            const key = 'item_' + Date.now();
+            state.sections.sec_statuses.items[key] = { name: name, price: 0 };
+            document.getElementById('simple-fail-name').value = '';
+            renderSimpleSettingsLists();
+            showToast("Причина отказа добавлена!");
+        }
+
+        function addSimpleShift() {
+            saveCurrentSimpleInputs();
+            const name = document.getElementById('simple-shift-name').value.trim();
+            const icon = document.getElementById('simple-shift-icon').value.trim() || '💼';
+            const color = document.getElementById('simple-shift-color').value || '#EF3124';
+            const isWork = document.getElementById('simple-shift-iswork').checked;
+
+            if (!name) return alert("Введите название смены!");
+
+            const key = 'shift_' + Date.now();
+            state.shiftCategories[key] = { name: name, icon: icon, color: color, isWork: isWork };
+            document.getElementById('simple-shift-name').value = '';
+            document.getElementById('simple-shift-icon').value = '';
+            renderSimpleSettingsLists();
+            showToast("Смена добавлена!");
+        }
+
+        function removeSimpleShift(key) {
+            saveCurrentSimpleInputs();
+            if (confirm("Удалить этот тип смены?")) {
+                delete state.shiftCategories[key];
+                renderSimpleSettingsLists();
+            }
+        }
+
+        function applyBankerPreset() {
+            if (!confirm("Загрузить стандартный набор банковских продуктов и отказов? Существующие данные не удалятся, а добавятся.")) return;
+
+            saveCurrentSimpleInputs();
+
+            const mainItems = [
+                { name: "Дебетовая карта", price: 200 },
+                { name: "Кредитная карта", price: 600 },
+                { name: "Сим-карта", price: 150 },
+                { name: "Платежный стикер", price: 250 }
+            ];
+
+            const crossItems = [
+                { name: "Накопительный счет / Вклад", price: 100 },
+                { name: "Автоплатеж / СПБ", price: 50 },
+                { name: "Биометрия", price: 50 },
+                { name: "Альфа-Чек (смс)", price: 50 }
+            ];
+
+            const failItems = [
+                "Не вышел на связь / Сбросил",
+                "Отказ от встречи / Передумал",
+                "Нет паспорта / Просрочен",
+                "Клиент не на месте / Перенос",
+                "Техническая ошибка ПО"
+            ];
+
+            mainItems.forEach(it => {
+                const k = 'item_' + Math.random().toString(36).substr(2, 9);
+                state.sections.sec_main.items[k] = { name: it.name, price: it.price, assigned: 0 };
+            });
+
+            crossItems.forEach(it => {
+                const k = 'item_' + Math.random().toString(36).substr(2, 9);
+                state.sections.sec_cross.items[k] = { name: it.name, price: it.price };
+            });
+
+            failItems.forEach(name => {
+                const k = 'item_' + Math.random().toString(36).substr(2, 9);
+                state.sections.sec_statuses.items[k] = { name: name, price: 0 };
+            });
+
+            renderSimpleSettingsLists();
+            showToast("Стандартный набор успешно загружен!");
         }
 
         function confirmReset() {
