@@ -536,6 +536,26 @@
             color: var(--alfa-text);
         }
 
+        .editable-report {
+            width: 100%;
+            background: var(--alfa-bg);
+            border: 1px solid var(--alfa-border);
+            border-radius: 10px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--alfa-text);
+            resize: vertical;
+            min-height: 140px;
+            outline: none;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .editable-report:focus {
+            border-color: var(--alfa-red);
+            background: var(--alfa-card);
+        }
+
         .history-list {
             display: flex;
             flex-direction: column;
@@ -1133,8 +1153,16 @@
                     <button class="btn-icon" style="width:30px; height:30px; font-size:12px;" onclick="changePlanMonth(1)">▶</button>
                 </div>
             </div>
-            <div class="report-preview" id="month-plan-report-preview">Данных по плану за этот месяц нет...</div>
-            <button class="btn-primary" style="background-color: var(--alfa-card); color: var(--alfa-text); border: 1px solid var(--alfa-border);" onclick="copyMonthPlanReport()">Скопировать отчет по плану за месяц</button>
+            
+            <p style="font-size:11px; color:var(--alfa-muted); margin-bottom:6px;">
+                ✏️ Текст отчета ниже формируется автоматически нарастающим итогом за все рабочие дни месяца:
+            </p>
+            <textarea id="month-plan-report-preview" class="editable-report" oninput="saveEditedMonthReport()"></textarea>
+            
+            <div style="display:flex; gap:6px;">
+                <button class="btn-primary" style="background-color: var(--alfa-card); color: var(--alfa-text); border: 1px solid var(--alfa-border); flex:1;" onclick="copyMonthPlanReport()">Скопировать отчет</button>
+                <button class="btn-primary" style="background-color: var(--alfa-card); color: var(--alfa-muted); border: 1px solid var(--alfa-border); width:auto; padding:10px 14px;" onclick="renderMonthPlanReport(true)" title="Сбросить правки и пересчитать заново">🔄 Обновить расчет</button>
+            </div>
         </div>
     </div>
 
@@ -1371,7 +1399,6 @@
     <div class="toast" id="toast-msg">Отчет скопирован!</div>
 
     <script>
-        // Встроенный эталонный набор пользователя по умолчанию
         const defaultUserSections = {
             "sec_main": {
                 "name": "Основные продукты",
@@ -1450,7 +1477,7 @@
             shiftCategories: JSON.parse(JSON.stringify(defaultShiftCategories)),
             schedule: {},
             daysData: {},
-            globalPlans: {},
+            dayAssigned: {},
             dayPlanTemplate: JSON.parse(JSON.stringify(defaultDayPlanTemplate)),
             dailyPlans: {},
             monthPlanHistory: {},
@@ -1490,6 +1517,26 @@
             return ensureDayData(currentActiveDateKey);
         }
 
+        function getDayAssignedCount(sKey, iKey, dKey = currentActiveDateKey) {
+            if (!state.dayAssigned) state.dayAssigned = {};
+            if (!state.dayAssigned[dKey]) state.dayAssigned[dKey] = {};
+            if (!state.dayAssigned[dKey][sKey]) state.dayAssigned[dKey][sKey] = {};
+            return state.dayAssigned[dKey][sKey][iKey] || 0;
+        }
+
+        function setDayAssignedCount(sKey, iKey, val, dKey = currentActiveDateKey) {
+            if (!state.dayAssigned) state.dayAssigned = {};
+            if (!state.dayAssigned[dKey]) state.dayAssigned[dKey] = {};
+            if (!state.dayAssigned[dKey][sKey]) state.dayAssigned[dKey][sKey] = {};
+            state.dayAssigned[dKey][sKey][iKey] = Math.max(0, parseInt(val) || 0);
+            saveState();
+        }
+
+        function changeDayAssignedCount(sKey, iKey, delta) {
+            const current = getDayAssignedCount(sKey, iKey, currentActiveDateKey);
+            setDayAssignedCount(sKey, iKey, current + delta, currentActiveDateKey);
+        }
+
         function getDayPlanList(dKey) {
             if (!state.dailyPlans) state.dailyPlans = {};
             if (!state.dailyPlans[dKey]) {
@@ -1525,7 +1572,8 @@
         }
 
         function loadState() {
-            let saved = localStorage.getItem('alfacalc_builder_v15') ||
+            let saved = localStorage.getItem('alfacalc_builder_v16') ||
+                        localStorage.getItem('alfacalc_builder_v15') ||
                         localStorage.getItem('alfacalc_builder_v14') ||
                         localStorage.getItem('alfacalc_builder_v13') ||
                         localStorage.getItem('alfacalc_builder_v12') ||
@@ -1543,7 +1591,7 @@
                     if (parsed.shiftCategories) state.shiftCategories = parsed.shiftCategories;
                     if (parsed.schedule) state.schedule = parsed.schedule;
                     if (parsed.daysData) state.daysData = parsed.daysData;
-                    if (parsed.globalPlans) state.globalPlans = parsed.globalPlans;
+                    if (parsed.dayAssigned) state.dayAssigned = parsed.dayAssigned;
                     if (parsed.taxRate !== undefined) state.taxRate = parsed.taxRate;
                     if (parsed.fuelSettings) state.fuelSettings = parsed.fuelSettings;
                     if (parsed.darkMode !== undefined) state.darkMode = parsed.darkMode;
@@ -1561,13 +1609,12 @@
                         }));
                     }
 
-                    if (!state.globalPlans || Object.keys(state.globalPlans).length === 0) {
-                        state.globalPlans = {};
-                        for (let sKey in state.sections) {
-                            if (state.sections[sKey].type === 'counter') {
-                                state.globalPlans[sKey] = {};
-                                for (let iKey in state.sections[sKey].items) {
-                                    state.globalPlans[sKey][iKey] = state.sections[sKey].items[iKey].assigned || 0;
+                    if (!state.dayAssigned || Object.keys(state.dayAssigned).length === 0) {
+                        state.dayAssigned = {};
+                        if (parsed.daysData) {
+                            for (let d in parsed.daysData) {
+                                if (parsed.daysData[d].plans) {
+                                    state.dayAssigned[d] = parsed.daysData[d].plans;
                                 }
                             }
                         }
@@ -1601,16 +1648,12 @@
 
         function saveState() {
             const data = JSON.stringify(state);
+            localStorage.setItem('alfacalc_builder_v16', data);
             localStorage.setItem('alfacalc_builder_v15', data);
             localStorage.setItem('alfacalc_builder_v14', data);
-            localStorage.setItem('alfacalc_builder_v13', data);
-            localStorage.setItem('alfacalc_builder_v12', data);
-            localStorage.setItem('alfacalc_builder_v11', data);
-            localStorage.setItem('alfacalc_builder_v10', data);
-            localStorage.setItem('alfacalc_builder_v9', data);
             renderAll();
             renderDayPlan();
-            renderMonthPlanReport();
+            renderMonthPlanReport(false);
         }
 
         function toggleTheme() {
@@ -1681,7 +1724,7 @@
         function copyBackupToClipboard() {
             const jsonText = JSON.stringify(state);
             copyToClipboard(jsonText);
-            alert("Код резервной копии скопирован в буфер обмена! Вы можете сохранить его в Заметках или отправить в Telegram.");
+            alert("Код резервной копии скопирован в буфер обмена!");
         }
 
         function importBackupFromClipboard() {
@@ -1691,10 +1734,7 @@
                 const parsed = JSON.parse(text.trim());
                 if (parsed.sections && (parsed.daysData || parsed.schedule)) {
                     state = parsed;
-                    if (!state.globalPlans) state.globalPlans = {};
-                    if (!state.dayPlanTemplate) state.dayPlanTemplate = [];
-                    if (!state.dailyPlans) state.dailyPlans = {};
-                    if (!state.monthPlanHistory) state.monthPlanHistory = {};
+                    if (!state.dayAssigned) state.dayAssigned = {};
                     applyThemeUI();
                     saveState();
                     loadActiveDayToUI();
@@ -1719,10 +1759,7 @@
                     const parsed = JSON.parse(e.target.result);
                     if (parsed.sections && (parsed.daysData || parsed.schedule)) {
                         state = parsed;
-                        if (!state.globalPlans) state.globalPlans = {};
-                        if (!state.dayPlanTemplate) state.dayPlanTemplate = [];
-                        if (!state.dailyPlans) state.dailyPlans = {};
-                        if (!state.monthPlanHistory) state.monthPlanHistory = {};
+                        if (!state.dayAssigned) state.dayAssigned = {};
                         applyThemeUI();
                         saveState();
                         loadActiveDayToUI();
@@ -1770,7 +1807,7 @@
             document.getElementById('fuel-km-input').value = dayData.fuel.km || '';
             calculateFuel(false);
             renderDayPlan();
-            renderMonthPlanReport();
+            renderMonthPlanReport(false);
             
             const isToday = currentActiveDateKey === getFormattedDate(new Date());
             document.getElementById('profit-box-label').innerText = isToday ? "Заработано за сегодня" : `Заработано за ${formatDateDisplay(currentActiveDateKey)}`;
@@ -1793,7 +1830,7 @@
             if (tab === 'schedule') renderCalendar();
             if (tab === 'day-plan') {
                 renderDayPlan();
-                renderMonthPlanReport();
+                renderMonthPlanReport(false);
             }
         }
 
@@ -1843,19 +1880,13 @@
             let totalProfit = dayData.extraIncome || 0;
             let potentialProfit = 0;
 
-            if (!state.globalPlans) state.globalPlans = {};
-
             for (let sKey in state.sections) {
                 const sec = state.sections[sKey];
-                if (!state.globalPlans[sKey]) state.globalPlans[sKey] = {};
                 for (let iKey in sec.items) {
                     issuedCounts[iKey] = 0;
                     if (sec.type === 'counter') {
-                        if (state.globalPlans[sKey][iKey] === undefined) {
-                            state.globalPlans[sKey][iKey] = sec.items[iKey].assigned || 0;
-                        }
-                        const planCount = state.globalPlans[sKey][iKey];
-                        potentialProfit += planCount * (sec.items[iKey].price || 0);
+                        const assignedToday = getDayAssignedCount(sKey, iKey, currentActiveDateKey);
+                        potentialProfit += assignedToday * (sec.items[iKey].price || 0);
                     }
                 }
             }
@@ -1917,22 +1948,16 @@
 
         function renderPlanCounterSection() {
             const container = document.getElementById('plan-container');
-            if (!state.globalPlans) state.globalPlans = {};
-
             let html = '';
             let count = 0;
 
             for (let sKey in state.sections) {
                 const sec = state.sections[sKey];
                 if (sec.type === 'counter') {
-                    if (!state.globalPlans[sKey]) state.globalPlans[sKey] = {};
                     for (let iKey in sec.items) {
                         count++;
                         const item = sec.items[iKey];
-                        if (state.globalPlans[sKey][iKey] === undefined) {
-                            state.globalPlans[sKey][iKey] = item.assigned || 0;
-                        }
-                        const currentVal = state.globalPlans[sKey][iKey];
+                        const currentVal = getDayAssignedCount(sKey, iKey, currentActiveDateKey);
 
                         html += `
                             <div class="plan-item">
@@ -1941,9 +1966,14 @@
                                     <span style="font-size:12px; color:var(--alfa-muted); margin-left:6px;">(${item.price || 0} ₽)</span>
                                 </div>
                                 <div class="counter-controls">
-                                    <button class="btn-counter" onclick="changeGlobalCounterPlan('${sKey}', '${iKey}', -1)">-</button>
-                                    <span class="counter-value">${currentVal}</span>
-                                    <button class="btn-counter" onclick="changeGlobalCounterPlan('${sKey}', '${iKey}', 1)">+</button>
+                                    <button class="btn-counter" onclick="changeDayAssignedCount('${sKey}', '${iKey}', -1)">-</button>
+                                    <input type="number" 
+                                           class="counter-input" 
+                                           value="${currentVal}" 
+                                           min="0"
+                                           onchange="setDayAssignedCount('${sKey}', '${iKey}', this.value)"
+                                           onkeydown="if(event.key==='Enter'){ this.blur(); }">
+                                    <button class="btn-counter" onclick="changeDayAssignedCount('${sKey}', '${iKey}', 1)">+</button>
                                 </div>
                             </div>
                         `;
@@ -1951,14 +1981,7 @@
                 }
             }
 
-            container.innerHTML = count > 0 ? html : '<div class="empty-history">Добавьте основные продукты в настройках ⚙️️</div>';
-        }
-
-        function changeGlobalCounterPlan(sKey, iKey, delta) {
-            if (!state.globalPlans[sKey]) state.globalPlans[sKey] = {};
-            const cur = state.globalPlans[sKey][iKey] || 0;
-            state.globalPlans[sKey][iKey] = Math.max(0, cur + delta);
-            saveState();
+            container.innerHTML = count > 0 ? html : '<div class="empty-history">Добавьте основные продукты в настройках ⚙️</div>';
         }
 
         function renderDynamicMeetingForms() {
@@ -2005,7 +2028,7 @@
                             <label>${sec.name}</label>
                             <select id="form-sel-fail-${sKey}">
                                 <option value="">-- Выберите причину отказа --</option>
-                                ${itemKeys.map(k => `<option value="${k}">${sec.items[k].name} ${sec.items[k].price ? `(+${sec.items[k].price} ₽)` : ''}</option>`).join('')}
+                                ${itemKeys.map(k => `<option value="${k}">${sec.items[k].name}</option>`).join('')}
                             </select>
                         </div>
                     `;
@@ -2151,10 +2174,8 @@
                     const count = issuedCounts[k] || 0;
 
                     if (sec.type === 'counter') {
-                        const assigned = (state.globalPlans && state.globalPlans[sKey] && state.globalPlans[sKey][k] !== undefined)
-                            ? state.globalPlans[sKey][k]
-                            : (it.assigned || 0);
-                        report += `${it.name} - ${count}/${assigned}\n`;
+                        const assignedToday = getDayAssignedCount(sKey, k, currentActiveDateKey);
+                        report += `${it.name} - ${count}/${assignedToday}\n`;
                     } else {
                         report += `${it.name} - ${count}\n`;
                     }
@@ -2441,7 +2462,7 @@
                 item.innerHTML = `
                     <div class="plan-target-info">
                         <span class="plan-target-title">${t.name}</span>
-                        <span class="plan-target-sub">${t.sold}/${t.goal} ${u}</span>
+                        <span class="plan-target-sub">Продано за день: <b>${t.sold}</b> ${u}</span>
                     </div>
                     <div class="counter-controls">
                         <button class="btn-counter" onclick="changeTargetSold('${t.id}', -1)">-</button>
@@ -2456,7 +2477,7 @@
                     </div>
                 `;
                 list.appendChild(item);
-                report += `${idx + 1}. ${t.name} - ${t.sold}/${t.goal} ${u}\n`;
+                report += `${idx + 1}. ${t.name} - ${t.sold} ${u}\n`;
             });
 
             document.getElementById('plan-report-preview').innerText = report.trim();
@@ -2469,10 +2490,11 @@
 
         function changePlanMonth(delta) {
             currentPlanMonthDate.setMonth(currentPlanMonthDate.getMonth() + delta);
-            renderMonthPlanReport();
+            renderMonthPlanReport(false);
         }
 
-        function renderMonthPlanReport() {
+        // НАКОПИТЕЛЬНЫЙ ОТЧЕТ ЗА МЕСЯЦ (ВЫВОД ТОЛЬКО ФАКТИЧЕСКОГО КОЛИЧЕСТВА)
+        function renderMonthPlanReport(forceRecalculate = false) {
             const ym = getYearMonthKey(currentPlanMonthDate);
             const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
             const year = currentPlanMonthDate.getFullYear();
@@ -2481,58 +2503,64 @@
             const titleEl = document.getElementById('plan-month-title');
             if (titleEl) titleEl.innerText = `${monthNames[month]} ${year}`;
 
-            const monthAggregated = {};
+            const previewEl = document.getElementById('month-plan-report-preview');
+            if (!previewEl) return;
 
-            if (state.monthPlanHistory && state.monthPlanHistory[ym]) {
-                for (let k in state.monthPlanHistory[ym]) {
-                    const item = state.monthPlanHistory[ym][k];
-                    monthAggregated[k] = {
-                        name: item.name,
-                        goal: item.goal || 0,
-                        sold: 0,
-                        unit: item.unit || 'шт'
+            if (!forceRecalculate && document.activeElement === previewEl) {
+                return;
+            }
+
+            const monthTotals = {};
+
+            if (state.dayPlanTemplate) {
+                state.dayPlanTemplate.forEach(t => {
+                    monthTotals[t.name] = {
+                        name: t.name,
+                        totalSold: 0,
+                        unit: t.unit || 'шт'
                     };
-                }
+                });
             }
 
             if (state.dailyPlans) {
                 for (let dKey in state.dailyPlans) {
                     if (dKey.startsWith(ym)) {
                         state.dailyPlans[dKey].forEach(t => {
-                            const k = t.id || ('k_' + t.name);
-                            if (!monthAggregated[k]) {
-                                monthAggregated[k] = {
+                            if (!monthTotals[t.name]) {
+                                monthTotals[t.name] = {
                                     name: t.name,
-                                    goal: t.goal || 0,
-                                    sold: 0,
+                                    totalSold: 0,
                                     unit: t.unit || 'шт'
                                 };
                             }
-                            monthAggregated[k].sold += (t.sold || 0);
+                            monthTotals[t.name].totalSold += (parseInt(t.sold, 10) || 0);
                         });
                     }
                 }
             }
 
-            const keys = Object.keys(monthAggregated);
-            const previewEl = document.getElementById('month-plan-report-preview');
+            const items = Object.values(monthTotals);
 
-            if (keys.length === 0) {
-                previewEl.innerText = `План за ${monthNames[month]} ${year} пуст.`;
+            if (items.length === 0) {
+                previewEl.value = `План за ${monthNames[month]} ${year} пуст.`;
                 return;
             }
 
             let report = `Отчет по плану за ${monthNames[month]} ${year}:\n\n`;
-            keys.forEach((k, idx) => {
-                const item = monthAggregated[k];
-                report += `${idx + 1}. ${item.name} - ${item.sold}/${item.goal} ${item.unit}\n`;
+            items.forEach((item, idx) => {
+                report += `${idx + 1}. ${item.name} - ${item.totalSold} ${item.unit}\n`;
             });
 
-            previewEl.innerText = report.trim();
+            previewEl.value = report.trim();
+        }
+
+        function saveEditedMonthReport() {
+            // Пользовательские правки текста перед отправкой
         }
 
         function copyMonthPlanReport() {
-            const text = document.getElementById('month-plan-report-preview').innerText;
+            const previewEl = document.getElementById('month-plan-report-preview');
+            const text = previewEl ? previewEl.value : '';
             copyToClipboard(text);
             showToast("Отчет по плану за месяц скопирован!");
         }
@@ -2683,12 +2711,6 @@
             const iKey = 'item_' + Date.now();
             state.sections[targetSecKey].items[iKey] = { name: name, price: price, assigned: 0 };
             
-            if (type === 'counter') {
-                if (!state.globalPlans) state.globalPlans = {};
-                if (!state.globalPlans[targetSecKey]) state.globalPlans[targetSecKey] = {};
-                state.globalPlans[targetSecKey][iKey] = 0;
-            }
-
             document.getElementById('simple-prod-name').value = '';
             document.getElementById('simple-prod-price').value = '';
             renderSimpleSettingsLists();
@@ -2700,7 +2722,6 @@
             if (confirm("Удалить эту позицию?")) {
                 if (state.sections[sKey]?.items[iKey]) {
                     delete state.sections[sKey].items[iKey];
-                    if (state.globalPlans && state.globalPlans[sKey]) delete state.globalPlans[sKey][iKey];
                     renderSimpleSettingsLists();
                 }
             }
@@ -2749,7 +2770,6 @@
             }
         }
 
-        // Кнопка восстановления персонального эталонного набора
         function applyBankerPreset() {
             if (!confirm("Восстановить ваш персональный набор продуктов, кросс-продаж и отказов? Существующие расписания и доходы не сбросятся.")) return;
 
@@ -2769,6 +2789,9 @@
         function confirmReset() {
             if (confirm(`Сбросить результаты за ${formatDateDisplay(currentActiveDateKey)}? Встречи, бензин и доп. доход обнулятся. План и настройки останутся.`)) {
                 delete state.daysData[currentActiveDateKey];
+                if (state.dayAssigned && state.dayAssigned[currentActiveDateKey]) {
+                    delete state.dayAssigned[currentActiveDateKey];
+                }
                 loadActiveDayToUI();
                 saveState();
                 showToast("Результаты дня обнулены!");
@@ -2789,7 +2812,7 @@
             document.body.appendChild(ta);
             ta.select();
             document.execCommand('copy');
-            document.body.removeChild(ta);
+            document.removeChild(ta);
         }
 
         function showToast(msg) {
