@@ -22,6 +22,7 @@
             --alfa-green: #24C17E;
             --alfa-green-hover: #1DB06F;
             --alfa-purple: #6A1B9A;
+            --alfa-orange: #FF9800;
         }
 
         body.dark-mode {
@@ -288,6 +289,8 @@
             border-radius: 8px;
             outline: none;
             text-align: center;
+            min-height: 36px;
+            -webkit-appearance: none;
         }
 
         .btn-date-nav {
@@ -311,6 +314,31 @@
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
+        }
+
+        /* Т0 БАННЕР / БЛОК */
+        .t0-banner-box {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.12) 0%, rgba(239, 49, 36, 0.05) 100%);
+            border: 1px dashed var(--alfa-orange);
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .t0-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .t0-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--alfa-black);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .status-tabs {
@@ -607,6 +635,77 @@
 
         .empty-history { text-align: center; color: var(--alfa-muted); font-size: 13px; padding: 15px 0; }
 
+        /* ИНВЕНТАРИЗАЦИЯ */
+        .stock-item {
+            background: var(--alfa-bg);
+            border: 1px solid var(--alfa-border);
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stock-title { font-size: 15px; font-weight: 800; color: var(--alfa-black); }
+        
+        .stock-count-badge {
+            font-size: 14px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: var(--alfa-card);
+            border: 1px solid var(--alfa-border);
+        }
+        .stock-count-badge.low {
+            background: #FEEBEA;
+            border-color: #FCA5A5;
+            color: var(--alfa-red);
+        }
+
+        .stock-bindings {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .stock-tag {
+            font-size: 10px;
+            font-weight: 700;
+            background: rgba(239, 49, 36, 0.08);
+            color: var(--alfa-red);
+            border: 1px solid rgba(239, 49, 36, 0.2);
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+
+        .stock-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px dashed var(--alfa-border);
+            padding-top: 8px;
+            gap: 6px;
+        }
+
+        .btn-stock-add {
+            background: var(--alfa-card);
+            border: 1px solid var(--alfa-border);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--alfa-text);
+            cursor: pointer;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -624,7 +723,7 @@
             background: var(--alfa-card);
             border-radius: 20px;
             padding: 16px 14px;
-            max-width: 500px;
+            max-width: 520px;
             margin: 10px auto;
             box-sizing: border-box;
             border: 1px solid var(--alfa-border);
@@ -717,13 +816,48 @@
         }
 
         .setting-price-input {
-            width: 65px;
+            width: 60px;
             height: 34px;
             padding: 0 4px;
             border: 1px solid var(--alfa-border);
             border-radius: 8px;
             text-align: center;
             font-size: 13px;
+            font-weight: 700;
+            background: var(--alfa-bg);
+            color: var(--alfa-text);
+            outline: none;
+            flex-shrink: 0;
+        }
+
+        .plan-toggle-badge {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--alfa-bg);
+            border: 1px solid var(--alfa-border);
+            padding: 4px 6px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .plan-toggle-badge input[type="checkbox"] {
+            cursor: pointer;
+            accent-color: var(--alfa-red);
+        }
+
+        .plan-goal-input {
+            width: 44px;
+            height: 34px;
+            padding: 0 2px;
+            border: 1px solid var(--alfa-border);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
             font-weight: 700;
             background: var(--alfa-bg);
             color: var(--alfa-text);
@@ -792,13 +926,13 @@
             background: none;
             border: none;
             color: var(--alfa-muted);
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             cursor: pointer;
             flex: 1;
         }
 
-        .nav-item .nav-icon { font-size: 20px; }
+        .nav-item .nav-icon { font-size: 18px; }
         .nav-item.active { color: var(--alfa-red); }
 
         .calendar-header {
@@ -1033,6 +1167,19 @@
             <button class="btn-date-nav" onclick="stepDate(1)">Завтра ▶</button>
         </div>
 
+        <!-- БЛОК ДОБАВЛЕНИЯ Т0 (ДЕНЬ В ДЕНЬ) -->
+        <div class="t0-banner-box">
+            <div class="t0-header">
+                <span class="t0-title">⚡ Добавить заявку Т0 (день в день)</span>
+                <span style="font-size:11px; color:var(--alfa-muted); font-weight:700;">+ к назначенным</span>
+            </div>
+            <div style="display:flex; gap:6px;">
+                <select id="t0-product-select" class="input-text" style="flex:2; padding:8px 10px; font-size:13px;"></select>
+                <input type="number" id="t0-count-input" class="input-text" style="width:65px; padding:8px 4px; text-align:center; font-weight:800;" value="1" min="1">
+                <button class="btn-primary" style="width:auto; padding:8px 14px; font-size:13px; background:var(--alfa-orange);" onclick="addT0Assigned()">+ Т0</button>
+            </div>
+        </div>
+
         <div class="card" id="plan-section-card">
             <div class="card-title">1. Назначено на смену</div>
             <div class="plan-list" id="plan-container">
@@ -1118,15 +1265,18 @@
     <!-- ВКЛАДКА 2: ПЛАН НА ДЕНЬ + ПЛАН НА МЕСЯЦ -->
     <div id="tab-day-plan" class="container" style="display: none;">
         <div class="card">
-            <div class="card-title">🎯 Добавить задачу в план на день</div>
+            <div class="card-title">🎯 Добавить кастомную задачу в план</div>
             <div class="add-inline-group" style="display:flex; gap:6px;">
-                <input type="text" id="target-prod-name" class="input-text" placeholder="Название (Кредитка, БС...)" style="flex: 2;">
+                <input type="text" id="target-prod-name" class="input-text" placeholder="Название (Селфи ДК...)" style="flex: 2;">
                 <input type="number" id="target-prod-goal" class="input-text" placeholder="Цель" style="flex: 1;" min="1">
                 <select id="target-prod-unit" class="input-text" style="flex: 1.2;">
                     <option value="шт">Шт (1)</option>
                     <option value="%">% (100%)</option>
                 </select>
                 <button class="btn-primary" style="padding: 10px 14px; width: auto; font-size:14px; flex: 0.5;" onclick="addDayPlanTarget()">➕</button>
+            </div>
+            <div style="font-size:11px; color:var(--alfa-muted); margin-top:6px;">
+                💡 Продукты и кросс-продажи из 1-й вкладки подключаются автоматически через <b>Настройки ⚙️ → галочка «🎯 В план»</b>.
             </div>
         </div>
 
@@ -1166,7 +1316,29 @@
         </div>
     </div>
 
-    <!-- ВКЛАДКА 3: ГРАФИК РАБОТЫ И ДОХОД -->
+    <!-- ВКЛАДКА 3: ИНВЕНТАРИЗАЦИЯ КАРТ (СКЛАД) -->
+    <div id="tab-inventory" class="container" style="display: none;">
+        
+        <div class="card">
+            <div class="card-title">
+                <span>💳 Остатки карт на руках</span>
+                <button class="btn-primary" style="padding: 6px 12px; font-size:12px; width:auto;" onclick="openStockModal()">➕ Добавить карту</button>
+            </div>
+            <p style="font-size:12px; color:var(--alfa-muted); margin-bottom:12px;">
+                При успешных встречах количество карт списывается автоматически согласно вашим привязкам.
+            </p>
+            <div id="inventory-cards-list"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📋 Сводка по пластику</div>
+            <div class="report-preview" id="inventory-summary-report">Данные формируются...</div>
+            <button class="btn-primary" onclick="copyInventoryReport()">Скопировать остаток карт</button>
+        </div>
+
+    </div>
+
+    <!-- ВКЛАДКА 4: ГРАФИК РАБОТЫ И ДОХОД -->
     <div id="tab-schedule" class="container" style="display: none;">
         
         <div class="card profit-box" style="background: linear-gradient(135deg, #1B2028 0%, #2F3642 100%);">
@@ -1249,17 +1421,48 @@
     <nav class="bottom-nav">
         <button class="nav-item active" id="nav-calc" onclick="switchTab('calc')">
             <span class="nav-icon">🧮</span>
-            <span>Калькулятор</span>
+            <span>Кальк</span>
         </button>
         <button class="nav-item" id="nav-day-plan" onclick="switchTab('day-plan')">
             <span class="nav-icon">📋</span>
             <span>План</span>
+        </button>
+        <button class="nav-item" id="nav-inventory" onclick="switchTab('inventory')">
+            <span class="nav-icon">💳</span>
+            <span>Склад</span>
         </button>
         <button class="nav-item" id="nav-schedule" onclick="switchTab('schedule')">
             <span class="nav-icon">📅</span>
             <span>График</span>
         </button>
     </nav>
+
+    <!-- МОДАЛКА ДОБАВЛЕНИЯ/РЕДАКТИРОВАНИЯ КАРТЫ СКЛАДА -->
+    <div class="modal" id="stock-modal">
+        <div class="modal-content">
+            <div class="card-title">
+                <span id="stock-modal-title">📦 Позиция карты</span>
+                <button class="btn-delete" style="font-size:18px; padding:0 4px;" onclick="closeStockModal()">✕</button>
+            </div>
+
+            <div class="form-group">
+                <label>Название физической карты</label>
+                <input type="text" id="stock-card-name" class="input-text" placeholder="Например: Дебетовая Альфа-Карта (DK)">
+            </div>
+
+            <div class="form-group">
+                <label>Текущий остаток на руках (шт)</label>
+                <input type="number" id="stock-card-count" class="input-text" placeholder="25" min="0">
+            </div>
+
+            <div class="form-group">
+                <label>Привязать продукты (списывают эту карту при выдаче):</label>
+                <div id="stock-bindings-checklist" class="checkbox-grid" style="max-height:180px; overflow-y:auto; padding-right:4px;"></div>
+            </div>
+
+            <button class="btn-primary" style="margin-top:10px;" onclick="saveStockItem()">Сохранить карту</button>
+        </div>
+    </div>
 
     <!-- МОДАЛКА УПРАВЛЕНИЯ ДНЕМ -->
     <div class="modal" id="day-modal">
@@ -1294,38 +1497,43 @@
                 <button class="settings-nav-btn" id="set-tab-backup" onclick="switchSettingsTab('backup')">💾 Бэкап</button>
             </div>
 
-            <!-- 1. ПРОДУКТЫ И ЦЕНЫ -->
             <div id="set-pane-prod">
                 <div class="quick-preset-banner">
                     <p style="font-size:12px; font-weight:700; color:var(--alfa-black); margin-bottom:4px;">Ваш персональный набор</p>
-                    <p style="font-size:11px; color:var(--alfa-muted); margin-bottom:8px;">Загрузить стандартную сетку: DK/ZPC, X5, CC, Кредиты, Сим, Кросс и Приложения</p>
+                    <p style="font-size:11px; color:var(--alfa-muted); margin-bottom:8px;">Загрузить стандартную сетку продуктов, отказов и инвентаря</p>
                     <button class="btn-primary" style="padding: 8px 12px; font-size:12px; width:auto;" onclick="applyBankerPreset()">🪄 Восстановить мой стандартный набор</button>
                 </div>
 
                 <div class="simple-card-box">
                     <h4>➕ Добавить продукт или услугу</h4>
                     <div style="display:flex; flex-direction:column; gap:6px;">
-                        <input type="text" id="simple-prod-name" class="input-text" placeholder="Название (например: DK / ZPC / RE)">
+                        <input type="text" id="simple-prod-name" class="input-text" placeholder="Название (например: SIM / БС / DK)">
                         <div style="display:flex; gap:6px;">
-                            <input type="number" id="simple-prod-price" class="input-text" placeholder="Оплата за шт (₽)" style="flex:1;">
+                            <input type="number" id="simple-prod-price" class="input-text" placeholder="Оплата (₽)" style="flex:1;">
                             <select id="simple-prod-type" class="input-text" style="flex:1.4;">
                                 <option value="counter">Основной (встречи + план)</option>
                                 <option value="checkbox">Опция (галочка/допродажа)</option>
                                 <option value="apps">Приложения (галочка)</option>
                             </select>
                         </div>
+                        <div style="display:flex; gap:6px; align-items:center; background:var(--alfa-card); padding:8px 10px; border-radius:10px; border:1px solid var(--alfa-border);">
+                            <label style="font-size:12px; font-weight:700; display:flex; align-items:center; gap:6px; cursor:pointer; flex:1;">
+                                <input type="checkbox" id="simple-prod-inplan" checked>
+                                🎯 Включать в «План на день»
+                            </label>
+                            <input type="number" id="simple-prod-goal" class="input-text" placeholder="Цель" style="width:70px; padding:6px;" value="1" min="1">
+                        </div>
                         <button class="btn-primary" style="padding:10px; font-size:13px; margin-top:2px;" onclick="addSimpleProduct()">Добавить в калькулятор</button>
                     </div>
                 </div>
 
                 <div class="settings-hint-box">
-                    💡 <b>Основные продукты</b> учитываются в плане смены (3/5), а <b>опции</b> выбираются галочками при оформлении встречи.
+                    💡 Включите галочку <b>«🎯»</b> напротив тех продуктов, которые должны отображаться в плане. Для физического пластика привязывайте их во вкладке <b>«Склад»</b>.
                 </div>
 
-                <div id="settings-products-list" style="max-height: 260px; overflow-y: auto;"></div>
+                <div id="settings-products-list" style="max-height: 290px; overflow-y: auto;"></div>
             </div>
 
-            <!-- 2. СТАТУСЫ ОТКАЗОВ -->
             <div id="set-pane-fails" style="display: none;">
                 <div class="simple-card-box">
                     <h4>➕ Новая причина отказа</h4>
@@ -1339,13 +1547,12 @@
                 </div>
 
                 <div class="settings-hint-box">
-                    💡 Причины появляются в выпадающем списке при выборе <b>«Неуспешная встреча»</b>. Если за отказ есть оплата (например, 911), укажите цену.
+                    💡 Причины появляются в выпадающем списке при выборе <b>«Неуспешная встреча»</b>.
                 </div>
 
                 <div id="settings-fails-list" style="max-height: 280px; overflow-y: auto;"></div>
             </div>
 
-            <!-- 3. СТАТУСЫ ГРАФИКА СМЕН -->
             <div id="set-pane-shifts" style="display: none;">
                 <div class="simple-card-box">
                     <h4>➕ Добавить тип смены</h4>
@@ -1363,7 +1570,6 @@
                 <div id="settings-shifts-list" style="max-height: 280px; overflow-y: auto;"></div>
             </div>
 
-            <!-- 4. РЕЗЕРВНАЯ КОПИЯ -->
             <div id="set-pane-backup" style="display: none;">
                 <div class="simple-card-box">
                     <h4>🛡 Резервное копирование</h4>
@@ -1404,34 +1610,34 @@
                 "name": "Основные продукты",
                 "type": "counter",
                 "items": {
-                    "item_dk": { "name": "DK / ZPC / RE", "price": 330, "assigned": 0 },
-                    "item_x5": { "name": "X5", "price": 330, "assigned": 0 },
-                    "item_cc": { "name": "CC", "price": 570, "assigned": 0 },
-                    "item_ipoteka": { "name": "Ипотека", "price": 450, "assigned": 0 },
-                    "item_mp": { "name": "МП", "price": 330, "assigned": 0 },
-                    "item_credit": { "name": "Кредит наличными", "price": 600, "assigned": 0 },
-                    "item_sim": { "name": "SIM", "price": 330, "assigned": 0 },
-                    "item_simao": { "name": "SIM AO", "price": 450, "assigned": 0 },
-                    "item_semeyniy": { "name": "Семейный", "price": 270, "assigned": 0 },
-                    "item_dk_nerez": { "name": "ДК нерез.", "price": 570, "assigned": 0 },
-                    "item_kids": { "name": "Кидс", "price": 430, "assigned": 0 }
+                    "item_dk": { "name": "DK / ZPC / RE", "price": 330, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_x5": { "name": "X5", "price": 330, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_cc": { "name": "CC", "price": 570, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_ipoteka": { "name": "Ипотека", "price": 450, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_mp": { "name": "МП", "price": 330, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_credit": { "name": "Кредит наличными", "price": 600, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_sim": { "name": "SIM", "price": 330, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_simao": { "name": "SIM AO", "price": 450, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_semeyniy": { "name": "Семейный", "price": 270, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_dk_nerez": { "name": "ДК нерез.", "price": 570, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_kids": { "name": "Кидс", "price": 430, "assigned": 0, "inPlan": false, "goal": 1 }
                 }
             },
             "sec_cross": {
                 "name": "Кросс-продажи",
                 "type": "checkbox",
                 "items": {
-                    "item_act": { "name": "Активация", "price": 0, "assigned": 0 },
-                    "item_smart": { "name": "Смарт", "price": 30, "assigned": 0 },
-                    "item_combo": { "name": "Комбо", "price": 600, "assigned": 0 },
-                    "item_bs": { "name": "БС", "price": 270, "assigned": 0 },
-                    "item_cross_dk": { "name": "ДК", "price": 270, "assigned": 0 },
-                    "item_cross_kids_new": { "name": "Кидс (new)", "price": 430, "assigned": 0 },
-                    "item_cross_kids": { "name": "Кидс", "price": 270, "assigned": 0 },
-                    "item_cross_sim": { "name": "SIM", "price": 430, "assigned": 0 },
-                    "item_cp": { "name": "ЦП", "price": 20, "assigned": 0 },
-                    "item_pens": { "name": "Пенсия", "price": 270, "assigned": 0 },
-                    "item_box": { "name": "Коробка", "price": 100, "assigned": 0 }
+                    "item_combo": { "name": "Комбо", "price": 600, "assigned": 0, "inPlan": true, "goal": 2 },
+                    "item_bs": { "name": "БС", "price": 270, "assigned": 0, "inPlan": true, "goal": 1 },
+                    "item_cross_sim": { "name": "SIM", "price": 430, "assigned": 0, "inPlan": true, "goal": 1 },
+                    "item_cross_kids": { "name": "Детская", "price": 270, "assigned": 0, "inPlan": true, "goal": 1 },
+                    "item_smart": { "name": "Смарт", "price": 30, "assigned": 0, "inPlan": true, "goal": 100, "unit": "%" },
+                    "item_pens": { "name": "Пенсия", "price": 270, "assigned": 0, "inPlan": true, "goal": 1 },
+                    "item_act": { "name": "Активация", "price": 0, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_cross_dk": { "name": "ДК", "price": 270, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_cross_kids_new": { "name": "Кидс (new)", "price": 430, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_cp": { "name": "ЦП", "price": 20, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_box": { "name": "Коробка", "price": 100, "assigned": 0, "inPlan": false, "goal": 1 }
                 }
             },
             "sec_statuses": {
@@ -1450,9 +1656,9 @@
                 "name": "Приложения",
                 "type": "checkbox",
                 "items": {
-                    "item_ios": { "name": "IOS", "price": 0, "assigned": 0 },
-                    "item_android": { "name": "Android", "price": 0, "assigned": 0 },
-                    "item_app_x5": { "name": "X5", "price": 0, "assigned": 0 }
+                    "item_ios": { "name": "IOS", "price": 0, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_android": { "name": "Android", "price": 0, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_app_x5": { "name": "X5", "price": 0, "assigned": 0, "inPlan": false, "goal": 1 }
                 }
             }
         };
@@ -1464,12 +1670,34 @@
         };
 
         const defaultDayPlanTemplate = [
-            { "id": "target_combo", "name": "Комбо", "goal": 2, "unit": "шт" },
-            { "id": "target_bs", "name": "БС", "goal": 1, "unit": "шт" },
-            { "id": "target_kids", "name": "Детская", "goal": 1, "unit": "шт" },
-            { "id": "target_smart", "name": "Смарт", "goal": 100, "unit": "%" },
-            { "id": "target_pens", "name": "Пенсия", "goal": 1, "unit": "шт" },
-            { "id": "target_selfie", "name": "Селфи ДК", "goal": 1, "unit": "шт" }
+            { "id": "custom_selfie", "name": "Селфи ДК", "goal": 1, "unit": "шт", "isCustom": true }
+        ];
+
+        const defaultCardInventory = [
+            {
+                "id": "stock_dk",
+                "name": "Дебетовая карта (DK)",
+                "count": 25,
+                "boundItems": ["item_dk", "item_dk_nerez", "item_cross_dk"]
+            },
+            {
+                "id": "stock_cc",
+                "name": "Кредитная карта (CC)",
+                "count": 15,
+                "boundItems": ["item_cc", "item_combo"]
+            },
+            {
+                "id": "stock_kids",
+                "name": "Детская карта (Kids)",
+                "count": 10,
+                "boundItems": ["item_kids", "item_cross_kids", "item_cross_kids_new"]
+            },
+            {
+                "id": "stock_sim",
+                "name": "SIM-карта Альфа",
+                "count": 30,
+                "boundItems": ["item_sim", "item_simao", "item_cross_sim"]
+            }
         ];
 
         let state = {
@@ -1481,6 +1709,7 @@
             dayPlanTemplate: JSON.parse(JSON.stringify(defaultDayPlanTemplate)),
             dailyPlans: {},
             monthPlanHistory: {},
+            cardInventory: JSON.parse(JSON.stringify(defaultCardInventory)),
             taxRate: 13,
             fuelSettings: { consumption: 10, pricePerLiter: 64 },
             darkMode: false
@@ -1490,6 +1719,7 @@
         let currentCalendarDate = new Date();
         let currentPlanMonthDate = new Date();
         let selectedDayKey = null;
+        let editingStockId = null;
         let toastTimeout = null;
         let currentCalculatedTodayProfit = 0;
         let isCurrentMeetingSuccess = true;
@@ -1537,17 +1767,89 @@
             setDayAssignedCount(sKey, iKey, current + delta, currentActiveDateKey);
         }
 
+        // ОБРАБОТКА Т0: БЫСТРОЕ ДОБАВЛЕНИЕ ЗАЯВКИ ДЕНЬ В ДЕНЬ В ПЛАН
+        function addT0Assigned() {
+            const selectEl = document.getElementById('t0-product-select');
+            const countEl = document.getElementById('t0-count-input');
+            const itemKey = selectEl.value;
+            const count = parseInt(countEl.value, 10) || 1;
+
+            if (!itemKey) return alert("Выберите продукт для заявки Т0!");
+            if (count <= 0) return alert("Количество должно быть > 0!");
+
+            let foundSecKey = null;
+            for (let sKey in state.sections) {
+                if (state.sections[sKey].type === 'counter' && state.sections[sKey].items[itemKey]) {
+                    foundSecKey = sKey;
+                    break;
+                }
+            }
+
+            if (!foundSecKey) return alert("Продукт не найден среди основных продуктов!");
+
+            const current = getDayAssignedCount(foundSecKey, itemKey, currentActiveDateKey);
+            setDayAssignedCount(foundSecKey, itemKey, current + count, currentActiveDateKey);
+
+            showToast(`⚡ Т0 добавлено (+${count} шт. к назначенным)`);
+            countEl.value = '1';
+        }
+
+        function renderT0Select() {
+            const selectEl = document.getElementById('t0-product-select');
+            if (!selectEl) return;
+            let options = '';
+            for (let sKey in state.sections) {
+                const sec = state.sections[sKey];
+                if (sec.type === 'counter') {
+                    for (let iKey in sec.items) {
+                        options += `<option value="${iKey}">${sec.items[iKey].name}</option>`;
+                    }
+                }
+            }
+            selectEl.innerHTML = options || '<option value="">Нет основных продуктов</option>';
+        }
+
         function getDayPlanList(dKey) {
             if (!state.dailyPlans) state.dailyPlans = {};
-            if (!state.dailyPlans[dKey]) {
-                state.dailyPlans[dKey] = (state.dayPlanTemplate || []).map(t => ({
-                    id: t.id,
-                    name: t.name,
-                    goal: t.goal,
-                    sold: 0,
-                    unit: t.unit || 'шт'
-                }));
+            if (!state.dailyPlans[dKey]) state.dailyPlans[dKey] = [];
+
+            const currentList = state.dailyPlans[dKey];
+            const activePlanItems = [];
+
+            for (let sKey in state.sections) {
+                const sec = state.sections[sKey];
+                if (sec.type === 'select') continue;
+                for (let iKey in sec.items) {
+                    const item = sec.items[iKey];
+                    if (item.inPlan) {
+                        const existing = currentList.find(t => t.id === iKey);
+                        activePlanItems.push({
+                            id: iKey,
+                            name: item.name,
+                            goal: item.goal || 1,
+                            sold: existing ? (parseInt(existing.sold, 10) || 0) : 0,
+                            unit: item.unit || 'шт',
+                            isProduct: true
+                        });
+                    }
+                }
             }
+
+            if (state.dayPlanTemplate) {
+                state.dayPlanTemplate.forEach(t => {
+                    const existing = currentList.find(e => e.id === t.id);
+                    activePlanItems.push({
+                        id: t.id,
+                        name: t.name,
+                        goal: t.goal || 1,
+                        sold: existing ? (parseInt(existing.sold, 10) || 0) : 0,
+                        unit: t.unit || 'шт',
+                        isCustom: true
+                    });
+                });
+            }
+
+            state.dailyPlans[dKey] = activePlanItems;
             return state.dailyPlans[dKey];
         }
 
@@ -1572,18 +1874,9 @@
         }
 
         function loadState() {
-            let saved = localStorage.getItem('alfacalc_builder_v16') ||
-                        localStorage.getItem('alfacalc_builder_v15') ||
-                        localStorage.getItem('alfacalc_builder_v14') ||
-                        localStorage.getItem('alfacalc_builder_v13') ||
-                        localStorage.getItem('alfacalc_builder_v12') ||
-                        localStorage.getItem('alfacalc_builder_v11') ||
-                        localStorage.getItem('alfacalc_builder_v10') || 
-                        localStorage.getItem('alfacalc_builder_v9')  || 
-                        localStorage.getItem('alfacalc_builder_v8')  || 
-                        localStorage.getItem('alfacalc_builder_v7')  || 
-                        localStorage.getItem('alfacalc_builder_v6')  || 
-                        localStorage.getItem('alfacalc_builder_v5');
+            let saved = localStorage.getItem('alfacalc_smartinventory_v1') ||
+                        localStorage.getItem('alfacalc_smartplan_v1') ||
+                        localStorage.getItem('alfacalc_builder_v16');
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -1597,31 +1890,17 @@
                     if (parsed.darkMode !== undefined) state.darkMode = parsed.darkMode;
                     if (parsed.dailyPlans) state.dailyPlans = parsed.dailyPlans;
                     if (parsed.monthPlanHistory) state.monthPlanHistory = parsed.monthPlanHistory;
+                    if (parsed.dayPlanTemplate) state.dayPlanTemplate = parsed.dayPlanTemplate;
+                    if (parsed.cardInventory && Array.isArray(parsed.cardInventory)) state.cardInventory = parsed.cardInventory;
 
-                    if (parsed.dayPlanTemplate && parsed.dayPlanTemplate.length > 0) {
-                        state.dayPlanTemplate = parsed.dayPlanTemplate;
-                    } else if (parsed.dayPlanTargets && Array.isArray(parsed.dayPlanTargets)) {
-                        state.dayPlanTemplate = parsed.dayPlanTargets.map(t => ({
-                            id: t.id || ('target_' + Date.now()),
-                            name: t.name,
-                            goal: t.goal,
-                            unit: t.unit || 'шт'
-                        }));
-                    }
-
-                    if (!state.dayAssigned || Object.keys(state.dayAssigned).length === 0) {
-                        state.dayAssigned = {};
-                        if (parsed.daysData) {
-                            for (let d in parsed.daysData) {
-                                if (parsed.daysData[d].plans) {
-                                    state.dayAssigned[d] = parsed.daysData[d].plans;
-                                }
+                    for (let sKey in state.sections) {
+                        for (let iKey in state.sections[sKey].items) {
+                            const it = state.sections[sKey].items[iKey];
+                            if (it.inPlan === undefined) {
+                                it.inPlan = (iKey === 'item_combo' || iKey === 'item_bs' || iKey === 'item_cross_sim');
+                                it.goal = (iKey === 'item_combo') ? 2 : 1;
                             }
                         }
-                    }
-
-                    if (state.dayPlanTemplate) {
-                        state.dayPlanTemplate.forEach(t => syncTargetToMonthArchive(t, currentActiveDateKey));
                     }
                 } catch (e) {
                     console.error("Ошибка загрузки данных", e);
@@ -1639,21 +1918,22 @@
             loadActiveDayToUI();
             renderAll();
             renderCalendar();
+            renderInventory();
 
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 if (splash) splash.classList.add('hide');
-            }, 1400);
+            }, 1200);
         }
 
         function saveState() {
             const data = JSON.stringify(state);
-            localStorage.setItem('alfacalc_builder_v16', data);
-            localStorage.setItem('alfacalc_builder_v15', data);
-            localStorage.setItem('alfacalc_builder_v14', data);
+            localStorage.setItem('alfacalc_smartinventory_v1', data);
+            localStorage.setItem('alfacalc_smartplan_v1', data);
             renderAll();
             renderDayPlan();
             renderMonthPlanReport(false);
+            renderInventory();
         }
 
         function toggleTheme() {
@@ -1735,6 +2015,7 @@
                 if (parsed.sections && (parsed.daysData || parsed.schedule)) {
                     state = parsed;
                     if (!state.dayAssigned) state.dayAssigned = {};
+                    if (!state.cardInventory) state.cardInventory = JSON.parse(JSON.stringify(defaultCardInventory));
                     applyThemeUI();
                     saveState();
                     loadActiveDayToUI();
@@ -1760,6 +2041,7 @@
                     if (parsed.sections && (parsed.daysData || parsed.schedule)) {
                         state = parsed;
                         if (!state.dayAssigned) state.dayAssigned = {};
+                        if (!state.cardInventory) state.cardInventory = JSON.parse(JSON.stringify(defaultCardInventory));
                         applyThemeUI();
                         saveState();
                         loadActiveDayToUI();
@@ -1821,10 +2103,12 @@
         function switchTab(tab) {
             document.getElementById('tab-calc').style.display = tab === 'calc' ? 'block' : 'none';
             document.getElementById('tab-day-plan').style.display = tab === 'day-plan' ? 'block' : 'none';
+            document.getElementById('tab-inventory').style.display = tab === 'inventory' ? 'block' : 'none';
             document.getElementById('tab-schedule').style.display = tab === 'schedule' ? 'block' : 'none';
             
             document.getElementById('nav-calc').classList.toggle('active', tab === 'calc');
             document.getElementById('nav-day-plan').classList.toggle('active', tab === 'day-plan');
+            document.getElementById('nav-inventory').classList.toggle('active', tab === 'inventory');
             document.getElementById('nav-schedule').classList.toggle('active', tab === 'schedule');
             
             if (tab === 'schedule') renderCalendar();
@@ -1832,6 +2116,7 @@
                 renderDayPlan();
                 renderMonthPlanReport(false);
             }
+            if (tab === 'inventory') renderInventory();
         }
 
         function calculateFuel(triggerSave = true) {
@@ -1928,6 +2213,7 @@
             renderPlanCounterSection();
             renderDynamicMeetingForms();
             renderHistoryList();
+            renderT0Select();
             buildDayReport(issuedCounts);
         }
 
@@ -2039,6 +2325,40 @@
             failContainer.innerHTML = failHtml || '<div class="empty-history">Добавьте причины отказов в настройках ⚙️</div>';
         }
 
+        function applyMeetingSync(meeting, isAdding = true) {
+            if (!meeting.isSuccess) return;
+            const factor = isAdding ? 1 : -1;
+            const dayList = getDayPlanList(currentActiveDateKey);
+
+            const itemsIssued = [];
+            for (let s in meeting.selectValues) {
+                if (meeting.selectValues[s]) itemsIssued.push(meeting.selectValues[s]);
+            }
+            if (meeting.checkedItems) {
+                meeting.checkedItems.forEach(iKey => itemsIssued.push(iKey));
+            }
+
+            // 1. Синхронизация плана на день
+            itemsIssued.forEach(iKey => {
+                const target = dayList.find(t => t.id === iKey);
+                if (target) {
+                    target.sold = Math.max(0, (parseInt(target.sold, 10) || 0) + factor);
+                    syncTargetToMonthArchive(target, currentActiveDateKey);
+                }
+            });
+
+            // 2. Списание пластика со склада инвентаризации
+            if (state.cardInventory && Array.isArray(state.cardInventory)) {
+                itemsIssued.forEach(iKey => {
+                    state.cardInventory.forEach(stock => {
+                        if (stock.boundItems && stock.boundItems.includes(iKey)) {
+                            stock.count = Math.max(0, (parseInt(stock.count, 10) || 0) - factor);
+                        }
+                    });
+                });
+            }
+        }
+
         function saveMeeting() {
             const client = document.getElementById('client-info').value.trim() || "Клиент без имени";
             const comment = document.getElementById('meeting-comment').value.trim();
@@ -2103,10 +2423,13 @@
 
             const dayData = getActiveDayData();
             dayData.meetings.push(newMeeting);
+
+            applyMeetingSync(newMeeting, true);
+
             saveState();
 
             copyToClipboard(singleReportText);
-            showToast("Отчет встречи в буфере!");
+            showToast("Встреча сохранена, план и склад обновлены!");
 
             document.getElementById('client-info').value = '';
             document.getElementById('meeting-comment').value = '';
@@ -2153,9 +2476,13 @@
         }
 
         function deleteMeeting(id) {
-            if (confirm("Удалить эту встречу?")) {
+            if (confirm("Удалить эту встречу? (План и остаток карт будут скорректированы)")) {
                 const dayData = getActiveDayData();
-                dayData.meetings = dayData.meetings.filter(m => m.id !== id);
+                const m = dayData.meetings.find(x => x.id === id);
+                if (m) {
+                    applyMeetingSync(m, false);
+                }
+                dayData.meetings = dayData.meetings.filter(x => x.id !== id);
                 saveState();
             }
         }
@@ -2380,25 +2707,23 @@
             if (!name || goal <= 0) return alert("Укажите название и цель > 0!");
             if (!state.dayPlanTemplate) state.dayPlanTemplate = [];
 
-            const newId = 'target_' + Date.now();
-            const newTpl = { id: newId, name: name, goal: goal, unit: unit };
+            const newId = 'custom_' + Date.now();
+            const newTpl = { id: newId, name: name, goal: goal, unit: unit, isCustom: true };
             state.dayPlanTemplate.push(newTpl);
 
-            const dayList = getDayPlanList(currentActiveDateKey);
-            dayList.push({ id: newId, name: name, goal: goal, sold: 0, unit: unit });
-
+            getDayPlanList(currentActiveDateKey);
             syncTargetToMonthArchive(newTpl, currentActiveDateKey);
 
             nameInput.value = ''; goalInput.value = '';
             saveState();
-            showToast("Задача добавлена в план!");
+            showToast("Кастомная цель добавлена в план!");
         }
 
         function changeTargetSold(id, delta) {
             const dayList = getDayPlanList(currentActiveDateKey);
             const target = dayList.find(t => t.id === id);
             if (target) {
-                target.sold = Math.max(0, target.sold + delta);
+                target.sold = Math.max(0, (parseInt(target.sold, 10) || 0) + delta);
                 syncTargetToMonthArchive(target, currentActiveDateKey);
                 saveState();
             }
@@ -2417,23 +2742,32 @@
         }
 
         function deleteDayPlanTarget(id) {
-            const dayList = getDayPlanList(currentActiveDateKey);
-            const target = dayList.find(t => t.id === id);
-            if (target) {
-                syncTargetToMonthArchive(target, currentActiveDateKey);
+            let wasProduct = false;
+            for (let sKey in state.sections) {
+                if (state.sections[sKey].items[id]) {
+                    state.sections[sKey].items[id].inPlan = false;
+                    wasProduct = true;
+                    break;
+                }
             }
-            state.dailyPlans[currentActiveDateKey] = dayList.filter(t => t.id !== id);
-            if (state.dayPlanTemplate) {
+
+            if (!wasProduct && state.dayPlanTemplate) {
                 state.dayPlanTemplate = state.dayPlanTemplate.filter(t => t.id !== id);
             }
+
+            if (state.dailyPlans[currentActiveDateKey]) {
+                state.dailyPlans[currentActiveDateKey] = state.dailyPlans[currentActiveDateKey].filter(t => t.id !== id);
+            }
             saveState();
+            showToast("Позиция убрана из плана!");
         }
 
         function clearDayPlanTargets() {
-            if (confirm(`Очистить план на ${formatDateDisplay(currentActiveDateKey)}? Показатели за месяц сохранятся.`)) {
-                state.dailyPlans[currentActiveDateKey] = [];
+            if (confirm(`Обнулить проданное в плане за ${formatDateDisplay(currentActiveDateKey)}?`)) {
+                const dayList = getDayPlanList(currentActiveDateKey);
+                dayList.forEach(t => t.sold = 0);
                 saveState();
-                showToast("План на день очищен!");
+                showToast("Счетчики проданного обнулены!");
             }
         }
 
@@ -2449,7 +2783,7 @@
             }
 
             if (dayList.length === 0) {
-                list.innerHTML = '<div class="empty-history">На этот день задач нет. Добавьте цель выше!</div>';
+                list.innerHTML = '<div class="empty-history">В плане нет активных позиций. Включите их в Настройках ⚙️ («🎯 В план»)!</div>';
                 document.getElementById('plan-report-preview').innerText = `План на ${formatDateDisplay(currentActiveDateKey)} пуст.`;
                 return;
             }
@@ -2459,10 +2793,12 @@
                 const item = document.createElement('div');
                 item.className = 'plan-target-item';
                 const u = t.unit || 'шт';
+                const tagType = t.isCustom ? '<span style="font-size:10px; color:var(--alfa-muted); margin-left:4px;">(кастом)</span>' : '';
+
                 item.innerHTML = `
                     <div class="plan-target-info">
-                        <span class="plan-target-title">${t.name}</span>
-                        <span class="plan-target-sub">Продано за день: <b>${t.sold}</b> ${u}</span>
+                        <span class="plan-target-title">${t.name} ${tagType}</span>
+                        <span class="plan-target-sub">Продано за день: <b>${t.sold}</b> ${u} (цель: ${t.goal})</span>
                     </div>
                     <div class="counter-controls">
                         <button class="btn-counter" onclick="changeTargetSold('${t.id}', -1)">-</button>
@@ -2473,7 +2809,7 @@
                                onchange="setTargetSoldDirectly('${t.id}', this.value)"
                                onkeydown="if(event.key==='Enter'){ this.blur(); }">
                         <button class="btn-counter" onclick="changeTargetSold('${t.id}', 1)">+</button>
-                        <button class="btn-remove-prod" style="margin-left:4px;" onclick="deleteDayPlanTarget('${t.id}')">🗑️</button>
+                        <button class="btn-remove-prod" style="margin-left:4px;" title="Убрать из плана" onclick="deleteDayPlanTarget('${t.id}')">✕</button>
                     </div>
                 `;
                 list.appendChild(item);
@@ -2493,7 +2829,6 @@
             renderMonthPlanReport(false);
         }
 
-        // НАКОПИТЕЛЬНЫЙ ОТЧЕТ ЗА МЕСЯЦ (ВЫВОД ТОЛЬКО ФАКТИЧЕСКОГО КОЛИЧЕСТВА)
         function renderMonthPlanReport(forceRecalculate = false) {
             const ym = getYearMonthKey(currentPlanMonthDate);
             const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
@@ -2512,13 +2847,17 @@
 
             const monthTotals = {};
 
+            for (let sKey in state.sections) {
+                for (let iKey in state.sections[sKey].items) {
+                    const it = state.sections[sKey].items[iKey];
+                    if (it.inPlan) {
+                        monthTotals[it.name] = { name: it.name, totalSold: 0, unit: it.unit || 'шт' };
+                    }
+                }
+            }
             if (state.dayPlanTemplate) {
                 state.dayPlanTemplate.forEach(t => {
-                    monthTotals[t.name] = {
-                        name: t.name,
-                        totalSold: 0,
-                        unit: t.unit || 'шт'
-                    };
+                    monthTotals[t.name] = { name: t.name, totalSold: 0, unit: t.unit || 'шт' };
                 });
             }
 
@@ -2527,11 +2866,7 @@
                     if (dKey.startsWith(ym)) {
                         state.dailyPlans[dKey].forEach(t => {
                             if (!monthTotals[t.name]) {
-                                monthTotals[t.name] = {
-                                    name: t.name,
-                                    totalSold: 0,
-                                    unit: t.unit || 'шт'
-                                };
+                                monthTotals[t.name] = { name: t.name, totalSold: 0, unit: t.unit || 'шт' };
                             }
                             monthTotals[t.name].totalSold += (parseInt(t.sold, 10) || 0);
                         });
@@ -2554,15 +2889,187 @@
             previewEl.value = report.trim();
         }
 
-        function saveEditedMonthReport() {
-            // Пользовательские правки текста перед отправкой
-        }
+        function saveEditedMonthReport() {}
 
         function copyMonthPlanReport() {
             const previewEl = document.getElementById('month-plan-report-preview');
             const text = previewEl ? previewEl.value : '';
             copyToClipboard(text);
             showToast("Отчет по плану за месяц скопирован!");
+        }
+
+        /* ИНВЕНТАРИЗАЦИЯ КАРТ (СКЛАД) */
+        function renderInventory() {
+            const listEl = document.getElementById('inventory-cards-list');
+            if (!listEl) return;
+            listEl.innerHTML = '';
+
+            if (!state.cardInventory || state.cardInventory.length === 0) {
+                listEl.innerHTML = '<div class="empty-history">В инвентаре пока нет карт. Нажмите «➕ Добавить карту».</div>';
+                document.getElementById('inventory-summary-report').innerText = "Инвентарь пуст.";
+                return;
+            }
+
+            let reportText = `Остатки карт на руках (${formatDateDisplay(currentActiveDateKey)}):\n\n`;
+
+            state.cardInventory.forEach((card, idx) => {
+                const count = parseInt(card.count, 10) || 0;
+                const isLow = count <= 3;
+                const badgeClass = isLow ? 'stock-count-badge low' : 'stock-count-badge';
+
+                const boundNames = (card.boundItems || []).map(iKey => getItemName(iKey));
+                const tagsHtml = boundNames.map(name => `<span class="stock-tag">${name}</span>`).join('');
+
+                const div = document.createElement('div');
+                div.className = 'stock-item';
+                div.innerHTML = `
+                    <div class="stock-header">
+                        <span class="stock-title">${card.name}</span>
+                        <span class="${badgeClass}">${count} шт.</span>
+                    </div>
+                    <div class="stock-bindings">
+                        ${tagsHtml || '<span style="font-size:11px; color:var(--alfa-muted);">Нет привязанных продуктов</span>'}
+                    </div>
+                    <div class="stock-actions">
+                        <div style="display:flex; gap:4px;">
+                            <button class="btn-stock-add" onclick="adjustStockCount('${card.id}', 10)">+10</button>
+                            <button class="btn-stock-add" onclick="adjustStockCount('${card.id}', 50)">+50</button>
+                            <button class="btn-stock-add" onclick="setExactStockCount('${card.id}')">Вручную</button>
+                        </div>
+                        <div class="counter-controls">
+                            <button class="btn-counter" onclick="adjustStockCount('${card.id}', -1)">-</button>
+                            <button class="btn-counter" onclick="adjustStockCount('${card.id}', 1)">+</button>
+                            <button class="btn-remove-prod" title="Редактировать" onclick="editStockItem('${card.id}')">✏️</button>
+                            <button class="btn-remove-prod" title="Удалить" onclick="deleteStockItem('${card.id}')">🗑️</button>
+                        </div>
+                    </div>
+                `;
+                listEl.appendChild(div);
+                reportText += `${idx + 1}. ${card.name}: ${count} шт.\n`;
+            });
+
+            document.getElementById('inventory-summary-report').innerText = reportText.trim();
+        }
+
+        function adjustStockCount(id, delta) {
+            const card = state.cardInventory.find(c => c.id === id);
+            if (card) {
+                card.count = Math.max(0, (parseInt(card.count, 10) || 0) + delta);
+                saveState();
+            }
+        }
+
+        function setExactStockCount(id) {
+            const card = state.cardInventory.find(c => c.id === id);
+            if (!card) return;
+            const input = prompt(`Укажите точный остаток для «${card.name}» (шт):`, card.count);
+            if (input !== null) {
+                card.count = Math.max(0, parseInt(input, 10) || 0);
+                saveState();
+                showToast("Остаток обновлен!");
+            }
+        }
+
+        function openStockModal(cardId = null) {
+            editingStockId = cardId;
+            const titleEl = document.getElementById('stock-modal-title');
+            const nameEl = document.getElementById('stock-card-name');
+            const countEl = document.getElementById('stock-card-count');
+            const checklistEl = document.getElementById('stock-bindings-checklist');
+
+            let currentBound = [];
+
+            if (cardId) {
+                const card = state.cardInventory.find(c => c.id === cardId);
+                titleEl.innerText = "✏️ Редактировать карту";
+                nameEl.value = card.name;
+                countEl.value = card.count;
+                currentBound = card.boundItems || [];
+            } else {
+                titleEl.innerText = "📦 Новая карта в инвентарь";
+                nameEl.value = '';
+                countEl.value = '20';
+                currentBound = [];
+            }
+
+            let checkHtml = '';
+            for (let sKey in state.sections) {
+                const sec = state.sections[sKey];
+                if (sec.type === 'select') continue;
+                for (let iKey in sec.items) {
+                    const it = sec.items[iKey];
+                    const isChecked = currentBound.includes(iKey) ? 'checked' : '';
+                    checkHtml += `
+                        <label class="checkbox-item" style="padding:8px 6px;">
+                            <input type="checkbox" id="bind-prod-${iKey}" value="${iKey}" ${isChecked}>
+                            <span class="checkbox-label" style="font-size:12px;">${it.name}</span>
+                        </label>
+                    `;
+                }
+            }
+            checklistEl.innerHTML = checkHtml;
+            document.getElementById('stock-modal').style.display = 'block';
+        }
+
+        function closeStockModal() {
+            document.getElementById('stock-modal').style.display = 'none';
+            editingStockId = null;
+        }
+
+        function editStockItem(id) {
+            openStockModal(id);
+        }
+
+        function saveStockItem() {
+            const name = document.getElementById('stock-card-name').value.trim();
+            const count = parseInt(document.getElementById('stock-card-count').value, 10) || 0;
+
+            if (!name) return alert("Введите название физической карты!");
+
+            const selectedBindings = [];
+            for (let sKey in state.sections) {
+                const sec = state.sections[sKey];
+                if (sec.type === 'select') continue;
+                for (let iKey in sec.items) {
+                    const cb = document.getElementById(`bind-prod-${iKey}`);
+                    if (cb && cb.checked) selectedBindings.push(iKey);
+                }
+            }
+
+            if (!state.cardInventory) state.cardInventory = [];
+
+            if (editingStockId) {
+                const existing = state.cardInventory.find(c => c.id === editingStockId);
+                if (existing) {
+                    existing.name = name;
+                    existing.count = count;
+                    existing.boundItems = selectedBindings;
+                }
+            } else {
+                state.cardInventory.push({
+                    id: 'stock_' + Date.now(),
+                    name: name,
+                    count: count,
+                    boundItems: selectedBindings
+                });
+            }
+
+            saveState();
+            closeStockModal();
+            showToast("Карта сохранена в инвентаре!");
+        }
+
+        function deleteStockItem(id) {
+            if (confirm("Удалить эту позицию карты из инвентаря?")) {
+                state.cardInventory = state.cardInventory.filter(c => c.id !== id);
+                saveState();
+                showToast("Позиция удалена!");
+            }
+        }
+
+        function copyInventoryReport() {
+            copyToClipboard(document.getElementById('inventory-summary-report').innerText);
+            showToast("Остатки карт скопированы в буфер!");
         }
 
         /* ПРОСТЫЕ НАСТРОЙКИ (UI) */
@@ -2603,11 +3110,16 @@
                 let block = `<div style="font-size:12px; font-weight:800; color:var(--alfa-muted); margin:8px 0 4px 4px;">${label}:</div>`;
                 iKeys.forEach(k => {
                     const item = sec.items[k];
+                    const inPlanChecked = item.inPlan ? 'checked' : '';
                     block += `
                         <div class="setting-row">
                             <input type="text" class="setting-name-input" id="item-name-${sKey}-${k}" value="${item.name}">
-                            <input type="number" class="setting-price-input" id="item-price-${sKey}-${k}" value="${item.price || 0}">
-                            <span style="font-size:12px; font-weight:700; color:var(--alfa-muted);">₽</span>
+                            <input type="number" class="setting-price-input" id="item-price-${sKey}-${k}" value="${item.price || 0}" title="Цена">
+                            <label class="plan-toggle-badge" title="Отображать и считать в Плане на день">
+                                <input type="checkbox" id="item-inplan-${sKey}-${k}" ${inPlanChecked}>
+                                🎯
+                            </label>
+                            <input type="number" class="plan-goal-input" id="item-goal-${sKey}-${k}" value="${item.goal || 1}" title="Цель на день" min="1">
                             <button class="btn-remove-prod" onclick="removeSimpleItem('${sKey}', '${k}')">🗑️</button>
                         </div>
                     `;
@@ -2619,8 +3131,6 @@
             phtml += renderItemsOfSec('sec_cross', 'Кросс-продажи (допуслуги)');
             if (state.sections.sec_apps) {
                 phtml += renderItemsOfSec('sec_apps', 'Приложения (галочки)');
-            } else if (state.sections.sec_1788700380704) {
-                phtml += renderItemsOfSec('sec_1788700380704', 'Приложения (галочки)');
             }
 
             prodList.innerHTML = phtml || '<div class="empty-history">Список пуст. Добавьте первый продукт выше!</div>';
@@ -2664,8 +3174,13 @@
                 for (let iKey in state.sections[sKey].items) {
                     const nEl = document.getElementById(`item-name-${sKey}-${iKey}`);
                     const pEl = document.getElementById(`item-price-${sKey}-${iKey}`);
+                    const planEl = document.getElementById(`item-inplan-${sKey}-${iKey}`);
+                    const goalEl = document.getElementById(`item-goal-${sKey}-${iKey}`);
+
                     if (nEl && nEl.value.trim()) state.sections[sKey].items[iKey].name = nEl.value.trim();
                     if (pEl) state.sections[sKey].items[iKey].price = parseInt(pEl.value) || 0;
+                    if (planEl) state.sections[sKey].items[iKey].inPlan = planEl.checked;
+                    if (goalEl) state.sections[sKey].items[iKey].goal = Math.max(1, parseInt(goalEl.value) || 1);
                 }
             }
             if (state.sections.sec_statuses) {
@@ -2691,14 +3206,14 @@
             const name = document.getElementById('simple-prod-name').value.trim();
             const price = parseInt(document.getElementById('simple-prod-price').value) || 0;
             const type = document.getElementById('simple-prod-type').value;
+            const inPlan = document.getElementById('simple-prod-inplan').checked;
+            const goal = parseInt(document.getElementById('simple-prod-goal').value) || 1;
 
             if (!name) return alert("Введите название продукта!");
 
             let targetSecKey = 'sec_main';
             if (type === 'checkbox') targetSecKey = 'sec_cross';
-            if (type === 'apps') {
-                targetSecKey = state.sections.sec_apps ? 'sec_apps' : (state.sections.sec_1788700380704 ? 'sec_1788700380704' : 'sec_apps');
-            }
+            if (type === 'apps') targetSecKey = 'sec_apps';
 
             if (!state.sections[targetSecKey]) {
                 state.sections[targetSecKey] = { 
@@ -2709,7 +3224,14 @@
             }
 
             const iKey = 'item_' + Date.now();
-            state.sections[targetSecKey].items[iKey] = { name: name, price: price, assigned: 0 };
+            state.sections[targetSecKey].items[iKey] = { 
+                name: name, 
+                price: price, 
+                assigned: 0, 
+                inPlan: inPlan, 
+                goal: goal, 
+                unit: 'шт' 
+            };
             
             document.getElementById('simple-prod-name').value = '';
             document.getElementById('simple-prod-price').value = '';
@@ -2771,19 +3293,20 @@
         }
 
         function applyBankerPreset() {
-            if (!confirm("Восстановить ваш персональный набор продуктов, кросс-продаж и отказов? Существующие расписания и доходы не сбросятся.")) return;
+            if (!confirm("Восстановить ваш персональный набор продуктов, кросс-продаж, отказов и склада?")) return;
 
             saveCurrentSimpleInputs();
 
             state.sections = JSON.parse(JSON.stringify(defaultUserSections));
             state.shiftCategories = JSON.parse(JSON.stringify(defaultShiftCategories));
             state.dayPlanTemplate = JSON.parse(JSON.stringify(defaultDayPlanTemplate));
+            state.cardInventory = JSON.parse(JSON.stringify(defaultCardInventory));
             state.fuelSettings = { consumption: 10, pricePerLiter: 64 };
             state.taxRate = 13;
 
             renderSimpleSettingsLists();
             saveState();
-            showToast("Ваш персональный набор восстановлен!");
+            showToast("Персональный набор восстановлен!");
         }
 
         function confirmReset() {
@@ -2791,6 +3314,9 @@
                 delete state.daysData[currentActiveDateKey];
                 if (state.dayAssigned && state.dayAssigned[currentActiveDateKey]) {
                     delete state.dayAssigned[currentActiveDateKey];
+                }
+                if (state.dailyPlans && state.dailyPlans[currentActiveDateKey]) {
+                    state.dailyPlans[currentActiveDateKey].forEach(t => t.sold = 0);
                 }
                 loadActiveDayToUI();
                 saveState();
