@@ -779,6 +779,17 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.08);
         }
 
+        .settings-hint-box {
+            background: var(--alfa-bg);
+            border-left: 3px solid var(--alfa-red);
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--alfa-text);
+            margin-bottom: 12px;
+            line-height: 1.35;
+        }
+
         .simple-card-box {
             background: var(--alfa-bg);
             border: 1px solid var(--alfa-border);
@@ -1457,7 +1468,7 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА НАСТРОЕК -->
+    <!-- МОДАЛКА НАСТРОЕК С КОНСТРУКТОРОМ КРОСС-ПРОДАЖ -->
     <div class="modal" id="settings-modal">
         <div class="modal-content">
             <div class="card-title" style="margin-bottom: 10px;">
@@ -1484,6 +1495,7 @@
                     <button class="btn-primary" style="padding: 8px 12px; font-size:12px; width:auto;" onclick="applyBankerPreset()">🪄 Загрузить эталонный шаблон</button>
                 </div>
 
+                <!-- КОНСТРУКТОР НОВОГО ПРОДУКТА / КРОСС-ПРОДАЖИ -->
                 <div class="simple-card-box">
                     <h4>➕ Добавить продукт или кросс-продажу</h4>
                     <div style="display:flex; flex-direction:column; gap:6px;">
@@ -2205,7 +2217,6 @@
 
             let successHtml = '';
 
-            // 1. Выбор основного продукта
             const mainItems = state.sections.sec_main?.items || {};
             const mainKeys = Object.keys(mainItems);
             successHtml += `
@@ -2218,7 +2229,6 @@
                 </div>
             `;
 
-            // 2. Кросс-продажи
             const crossItems = state.sections.sec_cross?.items || {};
             let singleCrossHtml = '';
             let multiCrossHtml = '';
@@ -2262,7 +2272,6 @@
                 `;
             }
 
-            // 3. Приложения
             const appItems = state.sections.sec_apps?.items || {};
             const appKeys = Object.keys(appItems);
             if (appKeys.length > 0) {
@@ -2281,7 +2290,6 @@
                 `;
             }
 
-            // Форма отказов
             const failKeys = Object.keys(state.sections.sec_statuses?.items || {});
             let failHtml = `
                 <div class="form-group">
@@ -2497,7 +2505,6 @@
             }
         }
 
-        // ИТОГОВЫЙ ОТЧЕТ: БЕЗ СЛОВА "ШАБЛОН", С ТИРЕ В МУЛЬТИ-ПРОДАЖАХ
         function buildNewFormatDayReport(issuedCounts) {
             const dayData = getActiveDayData();
             const dateStr = formatDateDisplay(currentActiveDateKey);
@@ -2523,18 +2530,15 @@
 
                 report += `\n${prodName}:  назначено ${assigned} / выдано ${issued}`;
                 
-                // Проверка x5
                 if (prodKey === 'item_dk') {
-                    const x5Count = getCount('cross_is_x5');
+                    const x5Count = getCount('cross_is_x5') || getCount('item_is_x5');
                     if (x5Count > 0) report += ` (в том числе x5 - ${x5Count})`;
                 }
                 report += `\n`;
 
-                // Активация
-                const actCount = dayData.meetings.filter(m => m.isSuccess && (m.productKey === prodKey || m.selectValues['sec_main'] === prodKey) && m.checkedItems?.includes('cross_act')).length;
+                const actCount = dayData.meetings.filter(m => m.isSuccess && (m.productKey === prodKey || m.selectValues['sec_main'] === prodKey) && (m.checkedItems?.includes('cross_act') || m.checkedItems?.includes('item_act'))).length;
                 report += `Актив(пин-код): ${actCount}\n`;
 
-                // Неуспешные встречи строго под своим продуктом
                 failsForThisProd.forEach(f => {
                     const statusName = getItemName(f.selectValues['sec_statuses']) || 'Отказ';
                     const commentPart = f.comment ? `, ${f.comment}` : '';
@@ -2542,13 +2546,13 @@
                 });
             }
 
-            // 2. ДИНАМИЧЕСКИЙ БЛОК КРОСС-ПРОДАЖ (КОЛИЧЕСТВО ЧЕРЕЗ ТИРЕ)
+            // 2. ДИНАМИЧЕСКИЙ БЛОК КРОСС-ПРОДАЖ
             report += `\nКРОСС - ПРОДАЖИ:\n`;
             const crossSec = state.sections.sec_cross?.items || {};
 
             for (let cKey in crossSec) {
                 const it = crossSec[cKey];
-                if (cKey === 'cross_act' || cKey === 'cross_is_x5') continue;
+                if (cKey === 'cross_act' || cKey === 'cross_is_x5' || cKey === 'item_act' || cKey === 'item_is_x5') continue;
 
                 if (it.mode === 'multi' && it.subitems && it.subitems.length > 0) {
                     let parts = it.subitems.map(sub => {
@@ -2562,13 +2566,13 @@
             }
 
             // 3. ПРИЛОЖЕНИЯ
-            const iosCount = getCount('app_ios');
-            const androidCount = getCount('app_android');
-            const appX5Count = getCount('app_x5');
-            Установка приложений
-            report += `- МП iOS ${iosCount}\n`;
-            report += `- МП Андройд ${androidCount}\n`;
-            report += `- МП Х5 ${appX5Count}\n`;
+            const iosCount = getCount('app_ios') || getCount('item_ios');
+            const androidCount = getCount('app_android') || getCount('item_android');
+            const appX5Count = getCount('app_x5') || getCount('item_app_x5');
+
+            report += `- Установка МП: МП iOS - ${iosCount}/${totalMeetingsCount || 0}\n`;
+            report += `- МП Андройд - ${androidCount}\n`;
+            report += `- МП Х5 - ${appX5Count}\n`;
 
             // 4. ВСТРЕЧИ В АВТО
             report += `\nВстречи в авто ${carMeetingsCount} из ${totalMeetingsCount}`;
@@ -3226,7 +3230,6 @@
 
             prodList.innerHTML = phtml || '<div class="empty-history">Список пуст.</div>';
 
-            // Отказы
             const failList = document.getElementById('settings-fails-list');
             let fhtml = '';
             const failSec = state.sections.sec_statuses;
@@ -3245,7 +3248,6 @@
             }
             failList.innerHTML = fhtml || '<div class="empty-history">Причин отказов пока нет</div>';
 
-            // График
             const shiftList = document.getElementById('settings-shifts-list');
             let shtml = '';
             for (let cKey in state.shiftCategories) {
