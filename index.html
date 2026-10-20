@@ -316,7 +316,6 @@
             cursor: pointer;
         }
 
-        /* Т0 БАННЕР / БЛОК */
         .t0-banner-box {
             background: linear-gradient(135deg, rgba(255, 152, 0, 0.12) 0%, rgba(239, 49, 36, 0.05) 100%);
             border: 1px dashed var(--alfa-orange);
@@ -415,8 +414,8 @@
             align-items: center;
             justify-content: center;
             background: var(--alfa-bg);
-            padding: 12px;
-            border-radius: 12px;
+            padding: 10px;
+            border-radius: 10px;
             cursor: pointer;
             user-select: none;
             text-align: center;
@@ -439,6 +438,27 @@
         }
 
         .checkbox-item:has(input:checked) .checkbox-label { color: #FFFFFF; }
+
+        .cross-multi-card {
+            background: var(--alfa-bg);
+            border: 1px solid var(--alfa-border);
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+
+        .cross-multi-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--alfa-black);
+            margin-bottom: 6px;
+        }
+
+        .cross-multi-subgrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+            gap: 6px;
+        }
 
         .plan-list { display: flex; flex-direction: column; gap: 10px; }
         .plan-item {
@@ -558,10 +578,11 @@
             font-family: monospace;
             font-size: 12px;
             white-space: pre-wrap;
-            max-height: 200px;
+            max-height: 280px;
             overflow-y: auto;
             margin-bottom: 12px;
             color: var(--alfa-text);
+            line-height: 1.45;
         }
 
         .editable-report {
@@ -635,7 +656,6 @@
 
         .empty-history { text-align: center; color: var(--alfa-muted); font-size: 13px; padding: 15px 0; }
 
-        /* ИНВЕНТАРИЗАЦИЯ */
         .stock-item {
             background: var(--alfa-bg);
             border: 1px solid var(--alfa-border);
@@ -759,17 +779,6 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.08);
         }
 
-        .settings-hint-box {
-            background: var(--alfa-bg);
-            border-left: 3px solid var(--alfa-red);
-            padding: 8px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            color: var(--alfa-text);
-            margin-bottom: 12px;
-            line-height: 1.35;
-        }
-
         .simple-card-box {
             background: var(--alfa-bg);
             border: 1px solid var(--alfa-border);
@@ -790,15 +799,22 @@
 
         .setting-row {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 6px;
+            flex-direction: column;
+            margin-bottom: 8px;
             background: var(--alfa-card);
-            padding: 6px 8px;
+            padding: 8px 10px;
             border-radius: 10px;
             gap: 6px;
             width: 100%;
             border: 1px solid var(--alfa-border);
+        }
+
+        .setting-row-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            width: 100%;
         }
 
         .setting-name-input {
@@ -828,6 +844,18 @@
             color: var(--alfa-text);
             outline: none;
             flex-shrink: 0;
+        }
+
+        .setting-subitems-input {
+            width: 100%;
+            height: 30px;
+            padding: 0 8px;
+            border: 1px dashed var(--alfa-border);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--alfa-text);
+            background: var(--alfa-bg);
+            outline: none;
         }
 
         .plan-toggle-badge {
@@ -1167,7 +1195,7 @@
             <button class="btn-date-nav" onclick="stepDate(1)">Завтра ▶</button>
         </div>
 
-        <!-- БЛОК ДОБАВЛЕНИЯ Т0 (ДЕНЬ В ДЕНЬ) -->
+        <!-- БЛОК ДОБАВЛЕНИЯ Т0 -->
         <div class="t0-banner-box">
             <div class="t0-header">
                 <span class="t0-title">⚡ Добавить заявку Т0 (день в день)</span>
@@ -1200,6 +1228,13 @@
                 <input type="text" id="client-info" class="input-text" placeholder="Иванов И.И. / 1234">
             </div>
 
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+                <label class="checkbox-item" style="flex:1; padding:8px 10px; font-size:12px;">
+                    <input type="checkbox" id="check-car-meeting">
+                    <span class="checkbox-label">🚗 Встреча в авто</span>
+                </label>
+            </div>
+
             <div id="success-block">
                 <div id="dynamic-meeting-form-success"></div>
             </div>
@@ -1209,8 +1244,8 @@
             </div>
 
             <div class="form-group" style="margin-top: 10px;">
-                <label for="meeting-comment">Комментарий</label>
-                <textarea id="meeting-comment" rows="2" placeholder="Оставьте комментарий, если нужно..."></textarea>
+                <label for="meeting-comment">Причина / Комментарий</label>
+                <textarea id="meeting-comment" rows="2" placeholder="Например: клиент забыл паспорт, перенос на завтра..."></textarea>
             </div>
 
             <button class="btn-primary" onclick="saveMeeting()">Сохранить и скопировать отчет встречи</button>
@@ -1224,7 +1259,7 @@
         <div class="card">
             <div class="card-title">4. Итоговый отчет за день</div>
             <div class="report-preview" id="day-report-preview">Здесь будет сформирован отчет...</div>
-            <button class="btn-primary" style="background-color: var(--alfa-red);" onclick="copyDayReport()">Скопировать отчет за день</button>
+            <button class="btn-primary" style="background-color: var(--alfa-red);" onclick="copyDayReport()">Скопировать ежедневный отчет</button>
         </div>
 
         <div class="card">
@@ -1275,9 +1310,6 @@
                 </select>
                 <button class="btn-primary" style="padding: 10px 14px; width: auto; font-size:14px; flex: 0.5;" onclick="addDayPlanTarget()">➕</button>
             </div>
-            <div style="font-size:11px; color:var(--alfa-muted); margin-top:6px;">
-                💡 Продукты и кросс-продажи из 1-й вкладки подключаются автоматически через <b>Настройки ⚙️ → галочка «🎯 В план»</b>.
-            </div>
         </div>
 
         <div class="card">
@@ -1303,30 +1335,21 @@
                     <button class="btn-icon" style="width:30px; height:30px; font-size:12px;" onclick="changePlanMonth(1)">▶</button>
                 </div>
             </div>
-            
-            <p style="font-size:11px; color:var(--alfa-muted); margin-bottom:6px;">
-                ✏️ Текст отчета ниже формируется автоматически нарастающим итогом за все рабочие дни месяца:
-            </p>
             <textarea id="month-plan-report-preview" class="editable-report" oninput="saveEditedMonthReport()"></textarea>
-            
             <div style="display:flex; gap:6px;">
                 <button class="btn-primary" style="background-color: var(--alfa-card); color: var(--alfa-text); border: 1px solid var(--alfa-border); flex:1;" onclick="copyMonthPlanReport()">Скопировать отчет</button>
-                <button class="btn-primary" style="background-color: var(--alfa-card); color: var(--alfa-muted); border: 1px solid var(--alfa-border); width:auto; padding:10px 14px;" onclick="renderMonthPlanReport(true)" title="Сбросить правки и пересчитать заново">🔄 Обновить расчет</button>
+                <button class="btn-primary" style="background-color: var(--alfa-card); color: var(--alfa-muted); border: 1px solid var(--alfa-border); width:auto; padding:10px 14px;" onclick="renderMonthPlanReport(true)">🔄 Обновить расчет</button>
             </div>
         </div>
     </div>
 
     <!-- ВКЛАДКА 3: ИНВЕНТАРИЗАЦИЯ КАРТ (СКЛАД) -->
     <div id="tab-inventory" class="container" style="display: none;">
-        
         <div class="card">
             <div class="card-title">
                 <span>💳 Остатки карт на руках</span>
                 <button class="btn-primary" style="padding: 6px 12px; font-size:12px; width:auto;" onclick="openStockModal()">➕ Добавить карту</button>
             </div>
-            <p style="font-size:12px; color:var(--alfa-muted); margin-bottom:12px;">
-                При успешных встречах количество карт списывается автоматически согласно вашим привязкам.
-            </p>
             <div id="inventory-cards-list"></div>
         </div>
 
@@ -1335,33 +1358,19 @@
             <div class="report-preview" id="inventory-summary-report">Данные формируются...</div>
             <button class="btn-primary" onclick="copyInventoryReport()">Скопировать остаток карт</button>
         </div>
-
     </div>
 
     <!-- ВКЛАДКА 4: ГРАФИК РАБОТЫ И ДОХОД -->
     <div id="tab-schedule" class="container" style="display: none;">
-        
         <div class="card profit-box" style="background: linear-gradient(135deg, #1B2028 0%, #2F3642 100%);">
             <div class="label">Чистый доход на руки</div>
             <div class="amount" id="month-net-profit" style="color:var(--alfa-green);">0 ₽</div>
             
             <div class="month-breakdown-grid">
-                <div class="breakdown-row">
-                    <span>Начислено (грязными):</span>
-                    <b id="month-gross-profit">0 ₽</b>
-                </div>
-                <div class="breakdown-row">
-                    <span>Бензин за месяц:</span>
-                    <b id="month-fuel-profit" style="color:#FF766C;">0 ₽</b>
-                </div>
-                <div class="breakdown-row">
-                    <span>Удержано налога:</span>
-                    <b id="month-tax-profit" style="color:#FFB16C;">0 ₽</b>
-                </div>
-                <div class="breakdown-row">
-                    <span>Прогноз чистыми:</span>
-                    <b id="month-forecast-net" style="color:var(--alfa-green);">0 ₽</b>
-                </div>
+                <div class="breakdown-row"><span>Начислено:</span><b id="month-gross-profit">0 ₽</b></div>
+                <div class="breakdown-row"><span>Бензин:</span><b id="month-fuel-profit" style="color:#FF766C;">0 ₽</b></div>
+                <div class="breakdown-row"><span>Налог:</span><b id="month-tax-profit" style="color:#FFB16C;">0 ₽</b></div>
+                <div class="breakdown-row"><span>Прогноз чистыми:</span><b id="month-forecast-net" style="color:var(--alfa-green);">0 ₽</b></div>
             </div>
 
             <div class="tax-rate-box">
@@ -1393,73 +1402,42 @@
             <div class="calendar-grid" id="calendar-grid" style="margin-top: 6px;"></div>
 
             <div class="calendar-stats">
-                <div class="stat-item">
-                    <div class="stat-value" id="stat-total-work">0</div>
-                    <div class="stat-label">Всего смен</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" style="color:var(--alfa-purple);" id="stat-trip-work">0</div>
-                    <div class="stat-label">Выездов 🚘</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="stat-passed-work">0</div>
-                    <div class="stat-label">Отработано</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" style="color:var(--alfa-red);" id="stat-left-work">0</div>
-                    <div class="stat-label">Осталось смен</div>
-                </div>
-                <div class="stat-item" style="grid-column: span 2;">
-                    <div class="stat-value" style="color:var(--alfa-green);" id="stat-avg-work">0 ₽</div>
-                    <div class="stat-label">Средний чистый доход за смену</div>
-                </div>
+                <div class="stat-item"><div class="stat-value" id="stat-total-work">0</div><div class="stat-label">Всего смен</div></div>
+                <div class="stat-item"><div class="stat-value" style="color:var(--alfa-purple);" id="stat-trip-work">0</div><div class="stat-label">Выездов 🚘</div></div>
+                <div class="stat-item"><div class="stat-value" id="stat-passed-work">0</div><div class="stat-label">Отработано</div></div>
+                <div class="stat-item"><div class="stat-value" style="color:var(--alfa-red);" id="stat-left-work">0</div><div class="stat-label">Осталось смен</div></div>
+                <div class="stat-item" style="grid-column: span 2;"><div class="stat-value" style="color:var(--alfa-green);" id="stat-avg-work">0 ₽</div><div class="stat-label">Средний чистый доход за смену</div></div>
             </div>
         </div>
     </div>
 
     <!-- НАВИГАЦИЯ -->
     <nav class="bottom-nav">
-        <button class="nav-item active" id="nav-calc" onclick="switchTab('calc')">
-            <span class="nav-icon">🧮</span>
-            <span>Кальк</span>
-        </button>
-        <button class="nav-item" id="nav-day-plan" onclick="switchTab('day-plan')">
-            <span class="nav-icon">📋</span>
-            <span>План</span>
-        </button>
-        <button class="nav-item" id="nav-inventory" onclick="switchTab('inventory')">
-            <span class="nav-icon">💳</span>
-            <span>Склад</span>
-        </button>
-        <button class="nav-item" id="nav-schedule" onclick="switchTab('schedule')">
-            <span class="nav-icon">📅</span>
-            <span>График</span>
-        </button>
+        <button class="nav-item active" id="nav-calc" onclick="switchTab('calc')"><span class="nav-icon">🧮</span><span>Кальк</span></button>
+        <button class="nav-item" id="nav-day-plan" onclick="switchTab('day-plan')"><span class="nav-icon">📋</span><span>План</span></button>
+        <button class="nav-item" id="nav-inventory" onclick="switchTab('inventory')"><span class="nav-icon">💳</span><span>Склад</span></button>
+        <button class="nav-item" id="nav-schedule" onclick="switchTab('schedule')"><span class="nav-icon">📅</span><span>График</span></button>
     </nav>
 
-    <!-- МОДАЛКА ДОБАВЛЕНИЯ/РЕДАКТИРОВАНИЯ КАРТЫ СКЛАДА -->
+    <!-- МОДАЛКА СКЛАДА -->
     <div class="modal" id="stock-modal">
         <div class="modal-content">
             <div class="card-title">
                 <span id="stock-modal-title">📦 Позиция карты</span>
                 <button class="btn-delete" style="font-size:18px; padding:0 4px;" onclick="closeStockModal()">✕</button>
             </div>
-
             <div class="form-group">
                 <label>Название физической карты</label>
-                <input type="text" id="stock-card-name" class="input-text" placeholder="Например: Дебетовая Альфа-Карта (DK)">
+                <input type="text" id="stock-card-name" class="input-text" placeholder="Например: Дебетовая карта (ДК)">
             </div>
-
             <div class="form-group">
                 <label>Текущий остаток на руках (шт)</label>
                 <input type="number" id="stock-card-count" class="input-text" placeholder="25" min="0">
             </div>
-
             <div class="form-group">
                 <label>Привязать продукты (списывают эту карту при выдаче):</label>
-                <div id="stock-bindings-checklist" class="checkbox-grid" style="max-height:180px; overflow-y:auto; padding-right:4px;"></div>
+                <div id="stock-bindings-checklist" class="checkbox-grid" style="max-height:180px; overflow-y:auto;"></div>
             </div>
-
             <button class="btn-primary" style="margin-top:10px;" onclick="saveStockItem()">Сохранить карту</button>
         </div>
     </div>
@@ -1468,15 +1446,12 @@
     <div class="modal" id="day-modal">
         <div class="modal-content" style="max-width: 380px;">
             <div class="card-title" id="day-modal-title">Настройка дня</div>
-            
             <div style="margin-bottom: 12px;">
                 <label style="font-size:12px; font-weight:700; color:var(--alfa-black);">Чистый заработок за день (₽):</label>
                 <input type="number" id="day-profit-input" class="input-text" style="margin-top:4px;" placeholder="0">
             </div>
-
             <p style="font-size:13px; color:var(--alfa-muted); margin-bottom:6px;">Выберите статус/категорию:</p>
             <div class="day-actions-grid" id="day-categories-modal-grid"></div>
-
             <button class="btn-primary" style="margin-top:12px; background:var(--alfa-red);" onclick="saveDayDetails('none')">Очистить день</button>
             <button class="btn-delete" style="width:100%; margin-top:8px;" onclick="closeDayModal()">Отмена</button>
         </div>
@@ -1498,37 +1473,46 @@
             </div>
 
             <div id="set-pane-prod">
+                <div class="simple-card-box">
+                    <h4>👤 Профиль Мобильного Банкира</h4>
+                    <input type="text" id="setting-banker-fio" class="input-text" placeholder="ФИО МБ (например: Иванов Иван Иванович)">
+                </div>
+
                 <div class="quick-preset-banner">
-                    <p style="font-size:12px; font-weight:700; color:var(--alfa-black); margin-bottom:4px;">Ваш персональный набор</p>
-                    <p style="font-size:11px; color:var(--alfa-muted); margin-bottom:8px;">Загрузить стандартную сетку продуктов, отказов и инвентаря</p>
-                    <button class="btn-primary" style="padding: 8px 12px; font-size:12px; width:auto;" onclick="applyBankerPreset()">🪄 Восстановить мой стандартный набор</button>
+                    <p style="font-size:12px; font-weight:700; color:var(--alfa-black); margin-bottom:4px;">Восстановить эталонный набор</p>
+                    <p style="font-size:11px; color:var(--alfa-muted); margin-bottom:8px;">Сетка с настроенными мультикнопками (Комбо, БС, Детская, Смарт и т.д.)</p>
+                    <button class="btn-primary" style="padding: 8px 12px; font-size:12px; width:auto;" onclick="applyBankerPreset()">🪄 Загрузить эталонный шаблон</button>
                 </div>
 
                 <div class="simple-card-box">
-                    <h4>➕ Добавить продукт или услугу</h4>
+                    <h4>➕ Добавить продукт или кросс-продажу</h4>
                     <div style="display:flex; flex-direction:column; gap:6px;">
-                        <input type="text" id="simple-prod-name" class="input-text" placeholder="Название (например: SIM / БС / DK)">
+                        <input type="text" id="simple-prod-name" class="input-text" placeholder="Название (например: Комбо, БС, Смарт...)">
+                        
                         <div style="display:flex; gap:6px;">
                             <input type="number" id="simple-prod-price" class="input-text" placeholder="Оплата (₽)" style="flex:1;">
-                            <select id="simple-prod-type" class="input-text" style="flex:1.4;">
-                                <option value="counter">Основной (встречи + план)</option>
-                                <option value="checkbox">Опция (галочка/допродажа)</option>
-                                <option value="apps">Приложения (галочка)</option>
+                            <select id="simple-prod-type" class="input-text" style="flex:1.4;" onchange="toggleCustomSubitemsInput(this.value)">
+                                <option value="counter">Основной (выдача 3/5)</option>
+                                <option value="cross_single">Кросс (простая выдача)</option>
+                                <option value="cross_multi">Кросс (мульти-пункты)</option>
+                                <option value="apps">Приложения</option>
                             </select>
                         </div>
+
+                        <div id="cross-subitems-wrap" style="display:none;">
+                            <label style="font-size:11px; font-weight:700; color:var(--alfa-muted);">Подпункты через запятую (например: одобрено, выдано, транзакция):</label>
+                            <input type="text" id="simple-prod-subitems" class="input-text" placeholder="одобрено, выдано, транзакция">
+                        </div>
+
                         <div style="display:flex; gap:6px; align-items:center; background:var(--alfa-card); padding:8px 10px; border-radius:10px; border:1px solid var(--alfa-border);">
                             <label style="font-size:12px; font-weight:700; display:flex; align-items:center; gap:6px; cursor:pointer; flex:1;">
-                                <input type="checkbox" id="simple-prod-inplan" checked>
-                                🎯 Включать в «План на день»
+                                <input type="checkbox" id="simple-prod-inplan" checked> 🎯 В план на день
                             </label>
-                            <input type="number" id="simple-prod-goal" class="input-text" placeholder="Цель" style="width:70px; padding:6px;" value="1" min="1">
+                            <input type="number" id="simple-prod-goal" class="input-text" placeholder="Цель" style="width:65px; padding:6px;" value="1" min="1">
                         </div>
-                        <button class="btn-primary" style="padding:10px; font-size:13px; margin-top:2px;" onclick="addSimpleProduct()">Добавить в калькулятор</button>
-                    </div>
-                </div>
 
-                <div class="settings-hint-box">
-                    💡 Включите галочку <b>«🎯»</b> напротив тех продуктов, которые должны отображаться в плане. Для физического пластика привязывайте их во вкладке <b>«Склад»</b>.
+                        <button class="btn-primary" style="padding:10px; font-size:13px; margin-top:2px;" onclick="addSimpleProduct()">Сохранить позицию</button>
+                    </div>
                 </div>
 
                 <div id="settings-products-list" style="max-height: 290px; overflow-y: auto;"></div>
@@ -1545,11 +1529,6 @@
                         <button class="btn-primary" style="padding:8px; font-size:13px;" onclick="addSimpleFailReason()">Добавить причину</button>
                     </div>
                 </div>
-
-                <div class="settings-hint-box">
-                    💡 Причины появляются в выпадающем списке при выборе <b>«Неуспешная встреча»</b>.
-                </div>
-
                 <div id="settings-fails-list" style="max-height: 280px; overflow-y: auto;"></div>
             </div>
 
@@ -1557,7 +1536,7 @@
                 <div class="simple-card-box">
                     <h4>➕ Добавить тип смены</h4>
                     <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
-                        <input type="color" id="simple-shift-color" value="#EF3124" class="color-picker-btn" title="Цвет на календаре">
+                        <input type="color" id="simple-shift-color" value="#EF3124" class="color-picker-btn">
                         <input type="text" id="simple-shift-icon" class="input-text" placeholder="🏖️" style="width:48px; text-align:center;">
                         <input type="text" id="simple-shift-name" class="input-text" placeholder="Название смены" style="flex:1;">
                     </div>
@@ -1566,32 +1545,18 @@
                     </label>
                     <button class="btn-primary" style="padding:10px; font-size:13px;" onclick="addSimpleShift()">Добавить смену</button>
                 </div>
-
                 <div id="settings-shifts-list" style="max-height: 280px; overflow-y: auto;"></div>
             </div>
 
             <div id="set-pane-backup" style="display: none;">
                 <div class="simple-card-box">
                     <h4>🛡 Резервное копирование</h4>
-                    <p style="font-size:12px; color:var(--alfa-muted); margin-bottom:12px;">
-                        Нажмите «Сохранить в Файлы», чтобы появилось системное меню iPhone, или скопируйте всю базу как текст.
-                    </p>
                     <div style="display:flex; flex-direction:column; gap:8px;">
-                        <button class="btn-primary" style="background:var(--alfa-green); padding:12px; font-size:13px;" onclick="exportBackup()">
-                            📥 Сохранить в Файлы (меню iPhone)
-                        </button>
-
-                        <button class="btn-primary" style="background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border); padding:10px; font-size:13px;" onclick="copyBackupToClipboard()">
-                            📋 Скопировать бэкап как текст в буфер
-                        </button>
-
+                        <button class="btn-primary" style="background:var(--alfa-green); padding:12px; font-size:13px;" onclick="exportBackup()">📥 Сохранить в Файлы (меню iPhone)</button>
+                        <button class="btn-primary" style="background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border); padding:10px; font-size:13px;" onclick="copyBackupToClipboard()">📋 Скопировать бэкап как текст</button>
                         <div style="display:flex; gap:6px; margin-top:6px;">
-                            <button class="btn-primary" style="flex:1; background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border); padding:10px; font-size:12px;" onclick="document.getElementById('backup-file-input').click()">
-                                📤 Из файла .json
-                            </button>
-                            <button class="btn-primary" style="flex:1; background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border); padding:10px; font-size:12px;" onclick="importBackupFromClipboard()">
-                                📋 Вставить текст
-                            </button>
+                            <button class="btn-primary" style="flex:1; background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border); padding:10px; font-size:12px;" onclick="document.getElementById('backup-file-input').click()">📤 Из .json</button>
+                            <button class="btn-primary" style="flex:1; background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border); padding:10px; font-size:12px;" onclick="importBackupFromClipboard()">📋 Вставить текст</button>
                         </div>
                         <input type="file" id="backup-file-input" style="display:none;" accept=".json" onchange="importBackup(event)">
                     </div>
@@ -1610,55 +1575,54 @@
                 "name": "Основные продукты",
                 "type": "counter",
                 "items": {
-                    "item_dk": { "name": "DK / ZPC / RE", "price": 330, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_x5": { "name": "X5", "price": 330, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_cc": { "name": "CC", "price": 570, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_ipoteka": { "name": "Ипотека", "price": 450, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_mp": { "name": "МП", "price": 330, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_dk": { "name": "ДК", "price": 330, "assigned": 0, "inPlan": true, "goal": 5 },
+                    "item_re": { "name": "Re", "price": 330, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_cc1": { "name": "CC1", "price": 570, "assigned": 0, "inPlan": true, "goal": 2 },
+                    "item_cc2": { "name": "CC2", "price": 570, "assigned": 0, "inPlan": false, "goal": 1 },
                     "item_credit": { "name": "Кредит наличными", "price": 600, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_sim": { "name": "SIM", "price": 330, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_simao": { "name": "SIM AO", "price": 450, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_semeyniy": { "name": "Семейный", "price": 270, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_dk_nerez": { "name": "ДК нерез.", "price": 570, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_kids": { "name": "Кидс", "price": 430, "assigned": 0, "inPlan": false, "goal": 1 }
+                    "item_ipoteka": { "name": "Ипотека", "price": 450, "assigned": 0, "inPlan": false, "goal": 1 },
+                    "item_sim_main": { "name": "СИМ", "price": 330, "assigned": 0, "inPlan": false, "goal": 1 }
                 }
             },
             "sec_cross": {
                 "name": "Кросс-продажи",
-                "type": "checkbox",
+                "type": "cross_builder",
                 "items": {
-                    "item_combo": { "name": "Комбо", "price": 600, "assigned": 0, "inPlan": true, "goal": 2 },
-                    "item_bs": { "name": "БС", "price": 270, "assigned": 0, "inPlan": true, "goal": 1 },
-                    "item_cross_sim": { "name": "SIM", "price": 430, "assigned": 0, "inPlan": true, "goal": 1 },
-                    "item_cross_kids": { "name": "Детская", "price": 270, "assigned": 0, "inPlan": true, "goal": 1 },
-                    "item_smart": { "name": "Смарт", "price": 30, "assigned": 0, "inPlan": true, "goal": 100, "unit": "%" },
-                    "item_pens": { "name": "Пенсия", "price": 270, "assigned": 0, "inPlan": true, "goal": 1 },
-                    "item_act": { "name": "Активация", "price": 0, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_cross_dk": { "name": "ДК", "price": 270, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_cross_kids_new": { "name": "Кидс (new)", "price": 430, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_cp": { "name": "ЦП", "price": 20, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_box": { "name": "Коробка", "price": 100, "assigned": 0, "inPlan": false, "goal": 1 }
+                    "cross_act": { "name": "Актив(пин-код)", "price": 0, "mode": "single", "inPlan": false, "goal": 1 },
+                    "cross_is_x5": { "name": "в том числе x5", "price": 0, "mode": "single", "inPlan": false, "goal": 1 },
+                    "cross_combo": { "name": "Комбо", "price": 600, "mode": "multi", "subitems": ["одобрено", "выдано", "транзакция"], "inPlan": true, "goal": 2 },
+                    "cross_kids": { "name": "Детская", "price": 270, "mode": "multi", "subitems": ["выдано", "транзакция"], "inPlan": true, "goal": 1 },
+                    "cross_smart": { "name": "Смарт", "price": 30, "mode": "single", "inPlan": true, "goal": 100, "unit": "%" },
+                    "cross_dk": { "name": "Кросс ДК", "price": 270, "mode": "multi", "subitems": ["выдано", "транзакция"], "inPlan": false, "goal": 1 },
+                    "cross_bs": { "name": "БС", "price": 270, "mode": "multi", "subitems": ["открыто", "пополнено"], "inPlan": true, "goal": 1 },
+                    "cross_sim": { "name": "СИМ", "price": 430, "mode": "single", "inPlan": true, "goal": 1 },
+                    "cross_pds": { "name": "ПДС", "price": 200, "mode": "single", "inPlan": false, "goal": 1 },
+                    "cross_ksp": { "name": "КСП (коробочное страх)", "price": 100, "mode": "single", "inPlan": false, "goal": 1 },
+                    "cross_cp": { "name": "ЦП", "price": 20, "mode": "single", "inPlan": false, "goal": 1 },
+                    "cross_pens": { "name": "Пенсия", "price": 270, "mode": "single", "inPlan": true, "goal": 1 },
+                    "cross_selfie": { "name": "Селфи N2B", "price": 50, "mode": "single", "inPlan": false, "goal": 1 }
                 }
             },
             "sec_statuses": {
                 "name": "Статусы отказов",
                 "type": "select",
                 "items": {
-                    "item_ndz": { "name": "НДЗ", "price": 0, "assigned": 0 },
-                    "item_perenos": { "name": "Перенос", "price": 0, "assigned": 0 },
-                    "item_otkaz911": { "name": "Отказ банка/911", "price": 250, "assigned": 0 },
-                    "item_otkaz_before": { "name": "Отказ клиента до встречи", "price": 0, "assigned": 0 },
-                    "item_otkaz_on": { "name": "Отказ клиента на встрече", "price": 100, "assigned": 0 },
-                    "item_dubl": { "name": "Дубль", "price": 0, "assigned": 0 }
+                    "item_ndz": { "name": "НДЗ", "price": 0 },
+                    "item_perenos": { "name": "перенос согласован", "price": 0 },
+                    "item_err_issue": { "name": "ошибка выдачи", "price": 0 },
+                    "item_bad_passport": { "name": "неактуальные паспортные данные", "price": 0 },
+                    "item_otkaz911": { "name": "отказ банка / 911", "price": 250 },
+                    "item_client_before": { "name": "отказ клиента до встречи", "price": 0 },
+                    "item_client_on": { "name": "отказ клиента на встрече", "price": 100 }
                 }
             },
             "sec_apps": {
                 "name": "Приложения",
                 "type": "checkbox",
                 "items": {
-                    "item_ios": { "name": "IOS", "price": 0, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_android": { "name": "Android", "price": 0, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_app_x5": { "name": "X5", "price": 0, "assigned": 0, "inPlan": false, "goal": 1 }
+                    "app_ios": { "name": "МП iOS", "price": 0 },
+                    "app_android": { "name": "МП Андройд", "price": 0 },
+                    "app_x5": { "name": "МП Х5", "price": 0 }
                 }
             }
         };
@@ -1669,44 +1633,22 @@
             "off": { "name": "Выходной", "icon": "🏖️", "color": "#2e3846", "isWork": false }
         };
 
-        const defaultDayPlanTemplate = [
-            { "id": "custom_selfie", "name": "Селфи ДК", "goal": 1, "unit": "шт", "isCustom": true }
-        ];
-
         const defaultCardInventory = [
-            {
-                "id": "stock_dk",
-                "name": "Дебетовая карта (DK)",
-                "count": 25,
-                "boundItems": ["item_dk", "item_dk_nerez", "item_cross_dk"]
-            },
-            {
-                "id": "stock_cc",
-                "name": "Кредитная карта (CC)",
-                "count": 15,
-                "boundItems": ["item_cc", "item_combo"]
-            },
-            {
-                "id": "stock_kids",
-                "name": "Детская карта (Kids)",
-                "count": 10,
-                "boundItems": ["item_kids", "item_cross_kids", "item_cross_kids_new"]
-            },
-            {
-                "id": "stock_sim",
-                "name": "SIM-карта Альфа",
-                "count": 30,
-                "boundItems": ["item_sim", "item_simao", "item_cross_sim"]
-            }
+            { "id": "stock_dk", "name": "Дебетовая карта (ДК)", "count": 25, "boundItems": ["item_dk", "cross_dk"] },
+            { "id": "stock_re", "name": "Карта Re", "count": 10, "boundItems": ["item_re"] },
+            { "id": "stock_cc", "name": "Кредитная карта (CC)", "count": 15, "boundItems": ["item_cc1", "item_cc2", "cross_combo"] },
+            { "id": "stock_kids", "name": "Детская карта (Kids)", "count": 10, "boundItems": ["cross_kids"] },
+            { "id": "stock_sim", "name": "SIM-карта Альфа", "count": 30, "boundItems": ["item_sim_main", "cross_sim"] }
         ];
 
         let state = {
+            bankerFio: "ФИО МБ",
             sections: JSON.parse(JSON.stringify(defaultUserSections)),
             shiftCategories: JSON.parse(JSON.stringify(defaultShiftCategories)),
             schedule: {},
             daysData: {},
             dayAssigned: {},
-            dayPlanTemplate: JSON.parse(JSON.stringify(defaultDayPlanTemplate)),
+            dayPlanTemplate: [],
             dailyPlans: {},
             monthPlanHistory: {},
             cardInventory: JSON.parse(JSON.stringify(defaultCardInventory)),
@@ -1767,7 +1709,6 @@
             setDayAssignedCount(sKey, iKey, current + delta, currentActiveDateKey);
         }
 
-        // ОБРАБОТКА Т0: БЫСТРОЕ ДОБАВЛЕНИЕ ЗАЯВКИ ДЕНЬ В ДЕНЬ В ПЛАН
         function addT0Assigned() {
             const selectEl = document.getElementById('t0-product-select');
             const countEl = document.getElementById('t0-count-input');
@@ -1785,12 +1726,12 @@
                 }
             }
 
-            if (!foundSecKey) return alert("Продукт не найден среди основных продуктов!");
+            if (!foundSecKey) return alert("Продукт не найден!");
 
             const current = getDayAssignedCount(foundSecKey, itemKey, currentActiveDateKey);
             setDayAssignedCount(foundSecKey, itemKey, current + count, currentActiveDateKey);
 
-            showToast(`⚡ Т0 добавлено (+${count} шт. к назначенным)`);
+            showToast(`⚡ Т0 добавлено (+${count} к назначенным)`);
             countEl.value = '1';
         }
 
@@ -1807,6 +1748,11 @@
                 }
             }
             selectEl.innerHTML = options || '<option value="">Нет основных продуктов</option>';
+        }
+
+        function toggleCustomSubitemsInput(val) {
+            const wrap = document.getElementById('cross-subitems-wrap');
+            if (wrap) wrap.style.display = val === 'cross_multi' ? 'block' : 'none';
         }
 
         function getDayPlanList(dKey) {
@@ -1874,12 +1820,12 @@
         }
 
         function loadState() {
-            let saved = localStorage.getItem('alfacalc_smartinventory_v1') ||
-                        localStorage.getItem('alfacalc_smartplan_v1') ||
-                        localStorage.getItem('alfacalc_builder_v16');
+            let saved = localStorage.getItem('alfacalc_customcross_v2') ||
+                        localStorage.getItem('alfacalc_structured_fails_v1');
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
+                    if (parsed.bankerFio) state.bankerFio = parsed.bankerFio;
                     if (parsed.sections && Object.keys(parsed.sections).length > 0) state.sections = parsed.sections;
                     if (parsed.shiftCategories) state.shiftCategories = parsed.shiftCategories;
                     if (parsed.schedule) state.schedule = parsed.schedule;
@@ -1890,20 +1836,9 @@
                     if (parsed.darkMode !== undefined) state.darkMode = parsed.darkMode;
                     if (parsed.dailyPlans) state.dailyPlans = parsed.dailyPlans;
                     if (parsed.monthPlanHistory) state.monthPlanHistory = parsed.monthPlanHistory;
-                    if (parsed.dayPlanTemplate) state.dayPlanTemplate = parsed.dayPlanTemplate;
-                    if (parsed.cardInventory && Array.isArray(parsed.cardInventory)) state.cardInventory = parsed.cardInventory;
-
-                    for (let sKey in state.sections) {
-                        for (let iKey in state.sections[sKey].items) {
-                            const it = state.sections[sKey].items[iKey];
-                            if (it.inPlan === undefined) {
-                                it.inPlan = (iKey === 'item_combo' || iKey === 'item_bs' || iKey === 'item_cross_sim');
-                                it.goal = (iKey === 'item_combo') ? 2 : 1;
-                            }
-                        }
-                    }
+                    if (parsed.cardInventory) state.cardInventory = parsed.cardInventory;
                 } catch (e) {
-                    console.error("Ошибка загрузки данных", e);
+                    console.error("Ошибка загрузки", e);
                 }
             }
 
@@ -1914,6 +1849,8 @@
             document.getElementById('tax-rate-input').value = state.taxRate !== undefined ? state.taxRate : 13;
             document.getElementById('fuel-cons-input').value = state.fuelSettings.consumption || 10.0;
             document.getElementById('fuel-price-input').value = state.fuelSettings.pricePerLiter || 64.0;
+            const fioEl = document.getElementById('setting-banker-fio');
+            if (fioEl) fioEl.value = state.bankerFio || "ФИО МБ";
 
             loadActiveDayToUI();
             renderAll();
@@ -1923,13 +1860,12 @@
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 if (splash) splash.classList.add('hide');
-            }, 1200);
+            }, 900);
         }
 
         function saveState() {
             const data = JSON.stringify(state);
-            localStorage.setItem('alfacalc_smartinventory_v1', data);
-            localStorage.setItem('alfacalc_smartplan_v1', data);
+            localStorage.setItem('alfacalc_customcross_v2', data);
             renderAll();
             renderDayPlan();
             renderMonthPlanReport(false);
@@ -1995,16 +1931,15 @@
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
                 }, 200);
-                showToast("Запрос на скачивание отправлен!");
+                showToast("Файл скачивается!");
             } catch (err) {
                 copyBackupToClipboard();
             }
         }
 
         function copyBackupToClipboard() {
-            const jsonText = JSON.stringify(state);
-            copyToClipboard(jsonText);
-            alert("Код резервной копии скопирован в буфер обмена!");
+            copyToClipboard(JSON.stringify(state));
+            alert("Код бэкапа скопирован в буфер!");
         }
 
         function importBackupFromClipboard() {
@@ -2012,10 +1947,8 @@
             if (!text) return;
             try {
                 const parsed = JSON.parse(text.trim());
-                if (parsed.sections && (parsed.daysData || parsed.schedule)) {
+                if (parsed.sections) {
                     state = parsed;
-                    if (!state.dayAssigned) state.dayAssigned = {};
-                    if (!state.cardInventory) state.cardInventory = JSON.parse(JSON.stringify(defaultCardInventory));
                     applyThemeUI();
                     saveState();
                     loadActiveDayToUI();
@@ -2026,7 +1959,7 @@
                     alert("Некорректный формат данных!");
                 }
             } catch (e) {
-                alert("Ошибка распознавания текста: " + e.message);
+                alert("Ошибка: " + e.message);
             }
         }
 
@@ -2038,10 +1971,8 @@
             reader.onload = function(e) {
                 try {
                     const parsed = JSON.parse(e.target.result);
-                    if (parsed.sections && (parsed.daysData || parsed.schedule)) {
+                    if (parsed.sections) {
                         state = parsed;
-                        if (!state.dayAssigned) state.dayAssigned = {};
-                        if (!state.cardInventory) state.cardInventory = JSON.parse(JSON.stringify(defaultCardInventory));
                         applyThemeUI();
                         saveState();
                         loadActiveDayToUI();
@@ -2049,10 +1980,10 @@
                         closeSettings();
                         showToast("Данные успешно восстановлены!");
                     } else {
-                        alert("Некорректный файл резервной копии!");
+                        alert("Некорректный файл бэкапа!");
                     }
                 } catch (err) {
-                    alert("Ошибка чтения файла: " + err.message);
+                    alert("Ошибка: " + err.message);
                 }
             };
             reader.readAsText(file);
@@ -2177,29 +2108,27 @@
             }
 
             dayData.meetings.forEach(m => {
-                if (!m.isSuccess) {
-                    for (let sKey in m.selectValues) {
-                        const itemKey = m.selectValues[sKey];
-                        if (itemKey && issuedCounts[itemKey] !== undefined) {
-                            issuedCounts[itemKey]++;
-                            totalProfit += getItemPrice(sKey, itemKey);
-                        }
-                    }
-                } else {
-                    for (let sKey in m.selectValues) {
-                        const itemKey = m.selectValues[sKey];
-                        if (itemKey && issuedCounts[itemKey] !== undefined) {
-                            issuedCounts[itemKey]++;
-                            totalProfit += getItemPrice(sKey, itemKey);
-                        }
+                if (m.isSuccess) {
+                    if (m.productKey && state.sections.sec_main?.items[m.productKey]) {
+                        issuedCounts[m.productKey] = (issuedCounts[m.productKey] || 0) + 1;
+                        totalProfit += getItemPrice('sec_main', m.productKey);
                     }
                     if (m.checkedItems) {
                         m.checkedItems.forEach(iKey => {
-                            if (issuedCounts[iKey] !== undefined) {
-                                issuedCounts[iKey]++;
-                                totalProfit += getItemPrice(null, iKey);
-                            }
+                            issuedCounts[iKey] = (issuedCounts[iKey] || 0) + 1;
+                            totalProfit += getItemPrice(null, iKey);
                         });
+                    }
+                    if (m.multiCross) {
+                        for (let cKey in m.multiCross) {
+                            for (let subKey in m.multiCross[cKey]) {
+                                const fullKey = `${cKey}__${subKey}`;
+                                issuedCounts[fullKey] = (issuedCounts[fullKey] || 0) + (m.multiCross[cKey][subKey] ? 1 : 0);
+                            }
+                            if (Object.values(m.multiCross[cKey]).some(v => v)) {
+                                totalProfit += getItemPrice(null, cKey);
+                            }
+                        }
                     }
                 }
             });
@@ -2214,7 +2143,7 @@
             renderDynamicMeetingForms();
             renderHistoryList();
             renderT0Select();
-            buildDayReport(issuedCounts);
+            buildNewFormatDayReport(issuedCounts);
         }
 
         function getItemPrice(sKey, iKey) {
@@ -2275,164 +2204,237 @@
             const failContainer = document.getElementById('dynamic-meeting-form-fail');
 
             let successHtml = '';
-            let failHtml = '';
 
-            for (let sKey in state.sections) {
-                const sec = state.sections[sKey];
-                const itemKeys = Object.keys(sec.items);
-                if (itemKeys.length === 0) continue;
+            // 1. Выбор основного продукта
+            const mainItems = state.sections.sec_main?.items || {};
+            const mainKeys = Object.keys(mainItems);
+            successHtml += `
+                <div class="form-group">
+                    <label>Основной продукт (выдача):</label>
+                    <select id="form-sel-sec_main">
+                        <option value="">-- Не выбрано --</option>
+                        ${mainKeys.map(k => `<option value="${k}">${mainItems[k].name} (+${mainItems[k].price || 0} ₽)</option>`).join('')}
+                    </select>
+                </div>
+            `;
 
-                if (sec.type === 'counter') {
-                    const blockHtml = `
-                        <div class="form-group">
-                            <label>${sec.name}</label>
-                            <select id="form-sel-${sKey}">
-                                <option value="">-- Не выбрано --</option>
-                                ${itemKeys.map(k => `<option value="${k}">${sec.items[k].name} ${sec.items[k].price ? `(+${sec.items[k].price} ₽)` : ''}</option>`).join('')}
-                            </select>
-                        </div>
-                    `;
-                    successHtml += blockHtml;
-                    failHtml += blockHtml;
-                } else if (sec.type === 'checkbox') {
-                    successHtml += `
-                        <div class="form-group">
-                            <label>${sec.name}</label>
-                            <div class="checkbox-grid">
-                                ${itemKeys.map(k => `
-                                    <label class="checkbox-item">
-                                        <input type="checkbox" id="form-check-${k}">
-                                        <span class="checkbox-label">${sec.items[k].name}</span>
+            // 2. Кросс-продажи
+            const crossItems = state.sections.sec_cross?.items || {};
+            let singleCrossHtml = '';
+            let multiCrossHtml = '';
+
+            for (let cKey in crossItems) {
+                const cItem = crossItems[cKey];
+                if (cItem.mode === 'multi' && cItem.subitems && cItem.subitems.length > 0) {
+                    multiCrossHtml += `
+                        <div class="cross-multi-card">
+                            <div class="cross-multi-title">${cItem.name}</div>
+                            <div class="cross-multi-subgrid">
+                                ${cItem.subitems.map(sub => `
+                                    <label class="checkbox-item" style="padding:6px 4px;">
+                                        <input type="checkbox" id="check-multi-${cKey}-${sub}">
+                                        <span class="checkbox-label" style="font-size:11px;">${sub}</span>
                                     </label>
                                 `).join('')}
                             </div>
                         </div>
                     `;
-                } else if (sec.type === 'select') {
-                    failHtml += `
-                        <div class="form-group">
-                            <label>${sec.name}</label>
-                            <select id="form-sel-fail-${sKey}">
-                                <option value="">-- Выберите причину отказа --</option>
-                                ${itemKeys.map(k => `<option value="${k}">${sec.items[k].name}</option>`).join('')}
-                            </select>
-                        </div>
+                } else {
+                    singleCrossHtml += `
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="form-check-${cKey}">
+                            <span class="checkbox-label">${cItem.name}</span>
+                        </label>
                     `;
                 }
             }
 
-            successContainer.innerHTML = successHtml || '<div class="empty-history">Добавьте продукты в настройках ⚙️</div>';
-            failContainer.innerHTML = failHtml || '<div class="empty-history">Добавьте причины отказов в настройках ⚙️</div>';
+            if (multiCrossHtml) {
+                successHtml += `<div class="form-group"><label>Кросс-продажи (мульти):</label>${multiCrossHtml}</div>`;
+            }
+
+            if (singleCrossHtml) {
+                successHtml += `
+                    <div class="form-group">
+                        <label>Кросс-продажи (простые):</label>
+                        <div class="checkbox-grid">${singleCrossHtml}</div>
+                    </div>
+                `;
+            }
+
+            // 3. Приложения
+            const appItems = state.sections.sec_apps?.items || {};
+            const appKeys = Object.keys(appItems);
+            if (appKeys.length > 0) {
+                successHtml += `
+                    <div class="form-group">
+                        <label>Приложения:</label>
+                        <div class="checkbox-grid">
+                            ${appKeys.map(k => `
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="form-check-${k}">
+                                    <span class="checkbox-label">${appItems[k].name}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Форма отказов
+            const failKeys = Object.keys(state.sections.sec_statuses?.items || {});
+            let failHtml = `
+                <div class="form-group">
+                    <label>По какому продукту сорвалась встреча?</label>
+                    <select id="form-sel-fail-product">
+                        <option value="">-- Выберите продукт --</option>
+                        ${mainKeys.map(k => `<option value="${k}">${mainItems[k].name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Статус / причина отказа:</label>
+                    <select id="form-sel-fail-status">
+                        <option value="">-- Выберите статус --</option>
+                        ${failKeys.map(k => `<option value="${k}">${state.sections.sec_statuses.items[k].name}</option>`).join('')}
+                    </select>
+                </div>
+            `;
+
+            successContainer.innerHTML = successHtml;
+            failContainer.innerHTML = failHtml;
         }
 
         function applyMeetingSync(meeting, isAdding = true) {
-            if (!meeting.isSuccess) return;
             const factor = isAdding ? 1 : -1;
             const dayList = getDayPlanList(currentActiveDateKey);
 
-            const itemsIssued = [];
-            for (let s in meeting.selectValues) {
-                if (meeting.selectValues[s]) itemsIssued.push(meeting.selectValues[s]);
-            }
-            if (meeting.checkedItems) {
-                meeting.checkedItems.forEach(iKey => itemsIssued.push(iKey));
-            }
-
-            // 1. Синхронизация плана на день
-            itemsIssued.forEach(iKey => {
-                const target = dayList.find(t => t.id === iKey);
-                if (target) {
-                    target.sold = Math.max(0, (parseInt(target.sold, 10) || 0) + factor);
-                    syncTargetToMonthArchive(target, currentActiveDateKey);
-                }
-            });
-
-            // 2. Списание пластика со склада инвентаризации
-            if (state.cardInventory && Array.isArray(state.cardInventory)) {
-                itemsIssued.forEach(iKey => {
-                    state.cardInventory.forEach(stock => {
-                        if (stock.boundItems && stock.boundItems.includes(iKey)) {
-                            stock.count = Math.max(0, (parseInt(stock.count, 10) || 0) - factor);
+            if (meeting.isSuccess) {
+                const itemsIssued = [];
+                if (meeting.productKey) itemsIssued.push(meeting.productKey);
+                if (meeting.checkedItems) meeting.checkedItems.forEach(k => itemsIssued.push(k));
+                if (meeting.multiCross) {
+                    for (let cKey in meeting.multiCross) {
+                        if (Object.values(meeting.multiCross[cKey]).some(v => v)) {
+                            itemsIssued.push(cKey);
                         }
-                    });
+                    }
+                }
+
+                itemsIssued.forEach(iKey => {
+                    const target = dayList.find(t => t.id === iKey);
+                    if (target) {
+                        target.sold = Math.max(0, (parseInt(target.sold, 10) || 0) + factor);
+                        syncTargetToMonthArchive(target, currentActiveDateKey);
+                    }
                 });
+
+                if (state.cardInventory && Array.isArray(state.cardInventory)) {
+                    itemsIssued.forEach(iKey => {
+                        state.cardInventory.forEach(stock => {
+                            if (stock.boundItems && stock.boundItems.includes(iKey)) {
+                                stock.count = Math.max(0, (parseInt(stock.count, 10) || 0) - factor);
+                            }
+                        });
+                    });
+                }
             }
         }
 
         function saveMeeting() {
             const client = document.getElementById('client-info').value.trim() || "Клиент без имени";
             const comment = document.getElementById('meeting-comment').value.trim();
+            const inCar = document.getElementById('check-car-meeting').checked;
 
             const newMeeting = {
                 id: 'meet_' + Date.now(),
                 client: client,
                 comment: comment,
                 isSuccess: isCurrentMeetingSuccess,
+                inCar: inCar,
+                productKey: null,
                 selectValues: {},
-                checkedItems: []
+                checkedItems: [],
+                multiCross: {}
             };
 
             let singleReportText = `${client}\n`;
 
             if (isCurrentMeetingSuccess) {
-                for (let sKey in state.sections) {
-                    const sec = state.sections[sKey];
-                    if (sec.type === 'counter') {
-                        const sel = document.getElementById(`form-sel-${sKey}`);
-                        if (sel && sel.value) {
-                            newMeeting.selectValues[sKey] = sel.value;
-                            singleReportText += `${getItemName(sel.value)}\n`;
+                const mainSel = document.getElementById('form-sel-sec_main');
+                if (mainSel && mainSel.value) {
+                    newMeeting.productKey = mainSel.value;
+                    newMeeting.selectValues['sec_main'] = mainSel.value;
+                    singleReportText += `${getItemName(mainSel.value)}\n`;
+                }
+
+                const crossItems = state.sections.sec_cross?.items || {};
+                for (let k in crossItems) {
+                    if (crossItems[k].mode !== 'multi') {
+                        const cb = document.getElementById(`form-check-${k}`);
+                        if (cb && cb.checked) {
+                            newMeeting.checkedItems.push(k);
+                            singleReportText += `${crossItems[k].name}\n`;
+                        }
+                    } else {
+                        const subs = crossItems[k].subitems || [];
+                        const checkedSubs = [];
+                        newMeeting.multiCross[k] = {};
+                        subs.forEach(s => {
+                            const subCb = document.getElementById(`check-multi-${k}-${s}`);
+                            if (subCb && subCb.checked) {
+                                newMeeting.multiCross[k][s] = true;
+                                checkedSubs.push(s);
+                            } else {
+                                newMeeting.multiCross[k][s] = false;
+                            }
+                        });
+                        if (checkedSubs.length > 0) {
+                            singleReportText += `${crossItems[k].name}: ${checkedSubs.join(', ')}\n`;
                         }
                     }
                 }
 
-                for (let sKey in state.sections) {
-                    const sec = state.sections[sKey];
-                    if (sec.type === 'checkbox') {
-                        for (let iKey in sec.items) {
-                            const cb = document.getElementById(`form-check-${iKey}`);
-                            if (cb && cb.checked) {
-                                newMeeting.checkedItems.push(iKey);
-                                singleReportText += `${sec.items[iKey].name}\n`;
-                            }
-                        }
+                const appItems = state.sections.sec_apps?.items || {};
+                for (let k in appItems) {
+                    const cb = document.getElementById(`form-check-${k}`);
+                    if (cb && cb.checked) {
+                        newMeeting.checkedItems.push(k);
+                        singleReportText += `${appItems[k].name}\n`;
                     }
                 }
             } else {
-                for (let sKey in state.sections) {
-                    const sec = state.sections[sKey];
-                    if (sec.type === 'counter') {
-                        const sel = document.getElementById(`form-sel-${sKey}`);
-                        if (sel && sel.value) {
-                            newMeeting.selectValues[sKey] = sel.value;
-                            singleReportText += `${getItemName(sel.value)}\n`;
-                        }
-                    }
-                    if (sec.type === 'select') {
-                        const selFail = document.getElementById(`form-sel-fail-${sKey}`);
-                        if (selFail && selFail.value) {
-                            newMeeting.selectValues[sKey] = selFail.value;
-                            singleReportText += `${getItemName(selFail.value)}\n`;
-                        }
-                    }
+                const failProdSel = document.getElementById('form-sel-fail-product');
+                const failStatusSel = document.getElementById('form-sel-fail-status');
+
+                const chosenProd = failProdSel ? failProdSel.value : '';
+                const chosenStatus = failStatusSel ? failStatusSel.value : '';
+
+                if (chosenProd) {
+                    newMeeting.productKey = chosenProd;
+                    newMeeting.selectValues['sec_main'] = chosenProd;
+                    singleReportText += `Продукт: ${getItemName(chosenProd)}\n`;
+                }
+                if (chosenStatus) {
+                    newMeeting.selectValues['sec_statuses'] = chosenStatus;
+                    singleReportText += `Статус: ${getItemName(chosenStatus)}\n`;
                 }
             }
 
-            if (comment) singleReportText += `Комментарий: ${comment}`;
-            if (singleReportText.endsWith('\n')) singleReportText = singleReportText.slice(0, -1);
+            if (comment) singleReportText += `Комментарий: ${comment}\n`;
+            if (inCar) singleReportText += `Встреча в авто: Да\n`;
 
             const dayData = getActiveDayData();
             dayData.meetings.push(newMeeting);
 
             applyMeetingSync(newMeeting, true);
-
             saveState();
 
-            copyToClipboard(singleReportText);
-            showToast("Встреча сохранена, план и склад обновлены!");
+            copyToClipboard(singleReportText.trim());
+            showToast("Встреча сохранена и учтена в отчете!");
 
             document.getElementById('client-info').value = '';
             document.getElementById('meeting-comment').value = '';
+            document.getElementById('check-car-meeting').checked = false;
             document.querySelectorAll('#success-block select, #fail-block select').forEach(s => s.value = '');
             document.querySelectorAll('#success-block input[type="checkbox"]').forEach(c => c.checked = false);
         }
@@ -2452,13 +2454,23 @@
                 item.className = 'history-item';
 
                 let details = [];
-                for (let sKey in m.selectValues) {
-                    details.push(`<b>${getItemName(m.selectValues[sKey])}</b>`);
+                if (m.productKey) details.push(`Продукт: <b>${getItemName(m.productKey)}</b>`);
+                if (!m.isSuccess && m.selectValues['sec_statuses']) {
+                    details.push(`Статус: <b>${getItemName(m.selectValues['sec_statuses'])}</b>`);
                 }
                 if (m.checkedItems && m.checkedItems.length > 0) {
                     details.push(`Опции: ${m.checkedItems.map(k => getItemName(k)).join(', ')}`);
                 }
+                if (m.multiCross) {
+                    for (let k in m.multiCross) {
+                        const activeSubs = Object.keys(m.multiCross[k]).filter(s => m.multiCross[k][s]);
+                        if (activeSubs.length > 0) {
+                            details.push(`${getItemName(k)} (${activeSubs.join(', ')})`);
+                        }
+                    }
+                }
                 if (m.comment) details.push(`<i>"${m.comment}"</i>`);
+                if (m.inCar) details.push(`🚗 В авто`);
 
                 const badgeClass = m.isSuccess ? 'badge-success' : 'badge-fail';
                 const badgeText = m.isSuccess ? 'УСПЕШНАЯ' : 'НЕУСПЕШНАЯ';
@@ -2476,38 +2488,89 @@
         }
 
         function deleteMeeting(id) {
-            if (confirm("Удалить эту встречу? (План и остаток карт будут скорректированы)")) {
+            if (confirm("Удалить эту встречу? (Отчет и план будут пересчитаны)")) {
                 const dayData = getActiveDayData();
                 const m = dayData.meetings.find(x => x.id === id);
-                if (m) {
-                    applyMeetingSync(m, false);
-                }
+                if (m) applyMeetingSync(m, false);
                 dayData.meetings = dayData.meetings.filter(x => x.id !== id);
                 saveState();
             }
         }
 
-        function buildDayReport(issuedCounts) {
-            let report = `Итоговый отчет за ${formatDateDisplay(currentActiveDateKey)}\n`;
+        // ИТОГОВЫЙ ОТЧЕТ: БЕЗ СЛОВА "ШАБЛОН", С ТИРЕ В МУЛЬТИ-ПРОДАЖАХ
+        function buildNewFormatDayReport(issuedCounts) {
+            const dayData = getActiveDayData();
+            const dateStr = formatDateDisplay(currentActiveDateKey);
+            const banker = state.bankerFio || "ФИО МБ";
 
-            for (let sKey in state.sections) {
-                const sec = state.sections[sKey];
-                const iKeys = Object.keys(sec.items);
-                if (iKeys.length === 0) continue;
+            let totalMeetingsCount = dayData.meetings.length;
+            let carMeetingsCount = dayData.meetings.filter(m => m.inCar).length;
 
-                report += `\n${sec.name}\n`;
-                iKeys.forEach(k => {
-                    const it = sec.items[k];
-                    const count = issuedCounts[k] || 0;
+            let report = `${dateStr}\n${banker}\n`;
 
-                    if (sec.type === 'counter') {
-                        const assignedToday = getDayAssignedCount(sKey, k, currentActiveDateKey);
-                        report += `${it.name} - ${count}/${assignedToday}\n`;
-                    } else {
-                        report += `${it.name} - ${count}\n`;
-                    }
+            const getCount = (k) => issuedCounts[k] || 0;
+            const mainSec = state.sections.sec_main?.items || {};
+
+            // 1. ОСНОВНЫЕ ПРОДУКТЫ
+            for (let prodKey in mainSec) {
+                const prodName = mainSec[prodKey].name;
+                const assigned = getDayAssignedCount('sec_main', prodKey, currentActiveDateKey);
+                const issued = getCount(prodKey);
+
+                const failsForThisProd = dayData.meetings.filter(m => !m.isSuccess && (m.productKey === prodKey || m.selectValues['sec_main'] === prodKey));
+
+                if (assigned === 0 && issued === 0 && failsForThisProd.length === 0) continue;
+
+                report += `\n${prodName}:  назначено ${assigned} / выдано ${issued}`;
+                
+                // Проверка x5
+                if (prodKey === 'item_dk') {
+                    const x5Count = getCount('cross_is_x5');
+                    if (x5Count > 0) report += ` (в том числе x5 - ${x5Count})`;
+                }
+                report += `\n`;
+
+                // Активация
+                const actCount = dayData.meetings.filter(m => m.isSuccess && (m.productKey === prodKey || m.selectValues['sec_main'] === prodKey) && m.checkedItems?.includes('cross_act')).length;
+                report += `Актив(пин-код): ${actCount}\n`;
+
+                // Неуспешные встречи строго под своим продуктом
+                failsForThisProd.forEach(f => {
+                    const statusName = getItemName(f.selectValues['sec_statuses']) || 'Отказ';
+                    const commentPart = f.comment ? `, ${f.comment}` : '';
+                    report += `${f.client} - ${statusName}${commentPart}\n`;
                 });
             }
+
+            // 2. ДИНАМИЧЕСКИЙ БЛОК КРОСС-ПРОДАЖ (КОЛИЧЕСТВО ЧЕРЕЗ ТИРЕ)
+            report += `\nКРОСС - ПРОДАЖИ:\n`;
+            const crossSec = state.sections.sec_cross?.items || {};
+
+            for (let cKey in crossSec) {
+                const it = crossSec[cKey];
+                if (cKey === 'cross_act' || cKey === 'cross_is_x5') continue;
+
+                if (it.mode === 'multi' && it.subitems && it.subitems.length > 0) {
+                    let parts = it.subitems.map(sub => {
+                        const cnt = getCount(`${cKey}__${sub}`);
+                        return `${sub} - ${cnt}`;
+                    });
+                    report += `- ${it.name} ${parts.join(' / ')}\n`;
+                } else {
+                    report += `- ${it.name} - ${getCount(cKey)}\n`;
+                }
+            }
+
+            // 3. ПРИЛОЖЕНИЯ
+            const iosCount = getCount('app_ios');
+            const androidCount = getCount('app_android');
+            const appX5Count = getCount('app_x5');
+            report += `- Установка МП: МП iOS ${iosCount}/${totalMeetingsCount || 0}\n`;
+            report += `- МП Андройд ${androidCount}\n`;
+            report += `- МП Х5 ${appX5Count}\n`;
+
+            // 4. ВСТРЕЧИ В АВТО
+            report += `\nВстречи в авто ${carMeetingsCount} из ${totalMeetingsCount}`;
 
             document.getElementById('day-report-preview').innerText = report;
         }
@@ -2528,7 +2591,7 @@
                 }
             }
             saveState();
-            showToast("Отчет скопирован, данные занесены в график!");
+            showToast("Отчет скопирован!");
         }
 
         function renderCalendar() {
@@ -2571,8 +2634,15 @@
                     const dD = state.daysData[dayKey];
                     dayGross = dD.extraIncome || 0;
                     dD.meetings.forEach(m => {
-                        for (let s in m.selectValues) dayGross += getItemPrice(s, m.selectValues[s]);
-                        if (m.isSuccess && m.checkedItems) m.checkedItems.forEach(k => dayGross += getItemPrice(null, k));
+                        if (m.isSuccess) {
+                            if (m.productKey) dayGross += getItemPrice('sec_main', m.productKey);
+                            if (m.checkedItems) m.checkedItems.forEach(k => dayGross += getItemPrice(null, k));
+                            if (m.multiCross) {
+                                for (let c in m.multiCross) {
+                                    if (Object.values(m.multiCross[c]).some(v => v)) dayGross += getItemPrice(null, c);
+                                }
+                            }
+                        }
                     });
                     dayFuelCost = dD.fuel?.cost || 0;
                 } else if (dayData.profit > 0) {
@@ -2716,7 +2786,7 @@
 
             nameInput.value = ''; goalInput.value = '';
             saveState();
-            showToast("Кастомная цель добавлена в план!");
+            showToast("Кастомная цель добавлена!");
         }
 
         function changeTargetSold(id, delta) {
@@ -2841,9 +2911,7 @@
             const previewEl = document.getElementById('month-plan-report-preview');
             if (!previewEl) return;
 
-            if (!forceRecalculate && document.activeElement === previewEl) {
-                return;
-            }
+            if (!forceRecalculate && document.activeElement === previewEl) return;
 
             const monthTotals = {};
 
@@ -3098,43 +3166,66 @@
         }
 
         function renderSimpleSettingsLists() {
+            const fioEl = document.getElementById('setting-banker-fio');
+            if (fioEl) fioEl.value = state.bankerFio || "ФИО МБ";
+
             const prodList = document.getElementById('settings-products-list');
             let phtml = '';
 
-            const renderItemsOfSec = (sKey, label) => {
-                const sec = state.sections[sKey];
-                if (!sec) return '';
-                const iKeys = Object.keys(sec.items);
-                if (iKeys.length === 0) return '';
-
-                let block = `<div style="font-size:12px; font-weight:800; color:var(--alfa-muted); margin:8px 0 4px 4px;">${label}:</div>`;
-                iKeys.forEach(k => {
-                    const item = sec.items[k];
-                    const inPlanChecked = item.inPlan ? 'checked' : '';
-                    block += `
-                        <div class="setting-row">
-                            <input type="text" class="setting-name-input" id="item-name-${sKey}-${k}" value="${item.name}">
-                            <input type="number" class="setting-price-input" id="item-price-${sKey}-${k}" value="${item.price || 0}" title="Цена">
-                            <label class="plan-toggle-badge" title="Отображать и считать в Плане на день">
-                                <input type="checkbox" id="item-inplan-${sKey}-${k}" ${inPlanChecked}>
-                                🎯
-                            </label>
-                            <input type="number" class="plan-goal-input" id="item-goal-${sKey}-${k}" value="${item.goal || 1}" title="Цель на день" min="1">
-                            <button class="btn-remove-prod" onclick="removeSimpleItem('${sKey}', '${k}')">🗑️</button>
+            // 1. Основные
+            phtml += `<div style="font-size:12px; font-weight:800; color:var(--alfa-muted); margin:8px 0 4px 4px;">Основные (выдача карт и кредитов):</div>`;
+            const mainItems = state.sections.sec_main?.items || {};
+            for (let k in mainItems) {
+                const item = mainItems[k];
+                const inPlanChecked = item.inPlan ? 'checked' : '';
+                phtml += `
+                    <div class="setting-row">
+                        <div class="setting-row-main">
+                            <input type="text" class="setting-name-input" id="item-name-sec_main-${k}" value="${item.name}">
+                            <input type="number" class="setting-price-input" id="item-price-sec_main-${k}" value="${item.price || 0}" title="Цена">
+                            <label class="plan-toggle-badge" title="В план"><input type="checkbox" id="item-inplan-sec_main-${k}" ${inPlanChecked}>🎯</label>
+                            <input type="number" class="plan-goal-input" id="item-goal-sec_main-${k}" value="${item.goal || 1}" title="Цель" min="1">
+                            <button class="btn-remove-prod" onclick="removeSimpleItem('sec_main', '${k}')">🗑️</button>
                         </div>
-                    `;
-                });
-                return block;
-            };
-
-            phtml += renderItemsOfSec('sec_main', 'Основные (выдача карт и кредитов)');
-            phtml += renderItemsOfSec('sec_cross', 'Кросс-продажи (допуслуги)');
-            if (state.sections.sec_apps) {
-                phtml += renderItemsOfSec('sec_apps', 'Приложения (галочки)');
+                    </div>
+                `;
             }
 
-            prodList.innerHTML = phtml || '<div class="empty-history">Список пуст. Добавьте первый продукт выше!</div>';
+            // 2. Кросс-продажи
+            phtml += `<div style="font-size:12px; font-weight:800; color:var(--alfa-muted); margin:12px 0 4px 4px;">Кросс-продажи (настраиваемые):</div>`;
+            const crossItems = state.sections.sec_cross?.items || {};
+            for (let k in crossItems) {
+                const item = crossItems[k];
+                const inPlanChecked = item.inPlan ? 'checked' : '';
+                const subVal = (item.subitems || []).join(', ');
+                const isMulti = item.mode === 'multi';
 
+                phtml += `
+                    <div class="setting-row">
+                        <div class="setting-row-main">
+                            <input type="text" class="setting-name-input" id="item-name-sec_cross-${k}" value="${item.name}">
+                            <input type="number" class="setting-price-input" id="item-price-sec_cross-${k}" value="${item.price || 0}" title="Оплата">
+                            <label class="plan-toggle-badge" title="В план"><input type="checkbox" id="item-inplan-sec_cross-${k}" ${inPlanChecked}>🎯</label>
+                            <input type="number" class="plan-goal-input" id="item-goal-sec_cross-${k}" value="${item.goal || 1}" title="Цель" min="1">
+                            <button class="btn-remove-prod" onclick="removeSimpleItem('sec_cross', '${k}')">🗑️</button>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <label style="font-size:11px; color:var(--alfa-muted); white-space:nowrap;">Режим:</label>
+                            <select id="item-mode-sec_cross-${k}" class="input-text" style="height:28px; padding:2px 6px; font-size:11px; width:auto;" onchange="toggleSubInputRow('${k}', this.value)">
+                                <option value="single" ${!isMulti ? 'selected' : ''}>Простая выдача (1 число)</option>
+                                <option value="multi" ${isMulti ? 'selected' : ''}>Мульти-пункты</option>
+                            </select>
+                        </div>
+                        <div id="sub-row-${k}" style="${isMulti ? 'display:block;' : 'display:none;'}">
+                            <input type="text" class="setting-subitems-input" id="item-subs-sec_cross-${k}" value="${subVal}" placeholder="Подпункты через запятую: одобрено, выдано, транзакция">
+                        </div>
+                    </div>
+                `;
+            }
+
+            prodList.innerHTML = phtml || '<div class="empty-history">Список пуст.</div>';
+
+            // Отказы
             const failList = document.getElementById('settings-fails-list');
             let fhtml = '';
             const failSec = state.sections.sec_statuses;
@@ -3142,7 +3233,7 @@
                 for (let k in failSec.items) {
                     const item = failSec.items[k];
                     fhtml += `
-                        <div class="setting-row">
+                        <div class="setting-row" style="flex-direction:row;">
                             <input type="text" class="setting-name-input" id="fail-name-${k}" value="${item.name}">
                             <input type="number" class="setting-price-input" id="fail-price-${k}" value="${item.price || 0}">
                             <span style="font-size:12px; font-weight:700; color:var(--alfa-muted);">₽</span>
@@ -3153,12 +3244,13 @@
             }
             failList.innerHTML = fhtml || '<div class="empty-history">Причин отказов пока нет</div>';
 
+            // График
             const shiftList = document.getElementById('settings-shifts-list');
             let shtml = '';
             for (let cKey in state.shiftCategories) {
                 const cat = state.shiftCategories[cKey];
                 shtml += `
-                    <div class="setting-row" style="gap:4px;">
+                    <div class="setting-row" style="flex-direction:row; gap:4px;">
                         <input type="color" class="color-picker-btn" id="cat-color-${cKey}" value="${cat.color || '#EF3124'}">
                         <input type="text" style="width:36px; text-align:center;" class="setting-name-input" id="cat-icon-${cKey}" value="${cat.icon || '💼'}">
                         <input type="text" class="setting-name-input" id="cat-name-${cKey}" value="${cat.name}">
@@ -3169,20 +3261,51 @@
             shiftList.innerHTML = shtml;
         }
 
-        function saveCurrentSimpleInputs() {
-            for (let sKey in state.sections) {
-                for (let iKey in state.sections[sKey].items) {
-                    const nEl = document.getElementById(`item-name-${sKey}-${iKey}`);
-                    const pEl = document.getElementById(`item-price-${sKey}-${iKey}`);
-                    const planEl = document.getElementById(`item-inplan-${sKey}-${iKey}`);
-                    const goalEl = document.getElementById(`item-goal-${sKey}-${iKey}`);
+        function toggleSubInputRow(key, mode) {
+            const el = document.getElementById(`sub-row-${key}`);
+            if (el) el.style.display = mode === 'multi' ? 'block' : 'none';
+        }
 
-                    if (nEl && nEl.value.trim()) state.sections[sKey].items[iKey].name = nEl.value.trim();
-                    if (pEl) state.sections[sKey].items[iKey].price = parseInt(pEl.value) || 0;
-                    if (planEl) state.sections[sKey].items[iKey].inPlan = planEl.checked;
-                    if (goalEl) state.sections[sKey].items[iKey].goal = Math.max(1, parseInt(goalEl.value) || 1);
+        function saveCurrentSimpleInputs() {
+            const fioEl = document.getElementById('setting-banker-fio');
+            if (fioEl) state.bankerFio = fioEl.value.trim() || "ФИО МБ";
+
+            for (let iKey in state.sections.sec_main?.items || {}) {
+                const nEl = document.getElementById(`item-name-sec_main-${iKey}`);
+                const pEl = document.getElementById(`item-price-sec_main-${iKey}`);
+                const planEl = document.getElementById(`item-inplan-sec_main-${iKey}`);
+                const goalEl = document.getElementById(`item-goal-sec_main-${iKey}`);
+
+                if (nEl && nEl.value.trim()) state.sections.sec_main.items[iKey].name = nEl.value.trim();
+                if (pEl) state.sections.sec_main.items[iKey].price = parseInt(pEl.value) || 0;
+                if (planEl) state.sections.sec_main.items[iKey].inPlan = planEl.checked;
+                if (goalEl) state.sections.sec_main.items[iKey].goal = Math.max(1, parseInt(goalEl.value) || 1);
+            }
+
+            for (let iKey in state.sections.sec_cross?.items || {}) {
+                const nEl = document.getElementById(`item-name-sec_cross-${iKey}`);
+                const pEl = document.getElementById(`item-price-sec_cross-${iKey}`);
+                const planEl = document.getElementById(`item-inplan-sec_cross-${iKey}`);
+                const goalEl = document.getElementById(`item-goal-sec_cross-${iKey}`);
+                const modeEl = document.getElementById(`item-mode-sec_cross-${iKey}`);
+                const subsEl = document.getElementById(`item-subs-sec_cross-${iKey}`);
+
+                if (nEl && nEl.value.trim()) state.sections.sec_cross.items[iKey].name = nEl.value.trim();
+                if (pEl) state.sections.sec_cross.items[iKey].price = parseInt(pEl.value) || 0;
+                if (planEl) state.sections.sec_cross.items[iKey].inPlan = planEl.checked;
+                if (goalEl) state.sections.sec_cross.items[iKey].goal = Math.max(1, parseInt(goalEl.value) || 1);
+
+                if (modeEl) {
+                    state.sections.sec_cross.items[iKey].mode = modeEl.value;
+                    if (modeEl.value === 'multi' && subsEl) {
+                        const parsedSubs = subsEl.value.split(/[,/]/).map(s => s.trim()).filter(Boolean);
+                        state.sections.sec_cross.items[iKey].subitems = parsedSubs.length > 0 ? parsedSubs : ["выдано"];
+                    } else {
+                        state.sections.sec_cross.items[iKey].subitems = [];
+                    }
                 }
             }
+
             if (state.sections.sec_statuses) {
                 for (let k in state.sections.sec_statuses.items) {
                     const fEl = document.getElementById(`fail-name-${k}`);
@@ -3191,6 +3314,7 @@
                     if (fpEl) state.sections.sec_statuses.items[k].price = parseInt(fpEl.value) || 0;
                 }
             }
+
             for (let cKey in state.shiftCategories) {
                 const colEl = document.getElementById(`cat-color-${cKey}`);
                 const icEl = document.getElementById(`cat-icon-${cKey}`);
@@ -3208,35 +3332,39 @@
             const type = document.getElementById('simple-prod-type').value;
             const inPlan = document.getElementById('simple-prod-inplan').checked;
             const goal = parseInt(document.getElementById('simple-prod-goal').value) || 1;
+            const subitemsRaw = document.getElementById('simple-prod-subitems').value.trim();
 
-            if (!name) return alert("Введите название продукта!");
+            if (!name) return alert("Введите название!");
 
-            let targetSecKey = 'sec_main';
-            if (type === 'checkbox') targetSecKey = 'sec_cross';
-            if (type === 'apps') targetSecKey = 'sec_apps';
+            const iKey = 'prod_' + Date.now();
 
-            if (!state.sections[targetSecKey]) {
-                state.sections[targetSecKey] = { 
-                    name: type === 'counter' ? "Основные продукты" : (type === 'apps' ? "Приложения" : "Кросс-продажи"), 
-                    type: type === 'counter' ? 'counter' : 'checkbox', 
-                    items: {} 
+            if (type === 'counter') {
+                if (!state.sections.sec_main) state.sections.sec_main = { name: "Основные продукты", type: "counter", items: {} };
+                state.sections.sec_main.items[iKey] = { name: name, price: price, assigned: 0, inPlan: inPlan, goal: goal, unit: 'шт' };
+            } else if (type === 'apps') {
+                if (!state.sections.sec_apps) state.sections.sec_apps = { name: "Приложения", type: "checkbox", items: {} };
+                state.sections.sec_apps.items[iKey] = { name: name, price: price };
+            } else {
+                if (!state.sections.sec_cross) state.sections.sec_cross = { name: "Кросс-продажи", type: "cross_builder", items: {} };
+                const mode = (type === 'cross_multi') ? 'multi' : 'single';
+                const subitems = mode === 'multi' ? subitemsRaw.split(/[,/]/).map(s => s.trim()).filter(Boolean) : [];
+
+                state.sections.sec_cross.items[iKey] = {
+                    name: name,
+                    price: price,
+                    mode: mode,
+                    subitems: subitems.length > 0 ? subitems : (mode === 'multi' ? ['выдано', 'транзакция'] : []),
+                    inPlan: inPlan,
+                    goal: goal,
+                    unit: 'шт'
                 };
             }
-
-            const iKey = 'item_' + Date.now();
-            state.sections[targetSecKey].items[iKey] = { 
-                name: name, 
-                price: price, 
-                assigned: 0, 
-                inPlan: inPlan, 
-                goal: goal, 
-                unit: 'шт' 
-            };
             
             document.getElementById('simple-prod-name').value = '';
             document.getElementById('simple-prod-price').value = '';
+            document.getElementById('simple-prod-subitems').value = '';
             renderSimpleSettingsLists();
-            showToast("Продукт добавлен!");
+            showToast("Позиция добавлена!");
         }
 
         function removeSimpleItem(sKey, iKey) {
@@ -3293,24 +3421,23 @@
         }
 
         function applyBankerPreset() {
-            if (!confirm("Восстановить ваш персональный набор продуктов, кросс-продаж, отказов и склада?")) return;
+            if (!confirm("Загрузить эталонный набор с готовыми мульти-пунктами для Комбо, БС, Детей и Смарта?")) return;
 
             saveCurrentSimpleInputs();
 
             state.sections = JSON.parse(JSON.stringify(defaultUserSections));
             state.shiftCategories = JSON.parse(JSON.stringify(defaultShiftCategories));
-            state.dayPlanTemplate = JSON.parse(JSON.stringify(defaultDayPlanTemplate));
             state.cardInventory = JSON.parse(JSON.stringify(defaultCardInventory));
             state.fuelSettings = { consumption: 10, pricePerLiter: 64 };
             state.taxRate = 13;
 
             renderSimpleSettingsLists();
             saveState();
-            showToast("Персональный набор восстановлен!");
+            showToast("Эталонный набор загружен!");
         }
 
         function confirmReset() {
-            if (confirm(`Сбросить результаты за ${formatDateDisplay(currentActiveDateKey)}? Встречи, бензин и доп. доход обнулятся. План и настройки останутся.`)) {
+            if (confirm(`Сбросить результаты за ${formatDateDisplay(currentActiveDateKey)}? Встречи, бензин и доп. доход обнулятся. Настройки останутся.`)) {
                 delete state.daysData[currentActiveDateKey];
                 if (state.dayAssigned && state.dayAssigned[currentActiveDateKey]) {
                     delete state.dayAssigned[currentActiveDateKey];
