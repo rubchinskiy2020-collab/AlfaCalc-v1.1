@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>AlfaCalc by Kosin</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -40,6 +40,7 @@
             padding: 0;
             -webkit-tap-highlight-color: transparent;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            touch-action: manipulation;
         }
 
         #splash-screen {
@@ -54,7 +55,8 @@
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
+            transition: opacity 0.4s ease, visibility 0.4s;
+            will-change: opacity, visibility;
         }
 
         body.dark-mode #splash-screen { background: #0E1217; }
@@ -135,11 +137,11 @@
         body {
             background-color: var(--alfa-bg);
             color: var(--alfa-text);
-            padding-bottom: 75px;
+            padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px));
             font-size: 15px;
             line-height: 1.4;
             overflow-x: hidden;
-            transition: background-color 0.25s ease, color 0.25s ease;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
         header {
@@ -150,7 +152,6 @@
             top: 0;
             z-index: 100;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            transition: background-color 0.25s ease, border-color 0.25s ease;
         }
 
         .header-container {
@@ -161,7 +162,6 @@
             align-items: center;
         }
 
-        .logo-title { display: flex; flex-direction: column; }
         .logo-title h1 { font-size: 18px; font-weight: 800; color: var(--alfa-black); letter-spacing: -0.5px; }
         .logo-title h1 span { color: var(--alfa-red); }
         .logo-title .subtitle { font-size: 11px; color: var(--alfa-muted); font-weight: 500; margin-top: 1px; }
@@ -180,7 +180,7 @@
             cursor: pointer;
             font-size: 16px;
             color: var(--alfa-text);
-            transition: background 0.2s;
+            transition: background 0.15s;
         }
 
         .btn-icon:active { background: var(--alfa-border); }
@@ -192,7 +192,6 @@
             padding: 16px;
             margin-bottom: 12px;
             border: 1px solid var(--alfa-border);
-            transition: background-color 0.25s ease, border-color 0.25s ease;
         }
 
         .card-title {
@@ -212,7 +211,6 @@
             text-align: center;
             padding: 16px;
             margin-bottom: 8px;
-            position: relative;
         }
         
         .profit-box .label {
@@ -235,7 +233,6 @@
             font-weight: 600;
             cursor: pointer;
             margin-top: 8px;
-            transition: background 0.2s;
             display: inline-block;
         }
 
@@ -293,27 +290,24 @@
             -webkit-appearance: none;
         }
 
-        .btn-date-nav {
-            background: var(--alfa-bg);
-            border: 1px solid var(--alfa-border);
+        .btn-date-nav, .btn-date-today {
             border-radius: 8px;
             padding: 7px 10px;
             font-size: 12px;
             font-weight: 700;
-            color: var(--alfa-text);
             cursor: pointer;
-            transition: background 0.15s;
+        }
+
+        .btn-date-nav {
+            background: var(--alfa-bg);
+            border: 1px solid var(--alfa-border);
+            color: var(--alfa-text);
         }
 
         .btn-date-today {
             background: var(--alfa-red);
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 7px 10px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
         }
 
         .t0-banner-box {
@@ -420,7 +414,7 @@
             user-select: none;
             text-align: center;
             border: 1px solid var(--alfa-border);
-            transition: background 0.2s ease, color 0.15s ease, border-color 0.2s ease;
+            transition: background 0.15s ease, border-color 0.15s ease;
         }
 
         .checkbox-item input { display: none; }
@@ -428,7 +422,6 @@
             font-size: 13px;
             font-weight: 600;
             color: var(--alfa-text);
-            transition: color 0.15s ease;
         }
 
         .checkbox-item:has(input:checked) {
@@ -500,15 +493,11 @@
             color: var(--alfa-text);
             outline: none;
             -moz-appearance: textfield;
-            transition: border-color 0.2s;
         }
         .counter-input::-webkit-outer-spin-button,
         .counter-input::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
-        }
-        .counter-input:focus {
-            border-color: var(--alfa-red);
         }
 
         .btn-primary {
@@ -570,39 +559,30 @@
         .fuel-stat-title { font-size: 11px; color: var(--alfa-muted); font-weight: 600; }
         .fuel-stat-val { font-size: 14px; font-weight: 800; color: var(--alfa-text); margin-top: 2px; }
 
-        .report-preview {
+        .report-preview, .editable-report {
             background: var(--alfa-bg);
             border: 1px solid var(--alfa-border);
             border-radius: 10px;
             padding: 12px;
             font-family: monospace;
             font-size: 12px;
-            white-space: pre-wrap;
-            max-height: 280px;
-            overflow-y: auto;
-            margin-bottom: 12px;
             color: var(--alfa-text);
             line-height: 1.45;
         }
 
+        .report-preview {
+            white-space: pre-wrap;
+            max-height: 280px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
+
         .editable-report {
             width: 100%;
-            background: var(--alfa-bg);
-            border: 1px solid var(--alfa-border);
-            border-radius: 10px;
-            padding: 12px;
-            font-family: monospace;
-            font-size: 12px;
-            color: var(--alfa-text);
             resize: vertical;
             min-height: 140px;
             outline: none;
             margin-bottom: 10px;
-            line-height: 1.4;
-        }
-        .editable-report:focus {
-            border-color: var(--alfa-red);
-            background: var(--alfa-card);
         }
 
         .history-list {
@@ -651,7 +631,6 @@
             cursor: pointer;
             padding: 6px 10px;
             border-radius: 6px;
-            transition: background 0.2s;
         }
 
         .empty-history { text-align: center; color: var(--alfa-muted); font-size: 13px; padding: 15px 0; }
@@ -745,7 +724,6 @@
             padding: 16px 14px;
             max-width: 520px;
             margin: 10px auto;
-            box-sizing: border-box;
             border: 1px solid var(--alfa-border);
         }
 
@@ -777,17 +755,6 @@
             background: var(--alfa-card);
             color: var(--alfa-red);
             box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        }
-
-        .settings-hint-box {
-            background: var(--alfa-bg);
-            border-left: 3px solid var(--alfa-red);
-            padding: 8px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            color: var(--alfa-text);
-            margin-bottom: 12px;
-            line-height: 1.35;
         }
 
         .simple-card-box {
@@ -951,10 +918,9 @@
             border-top: 1px solid var(--alfa-border);
             display: flex;
             justify-content: space-around;
-            padding: 8px 0;
+            padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px));
             z-index: 150;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-            transition: background-color 0.25s ease, border-color 0.25s ease;
         }
 
         .nav-item {
@@ -1016,7 +982,6 @@
             cursor: pointer;
             position: relative;
             border: 2px solid transparent;
-            transition: all 0.15s ease;
             color: var(--alfa-text);
         }
 
@@ -1135,7 +1100,7 @@
 
         .toast {
             position: fixed;
-            bottom: 85px;
+            bottom: calc(85px + env(safe-area-inset-bottom, 0px));
             left: 50%;
             transform: translateX(-50%) translateY(100px);
             background: rgba(11, 15, 20, 0.95);
@@ -1147,7 +1112,7 @@
             text-align: center;
             white-space: nowrap;
             opacity: 0;
-            transition: transform 0.25s ease-out, opacity 0.25s ease-out;
+            transition: transform 0.2s ease-out, opacity 0.2s ease-out;
             z-index: 300;
             box-shadow: 0 6px 20px rgba(0,0,0,0.2);
             pointer-events: none;
@@ -1185,7 +1150,6 @@
 
     <!-- ВКЛАДКА 1: КАЛЬКУЛЯТОР -->
     <div id="tab-calc" class="container">
-        
         <div class="card profit-box">
             <div class="label" id="profit-box-label">Заработано за день</div>
             <div class="amount" id="today-profit">0 ₽</div>
@@ -1239,10 +1203,15 @@
                 <input type="text" id="client-info" class="input-text" placeholder="Иванов И.И. / 1234">
             </div>
 
+            <!-- СИСТЕМНЫЕ ОПЦИИ ВСТРЕЧИ: АВТО И АКТИВАЦИЯ -->
             <div style="display:flex; gap:8px; margin-bottom:12px;">
                 <label class="checkbox-item" style="flex:1; padding:8px 10px; font-size:12px;">
                     <input type="checkbox" id="check-car-meeting">
-                    <span class="checkbox-label">🚗 Встреча в авто</span>
+                    <span class="checkbox-label">🚗 В авто</span>
+                </label>
+                <label class="checkbox-item" id="activation-checkbox-wrap" style="flex:1; padding:8px 10px; font-size:12px;">
+                    <input type="checkbox" id="check-activated-meeting">
+                    <span class="checkbox-label" id="check-activated-label">🔑 Актив (пин-код)</span>
                 </label>
             </div>
 
@@ -1270,7 +1239,7 @@
         <div class="card">
             <div class="card-title">4. Итоговый отчет за день</div>
             <div class="report-preview" id="day-report-preview">Здесь будет сформирован отчет...</div>
-            <button class="btn-primary" style="background-color: var(--alfa-red);" onclick="copyDayReport()">Скопировать ежедневный отчет</button>
+            <button class="btn-primary" onclick="copyDayReport()">Скопировать ежедневный отчет</button>
         </div>
 
         <div class="card">
@@ -1305,14 +1274,13 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <!-- ВКЛАДКА 2: ПЛАН НА ДЕНЬ + ПЛАН НА МЕСЯЦ -->
     <div id="tab-day-plan" class="container" style="display: none;">
         <div class="card">
             <div class="card-title">🎯 Добавить кастомную задачу в план</div>
-            <div class="add-inline-group" style="display:flex; gap:6px;">
+            <div style="display:flex; gap:6px;">
                 <input type="text" id="target-prod-name" class="input-text" placeholder="Название (Селфи ДК...)" style="flex: 2;">
                 <input type="number" id="target-prod-goal" class="input-text" placeholder="Цель" style="flex: 1;" min="1">
                 <select id="target-prod-unit" class="input-text" style="flex: 1.2;">
@@ -1334,7 +1302,7 @@
         <div class="card">
             <div class="card-title">📄 Отчет по плану на день</div>
             <div class="report-preview" id="plan-report-preview">План пока пуст...</div>
-            <button class="btn-primary" style="background-color: var(--alfa-red);" onclick="copyPlanReport()">Скопировать отчет План на день</button>
+            <button class="btn-primary" onclick="copyPlanReport()">Скопировать отчет План на день</button>
         </div>
 
         <div class="card">
@@ -1346,7 +1314,7 @@
                     <button class="btn-icon" style="width:30px; height:30px; font-size:12px;" onclick="changePlanMonth(1)">▶</button>
                 </div>
             </div>
-            <textarea id="month-plan-report-preview" class="editable-report" oninput="saveEditedMonthReport()"></textarea>
+            <textarea id="month-plan-report-preview" class="editable-report"></textarea>
             <div style="display:flex; gap:6px;">
                 <button class="btn-primary" style="background-color: var(--alfa-card); color: var(--alfa-text); border: 1px solid var(--alfa-border); flex:1;" onclick="copyMonthPlanReport()">Скопировать отчет</button>
                 <button class="btn-primary" style="background-color: var(--alfa-card); color: var(--alfa-muted); border: 1px solid var(--alfa-border); width:auto; padding:10px 14px;" onclick="renderMonthPlanReport(true)">🔄 Обновить расчет</button>
@@ -1489,13 +1457,23 @@
                     <input type="text" id="setting-banker-fio" class="input-text" placeholder="ФИО МБ (например: Иванов Иван Иванович)">
                 </div>
 
+                <!-- НАСТРОЙКИ СИСТЕМНОЙ АКТИВАЦИИ -->
+                <div class="simple-card-box">
+                    <h4>🔑 Настройка строки Активации в отчёте</h4>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <input type="text" id="setting-act-title" class="input-text" placeholder="Название (например: Актив(пин-код) или Активация)">
+                        <label style="font-size:12px; font-weight:700; display:flex; align-items:center; gap:6px; cursor:pointer;">
+                            <input type="checkbox" id="setting-act-show" checked> Показывать строку активации в отчете
+                        </label>
+                    </div>
+                </div>
+
                 <div class="quick-preset-banner">
                     <p style="font-size:12px; font-weight:700; color:var(--alfa-black); margin-bottom:4px;">Восстановить эталонный набор</p>
                     <p style="font-size:11px; color:var(--alfa-muted); margin-bottom:8px;">Сетка с настроенными мультикнопками (Комбо, БС, Детская, Смарт и т.д.)</p>
                     <button class="btn-primary" style="padding: 8px 12px; font-size:12px; width:auto;" onclick="applyBankerPreset()">🪄 Загрузить эталонный шаблон</button>
                 </div>
 
-                <!-- КОНСТРУКТОР НОВОГО ПРОДУКТА / КРОСС-ПРОДАЖИ -->
                 <div class="simple-card-box">
                     <h4>➕ Добавить продукт или кросс-продажу</h4>
                     <div style="display:flex; flex-direction:column; gap:6px;">
@@ -1600,7 +1578,6 @@
                 "name": "Кросс-продажи",
                 "type": "cross_builder",
                 "items": {
-                    "cross_act": { "name": "Актив(пин-код)", "price": 0, "mode": "single", "inPlan": false, "goal": 1 },
                     "cross_is_x5": { "name": "в том числе x5", "price": 0, "mode": "single", "inPlan": false, "goal": 1 },
                     "cross_combo": { "name": "Комбо", "price": 600, "mode": "multi", "subitems": ["одобрено", "выдано", "транзакция"], "inPlan": true, "goal": 2 },
                     "cross_kids": { "name": "Детская", "price": 270, "mode": "multi", "subitems": ["выдано", "транзакция"], "inPlan": true, "goal": 1 },
@@ -1655,6 +1632,10 @@
 
         let state = {
             bankerFio: "ФИО МБ",
+            activationConfig: {
+                title: "Актив(пин-код)",
+                enabled: true
+            },
             sections: JSON.parse(JSON.stringify(defaultUserSections)),
             shiftCategories: JSON.parse(JSON.stringify(defaultShiftCategories)),
             schedule: {},
@@ -1675,8 +1656,32 @@
         let selectedDayKey = null;
         let editingStockId = null;
         let toastTimeout = null;
+        let saveDebounceTimer = null;
         let currentCalculatedTodayProfit = 0;
         let isCurrentMeetingSuccess = true;
+
+        let itemIndex = {};
+
+        function rebuildItemIndex() {
+            itemIndex = {};
+            for (let sKey in state.sections) {
+                const sec = state.sections[sKey];
+                for (let iKey in sec.items) {
+                    itemIndex[iKey] = {
+                        name: sec.items[iKey].name,
+                        price: sec.items[iKey].price || 0,
+                        sectionKey: sKey
+                    };
+                }
+            }
+        }
+
+        function isX5Product(key, name) {
+            if (!key && !name) return false;
+            const k = (key || '').toLowerCase();
+            const n = (name || '').toLowerCase();
+            return k === 'cross_is_x5' || k === 'item_is_x5' || n.includes('x5') || n.includes('х5');
+        }
 
         function getFormattedDate(d) {
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -1702,18 +1707,16 @@
         }
 
         function getDayAssignedCount(sKey, iKey, dKey = currentActiveDateKey) {
-            if (!state.dayAssigned) state.dayAssigned = {};
-            if (!state.dayAssigned[dKey]) state.dayAssigned[dKey] = {};
-            if (!state.dayAssigned[dKey][sKey]) state.dayAssigned[dKey][sKey] = {};
-            return state.dayAssigned[dKey][sKey][iKey] || 0;
+            return state.dayAssigned?.[dKey]?.[sKey]?.[iKey] || 0;
         }
 
         function setDayAssignedCount(sKey, iKey, val, dKey = currentActiveDateKey) {
             if (!state.dayAssigned) state.dayAssigned = {};
             if (!state.dayAssigned[dKey]) state.dayAssigned[dKey] = {};
             if (!state.dayAssigned[dKey][sKey]) state.dayAssigned[dKey][sKey] = {};
-            state.dayAssigned[dKey][sKey][iKey] = Math.max(0, parseInt(val) || 0);
+            state.dayAssigned[dKey][sKey][iKey] = Math.max(0, parseInt(val, 10) || 0);
             saveState();
+            renderAll();
         }
 
         function changeDayAssignedCount(sKey, iKey, delta) {
@@ -1750,16 +1753,16 @@
         function renderT0Select() {
             const selectEl = document.getElementById('t0-product-select');
             if (!selectEl) return;
-            let options = '';
+            const options = [];
             for (let sKey in state.sections) {
                 const sec = state.sections[sKey];
                 if (sec.type === 'counter') {
                     for (let iKey in sec.items) {
-                        options += `<option value="${iKey}">${sec.items[iKey].name}</option>`;
+                        options.push(`<option value="${iKey}">${sec.items[iKey].name}</option>`);
                     }
                 }
             }
-            selectEl.innerHTML = options || '<option value="">Нет основных продуктов</option>';
+            selectEl.innerHTML = options.length ? options.join('') : '<option value="">Нет основных продуктов</option>';
         }
 
         function toggleCustomSubitemsInput(val) {
@@ -1832,12 +1835,13 @@
         }
 
         function loadState() {
-            let saved = localStorage.getItem('alfacalc_customcross_v2') ||
-                        localStorage.getItem('alfacalc_structured_fails_v1');
+            const saved = localStorage.getItem('alfacalc_customcross_v2') ||
+                          localStorage.getItem('alfacalc_structured_fails_v1');
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
                     if (parsed.bankerFio) state.bankerFio = parsed.bankerFio;
+                    if (parsed.activationConfig) state.activationConfig = parsed.activationConfig;
                     if (parsed.sections && Object.keys(parsed.sections).length > 0) state.sections = parsed.sections;
                     if (parsed.shiftCategories) state.shiftCategories = parsed.shiftCategories;
                     if (parsed.schedule) state.schedule = parsed.schedule;
@@ -1854,6 +1858,16 @@
                 }
             }
 
+            if (!state.activationConfig) {
+                state.activationConfig = { title: "Актив(пин-код)", enabled: true };
+            }
+
+            // Очищаем старый системный дубль активации из кросс-продаж если он там был
+            if (state.sections.sec_cross?.items?.cross_act) {
+                delete state.sections.sec_cross.items.cross_act;
+            }
+
+            rebuildItemIndex();
             applyThemeUI();
 
             currentActiveDateKey = getFormattedDate(new Date());
@@ -1864,30 +1878,44 @@
             const fioEl = document.getElementById('setting-banker-fio');
             if (fioEl) fioEl.value = state.bankerFio || "ФИО МБ";
 
+            const actTitleEl = document.getElementById('setting-act-title');
+            if (actTitleEl) actTitleEl.value = state.activationConfig.title || "Актив(пин-код)";
+            const actShowEl = document.getElementById('setting-act-show');
+            if (actShowEl) actShowEl.checked = state.activationConfig.enabled !== false;
+
+            updateActivationLabel();
             loadActiveDayToUI();
             renderAll();
-            renderCalendar();
-            renderInventory();
+            renderDynamicMeetingForms();
 
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 if (splash) splash.classList.add('hide');
-            }, 900);
+            }, 600);
         }
 
-        function saveState() {
-            const data = JSON.stringify(state);
-            localStorage.setItem('alfacalc_customcross_v2', data);
-            renderAll();
-            renderDayPlan();
-            renderMonthPlanReport(false);
-            renderInventory();
+        function updateActivationLabel() {
+            const lbl = document.getElementById('check-activated-label');
+            const wrap = document.getElementById('activation-checkbox-wrap');
+            if (lbl) lbl.innerText = `🔑 ${state.activationConfig.title || 'Актив(пин-код)'}`;
+            if (wrap) wrap.style.display = state.activationConfig.enabled ? 'flex' : 'none';
+        }
+
+        function saveState(immediate = false) {
+            if (immediate) {
+                localStorage.setItem('alfacalc_customcross_v2', JSON.stringify(state));
+                return;
+            }
+            if (saveDebounceTimer) clearTimeout(saveDebounceTimer);
+            saveDebounceTimer = setTimeout(() => {
+                localStorage.setItem('alfacalc_customcross_v2', JSON.stringify(state));
+            }, 250);
         }
 
         function toggleTheme() {
             state.darkMode = !state.darkMode;
             applyThemeUI();
-            saveState();
+            saveState(true);
         }
 
         function applyThemeUI() {
@@ -1961,10 +1989,13 @@
                 const parsed = JSON.parse(text.trim());
                 if (parsed.sections) {
                     state = parsed;
+                    if (!state.activationConfig) state.activationConfig = { title: "Актив(пин-код)", enabled: true };
+                    rebuildItemIndex();
                     applyThemeUI();
-                    saveState();
+                    saveState(true);
                     loadActiveDayToUI();
-                    renderCalendar();
+                    renderAll();
+                    renderDynamicMeetingForms();
                     closeSettings();
                     alert("Данные успешно восстановлены!");
                 } else {
@@ -1985,10 +2016,13 @@
                     const parsed = JSON.parse(e.target.result);
                     if (parsed.sections) {
                         state = parsed;
+                        if (!state.activationConfig) state.activationConfig = { title: "Актив(пин-код)", enabled: true };
+                        rebuildItemIndex();
                         applyThemeUI();
-                        saveState();
+                        saveState(true);
                         loadActiveDayToUI();
-                        renderCalendar();
+                        renderAll();
+                        renderDynamicMeetingForms();
                         closeSettings();
                         showToast("Данные успешно восстановлены!");
                     } else {
@@ -2011,7 +2045,7 @@
 
         function stepDate(delta) {
             const parts = currentActiveDateKey.split('-');
-            const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
             d.setDate(d.getDate() + delta);
             currentActiveDateKey = getFormattedDate(d);
             document.getElementById('selected-date-input').value = currentActiveDateKey;
@@ -2031,8 +2065,6 @@
             const dayData = getActiveDayData();
             document.getElementById('fuel-km-input').value = dayData.fuel.km || '';
             calculateFuel(false);
-            renderDayPlan();
-            renderMonthPlanReport(false);
             
             const isToday = currentActiveDateKey === getFormattedDate(new Date());
             document.getElementById('profit-box-label').innerText = isToday ? "Заработано за сегодня" : `Заработано за ${formatDateDisplay(currentActiveDateKey)}`;
@@ -2044,15 +2076,13 @@
         }
 
         function switchTab(tab) {
-            document.getElementById('tab-calc').style.display = tab === 'calc' ? 'block' : 'none';
-            document.getElementById('tab-day-plan').style.display = tab === 'day-plan' ? 'block' : 'none';
-            document.getElementById('tab-inventory').style.display = tab === 'inventory' ? 'block' : 'none';
-            document.getElementById('tab-schedule').style.display = tab === 'schedule' ? 'block' : 'none';
-            
-            document.getElementById('nav-calc').classList.toggle('active', tab === 'calc');
-            document.getElementById('nav-day-plan').classList.toggle('active', tab === 'day-plan');
-            document.getElementById('nav-inventory').classList.toggle('active', tab === 'inventory');
-            document.getElementById('nav-schedule').classList.toggle('active', tab === 'schedule');
+            const tabs = ['calc', 'day-plan', 'inventory', 'schedule'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const nav = document.getElementById(`nav-${t}`);
+                if (el) el.style.display = (t === tab) ? 'block' : 'none';
+                if (nav) nav.classList.toggle('active', t === tab);
+            });
             
             if (tab === 'schedule') renderCalendar();
             if (tab === 'day-plan') {
@@ -2074,21 +2104,19 @@
             const cost = Math.round(liters * price);
 
             const dayData = getActiveDayData();
-            dayData.fuel = { km: km, liters: parseFloat(liters.toFixed(2)), cost: cost };
+            dayData.fuel = { km, liters: parseFloat(liters.toFixed(2)), cost };
 
             document.getElementById('fuel-liters-val').innerText = `${dayData.fuel.liters} л`;
             document.getElementById('fuel-cost-val').innerText = `${dayData.fuel.cost} ₽`;
 
             if (triggerSave) {
                 saveState();
-                renderCalendar();
             }
         }
 
         function updateTaxRate(val) {
             state.taxRate = Math.min(100, Math.max(0, parseFloat(val) || 0));
             saveState();
-            renderCalendar();
             showToast("Процент вычета сохранен!");
         }
 
@@ -2096,10 +2124,19 @@
             const dayData = getActiveDayData();
             const input = prompt("Укажите дополнительный доход за этот день (₽):", dayData.extraIncome || 0);
             if (input !== null) {
-                dayData.extraIncome = Math.max(0, parseInt(input) || 0);
+                dayData.extraIncome = Math.max(0, parseInt(input, 10) || 0);
                 saveState();
+                renderAll();
                 showToast("Доп. доход обновлен!");
             }
+        }
+
+        function getItemPrice(sKey, iKey) {
+            return itemIndex[iKey]?.price || 0;
+        }
+
+        function getItemName(iKey) {
+            return itemIndex[iKey]?.name || iKey;
         }
 
         function renderAll() {
@@ -2119,31 +2156,36 @@
                 }
             }
 
-            dayData.meetings.forEach(m => {
+            for (let i = 0; i < dayData.meetings.length; i++) {
+                const m = dayData.meetings[i];
                 if (m.isSuccess) {
-                    if (m.productKey && state.sections.sec_main?.items[m.productKey]) {
+                    if (m.productKey && itemIndex[m.productKey]) {
                         issuedCounts[m.productKey] = (issuedCounts[m.productKey] || 0) + 1;
-                        totalProfit += getItemPrice('sec_main', m.productKey);
+                        totalProfit += itemIndex[m.productKey].price;
                     }
                     if (m.checkedItems) {
-                        m.checkedItems.forEach(iKey => {
-                            issuedCounts[iKey] = (issuedCounts[iKey] || 0) + 1;
-                            totalProfit += getItemPrice(null, iKey);
-                        });
+                        for (let j = 0; j < m.checkedItems.length; j++) {
+                            const k = m.checkedItems[j];
+                            issuedCounts[k] = (issuedCounts[k] || 0) + 1;
+                            totalProfit += itemIndex[k]?.price || 0;
+                        }
                     }
                     if (m.multiCross) {
                         for (let cKey in m.multiCross) {
+                            let hasAny = false;
                             for (let subKey in m.multiCross[cKey]) {
                                 const fullKey = `${cKey}__${subKey}`;
-                                issuedCounts[fullKey] = (issuedCounts[fullKey] || 0) + (m.multiCross[cKey][subKey] ? 1 : 0);
+                                const isChecked = !!m.multiCross[cKey][subKey];
+                                issuedCounts[fullKey] = (issuedCounts[fullKey] || 0) + (isChecked ? 1 : 0);
+                                if (isChecked) hasAny = true;
                             }
-                            if (Object.values(m.multiCross[cKey]).some(v => v)) {
-                                totalProfit += getItemPrice(null, cKey);
+                            if (hasAny) {
+                                totalProfit += itemIndex[cKey]?.price || 0;
                             }
                         }
                     }
                 }
-            });
+            }
 
             currentCalculatedTodayProfit = totalProfit;
 
@@ -2152,30 +2194,14 @@
             document.getElementById('potential-profit').innerText = potentialProfit.toLocaleString('ru-RU') + " ₽";
 
             renderPlanCounterSection();
-            renderDynamicMeetingForms();
             renderHistoryList();
             renderT0Select();
             buildNewFormatDayReport(issuedCounts);
         }
 
-        function getItemPrice(sKey, iKey) {
-            if (sKey && state.sections[sKey]?.items[iKey]) return state.sections[sKey].items[iKey].price || 0;
-            for (let sec in state.sections) {
-                if (state.sections[sec].items[iKey]) return state.sections[sec].items[iKey].price || 0;
-            }
-            return 0;
-        }
-
-        function getItemName(iKey) {
-            for (let sec in state.sections) {
-                if (state.sections[sec].items[iKey]) return state.sections[sec].items[iKey].name;
-            }
-            return iKey;
-        }
-
         function renderPlanCounterSection() {
             const container = document.getElementById('plan-container');
-            let html = '';
+            const html = [];
             let count = 0;
 
             for (let sKey in state.sections) {
@@ -2186,7 +2212,7 @@
                         const item = sec.items[iKey];
                         const currentVal = getDayAssignedCount(sKey, iKey, currentActiveDateKey);
 
-                        html += `
+                        html.push(`
                             <div class="plan-item">
                                 <div>
                                     <span style="font-weight:700;">${item.name}</span>
@@ -2203,23 +2229,23 @@
                                     <button class="btn-counter" onclick="changeDayAssignedCount('${sKey}', '${iKey}', 1)">+</button>
                                 </div>
                             </div>
-                        `;
+                        `);
                     }
                 }
             }
 
-            container.innerHTML = count > 0 ? html : '<div class="empty-history">Добавьте основные продукты в настройках ⚙️</div>';
+            container.innerHTML = count > 0 ? html.join('') : '<div class="empty-history">Добавьте основные продукты в настройках ⚙️</div>';
         }
 
         function renderDynamicMeetingForms() {
             const successContainer = document.getElementById('dynamic-meeting-form-success');
             const failContainer = document.getElementById('dynamic-meeting-form-fail');
 
-            let successHtml = '';
-
+            const successHtml = [];
             const mainItems = state.sections.sec_main?.items || {};
             const mainKeys = Object.keys(mainItems);
-            successHtml += `
+
+            successHtml.push(`
                 <div class="form-group">
                     <label>Основной продукт (выдача):</label>
                     <select id="form-sel-sec_main">
@@ -2227,16 +2253,16 @@
                         ${mainKeys.map(k => `<option value="${k}">${mainItems[k].name} (+${mainItems[k].price || 0} ₽)</option>`).join('')}
                     </select>
                 </div>
-            `;
+            `);
 
             const crossItems = state.sections.sec_cross?.items || {};
-            let singleCrossHtml = '';
-            let multiCrossHtml = '';
+            const singleCrossHtml = [];
+            const multiCrossHtml = [];
 
             for (let cKey in crossItems) {
                 const cItem = crossItems[cKey];
-                if (cItem.mode === 'multi' && cItem.subitems && cItem.subitems.length > 0) {
-                    multiCrossHtml += `
+                if (cItem.mode === 'multi' && cItem.subitems?.length) {
+                    multiCrossHtml.push(`
                         <div class="cross-multi-card">
                             <div class="cross-multi-title">${cItem.name}</div>
                             <div class="cross-multi-subgrid">
@@ -2248,34 +2274,34 @@
                                 `).join('')}
                             </div>
                         </div>
-                    `;
+                    `);
                 } else {
-                    singleCrossHtml += `
+                    singleCrossHtml.push(`
                         <label class="checkbox-item">
                             <input type="checkbox" id="form-check-${cKey}">
                             <span class="checkbox-label">${cItem.name}</span>
                         </label>
-                    `;
+                    `);
                 }
             }
 
-            if (multiCrossHtml) {
-                successHtml += `<div class="form-group"><label>Кросс-продажи (мульти):</label>${multiCrossHtml}</div>`;
+            if (multiCrossHtml.length) {
+                successHtml.push(`<div class="form-group"><label>Кросс-продажи (мульти):</label>${multiCrossHtml.join('')}</div>`);
             }
 
-            if (singleCrossHtml) {
-                successHtml += `
+            if (singleCrossHtml.length) {
+                successHtml.push(`
                     <div class="form-group">
                         <label>Кросс-продажи (простые):</label>
-                        <div class="checkbox-grid">${singleCrossHtml}</div>
+                        <div class="checkbox-grid">${singleCrossHtml.join('')}</div>
                     </div>
-                `;
+                `);
             }
 
             const appItems = state.sections.sec_apps?.items || {};
             const appKeys = Object.keys(appItems);
             if (appKeys.length > 0) {
-                successHtml += `
+                successHtml.push(`
                     <div class="form-group">
                         <label>Приложения:</label>
                         <div class="checkbox-grid">
@@ -2287,11 +2313,11 @@
                             `).join('')}
                         </div>
                     </div>
-                `;
+                `);
             }
 
             const failKeys = Object.keys(state.sections.sec_statuses?.items || {});
-            let failHtml = `
+            const failHtml = `
                 <div class="form-group">
                     <label>По какому продукту сорвалась встреча?</label>
                     <select id="form-sel-fail-product">
@@ -2308,7 +2334,7 @@
                 </div>
             `;
 
-            successContainer.innerHTML = successHtml;
+            successContainer.innerHTML = successHtml.join('');
             failContainer.innerHTML = failHtml;
         }
 
@@ -2322,7 +2348,7 @@
                 if (meeting.checkedItems) meeting.checkedItems.forEach(k => itemsIssued.push(k));
                 if (meeting.multiCross) {
                     for (let cKey in meeting.multiCross) {
-                        if (Object.values(meeting.multiCross[cKey]).some(v => v)) {
+                        if (Object.values(meeting.multiCross[cKey]).some(Boolean)) {
                             itemsIssued.push(cKey);
                         }
                     }
@@ -2339,7 +2365,7 @@
                 if (state.cardInventory && Array.isArray(state.cardInventory)) {
                     itemsIssued.forEach(iKey => {
                         state.cardInventory.forEach(stock => {
-                            if (stock.boundItems && stock.boundItems.includes(iKey)) {
+                            if (stock.boundItems?.includes(iKey)) {
                                 stock.count = Math.max(0, (parseInt(stock.count, 10) || 0) - factor);
                             }
                         });
@@ -2352,6 +2378,7 @@
             const client = document.getElementById('client-info').value.trim() || "Клиент без имени";
             const comment = document.getElementById('meeting-comment').value.trim();
             const inCar = document.getElementById('check-car-meeting').checked;
+            const isActivated = document.getElementById('check-activated-meeting').checked;
 
             const newMeeting = {
                 id: 'meet_' + Date.now(),
@@ -2359,6 +2386,7 @@
                 comment: comment,
                 isSuccess: isCurrentMeetingSuccess,
                 inCar: inCar,
+                isActivated: isActivated,
                 productKey: null,
                 selectValues: {},
                 checkedItems: [],
@@ -2369,7 +2397,7 @@
 
             if (isCurrentMeetingSuccess) {
                 const mainSel = document.getElementById('form-sel-sec_main');
-                if (mainSel && mainSel.value) {
+                if (mainSel?.value) {
                     newMeeting.productKey = mainSel.value;
                     newMeeting.selectValues['sec_main'] = mainSel.value;
                     singleReportText += `${getItemName(mainSel.value)}\n`;
@@ -2379,7 +2407,7 @@
                 for (let k in crossItems) {
                     if (crossItems[k].mode !== 'multi') {
                         const cb = document.getElementById(`form-check-${k}`);
-                        if (cb && cb.checked) {
+                        if (cb?.checked) {
                             newMeeting.checkedItems.push(k);
                             singleReportText += `${crossItems[k].name}\n`;
                         }
@@ -2389,7 +2417,7 @@
                         newMeeting.multiCross[k] = {};
                         subs.forEach(s => {
                             const subCb = document.getElementById(`check-multi-${k}-${s}`);
-                            if (subCb && subCb.checked) {
+                            if (subCb?.checked) {
                                 newMeeting.multiCross[k][s] = true;
                                 checkedSubs.push(s);
                             } else {
@@ -2405,7 +2433,7 @@
                 const appItems = state.sections.sec_apps?.items || {};
                 for (let k in appItems) {
                     const cb = document.getElementById(`form-check-${k}`);
-                    if (cb && cb.checked) {
+                    if (cb?.checked) {
                         newMeeting.checkedItems.push(k);
                         singleReportText += `${appItems[k].name}\n`;
                     }
@@ -2430,12 +2458,16 @@
 
             if (comment) singleReportText += `Комментарий: ${comment}\n`;
             if (inCar) singleReportText += `Встреча в авто: Да\n`;
+            if (isActivated && state.activationConfig.enabled) {
+                singleReportText += `${state.activationConfig.title || 'Актив(пин-код)'}: Да\n`;
+            }
 
             const dayData = getActiveDayData();
             dayData.meetings.push(newMeeting);
 
             applyMeetingSync(newMeeting, true);
             saveState();
+            renderAll();
 
             copyToClipboard(singleReportText.trim());
             showToast("Встреча сохранена и учтена в отчете!");
@@ -2443,39 +2475,41 @@
             document.getElementById('client-info').value = '';
             document.getElementById('meeting-comment').value = '';
             document.getElementById('check-car-meeting').checked = false;
+            document.getElementById('check-activated-meeting').checked = false;
             document.querySelectorAll('#success-block select, #fail-block select').forEach(s => s.value = '');
             document.querySelectorAll('#success-block input[type="checkbox"]').forEach(c => c.checked = false);
         }
 
         function renderHistoryList() {
             const container = document.getElementById('history-list-container');
-            container.innerHTML = '';
             const dayData = getActiveDayData();
 
-            if (!dayData.meetings || dayData.meetings.length === 0) {
+            if (!dayData.meetings?.length) {
                 container.innerHTML = '<div class="empty-history">Встреч за выбранный день нет</div>';
                 return;
             }
 
-            [...dayData.meetings].reverse().forEach(m => {
-                const item = document.createElement('div');
-                item.className = 'history-item';
-
-                let details = [];
+            const html = [];
+            for (let i = dayData.meetings.length - 1; i >= 0; i--) {
+                const m = dayData.meetings[i];
+                const details = [];
                 if (m.productKey) details.push(`Продукт: <b>${getItemName(m.productKey)}</b>`);
                 if (!m.isSuccess && m.selectValues['sec_statuses']) {
                     details.push(`Статус: <b>${getItemName(m.selectValues['sec_statuses'])}</b>`);
                 }
-                if (m.checkedItems && m.checkedItems.length > 0) {
+                if (m.checkedItems?.length) {
                     details.push(`Опции: ${m.checkedItems.map(k => getItemName(k)).join(', ')}`);
                 }
                 if (m.multiCross) {
                     for (let k in m.multiCross) {
                         const activeSubs = Object.keys(m.multiCross[k]).filter(s => m.multiCross[k][s]);
-                        if (activeSubs.length > 0) {
+                        if (activeSubs.length) {
                             details.push(`${getItemName(k)} (${activeSubs.join(', ')})`);
                         }
                     }
+                }
+                if (m.isActivated && state.activationConfig.enabled) {
+                    details.push(`🔑 ${state.activationConfig.title}`);
                 }
                 if (m.comment) details.push(`<i>"${m.comment}"</i>`);
                 if (m.inCar) details.push(`🚗 В авто`);
@@ -2483,16 +2517,18 @@
                 const badgeClass = m.isSuccess ? 'badge-success' : 'badge-fail';
                 const badgeText = m.isSuccess ? 'УСПЕШНАЯ' : 'НЕУСПЕШНАЯ';
 
-                item.innerHTML = `
-                    <div class="history-info">
-                        <span class="history-badge ${badgeClass}">${badgeText}</span>
-                        <span class="history-client">${m.client}</span>
-                        <span class="history-details">${details.join(' • ')}</span>
+                html.push(`
+                    <div class="history-item">
+                        <div class="history-info">
+                            <span class="history-badge ${badgeClass}">${badgeText}</span>
+                            <span class="history-client">${m.client}</span>
+                            <span class="history-details">${details.join(' • ')}</span>
+                        </div>
+                        <button class="btn-delete" onclick="deleteMeeting('${m.id}')">Удалить</button>
                     </div>
-                    <button class="btn-delete" onclick="deleteMeeting('${m.id}')">Удалить</button>
-                `;
-                container.appendChild(item);
-            });
+                `);
+            }
+            container.innerHTML = html.join('');
         }
 
         function deleteMeeting(id) {
@@ -2502,6 +2538,7 @@
                 if (m) applyMeetingSync(m, false);
                 dayData.meetings = dayData.meetings.filter(x => x.id !== id);
                 saveState();
+                renderAll();
             }
         }
 
@@ -2510,37 +2547,60 @@
             const dateStr = formatDateDisplay(currentActiveDateKey);
             const banker = state.bankerFio || "ФИО МБ";
 
-            let totalMeetingsCount = dayData.meetings.length;
-            let carMeetingsCount = dayData.meetings.filter(m => m.inCar).length;
+            const successfulMeetings = dayData.meetings.filter(m => m.isSuccess);
+            const totalSuccessCount = successfulMeetings.length;
+            const carSuccessMeetingsCount = successfulMeetings.filter(m => m.inCar).length;
 
             let report = `${dateStr}\n${banker}\n`;
-
             const getCount = (k) => issuedCounts[k] || 0;
             const mainSec = state.sections.sec_main?.items || {};
+            const crossSec = state.sections.sec_cross?.items || {};
+
+            const actTitle = state.activationConfig.title || "Актив(пин-код)";
+            const actShow = state.activationConfig.enabled !== false;
 
             // 1. ОСНОВНЫЕ ПРОДУКТЫ
             for (let prodKey in mainSec) {
                 const prodName = mainSec[prodKey].name;
                 const assigned = getDayAssignedCount('sec_main', prodKey, currentActiveDateKey);
                 const issued = getCount(prodKey);
-
-                const failsForThisProd = dayData.meetings.filter(m => !m.isSuccess && (m.productKey === prodKey || m.selectValues['sec_main'] === prodKey));
+                const failsForThisProd = dayData.meetings.filter(m => 
+                    !m.isSuccess && (m.productKey === prodKey || m.selectValues?.['sec_main'] === prodKey)
+                );
 
                 if (assigned === 0 && issued === 0 && failsForThisProd.length === 0) continue;
 
                 report += `\n${prodName}:  назначено ${assigned} / выдано ${issued}`;
                 
+                // x5 подпункт для ДК
                 if (prodKey === 'item_dk') {
-                    const x5Count = getCount('cross_is_x5') || getCount('item_is_x5');
+                    let x5Count = 0;
+                    for (let cKey in crossSec) {
+                        if (isX5Product(cKey, crossSec[cKey].name)) {
+                            x5Count += getCount(cKey);
+                        }
+                    }
                     if (x5Count > 0) report += ` (в том числе x5 - ${x5Count})`;
                 }
                 report += `\n`;
 
-                const actCount = dayData.meetings.filter(m => m.isSuccess && (m.productKey === prodKey || m.selectValues['sec_main'] === prodKey) && (m.checkedItems?.includes('cross_act') || m.checkedItems?.includes('item_act'))).length;
-                report += `Актив(пин-код): ${actCount}\n`;
+                // Системный подсчёт активации:
+                // 1) По прямому флагу m.isActivated
+                // 2) Поддержка старых записей, где активация была в checkedItems
+                if (actShow) {
+                    const actCount = dayData.meetings.filter(m => {
+                        if (!m.isSuccess) return false;
+                        const matchesProduct = (m.productKey === prodKey || m.selectValues?.['sec_main'] === prodKey);
+                        if (!matchesProduct) return false;
+
+                        return m.isActivated === true || m.checkedItems?.includes('cross_act') || m.checkedItems?.includes('item_act');
+                    }).length;
+
+                    report += `${actTitle}: ${actCount}\n`;
+                }
 
                 failsForThisProd.forEach(f => {
-                    const statusName = getItemName(f.selectValues['sec_statuses']) || 'Отказ';
+                    const statusName = getItemName(f.selectValues?.['sec_statuses']) || 'Отказ';
                     const commentPart = f.comment ? `, ${f.comment}` : '';
                     report += `${f.client} - ${statusName}${commentPart}\n`;
                 });
@@ -2548,17 +2608,13 @@
 
             // 2. ДИНАМИЧЕСКИЙ БЛОК КРОСС-ПРОДАЖ
             report += `\nКРОСС - ПРОДАЖИ:\n`;
-            const crossSec = state.sections.sec_cross?.items || {};
 
             for (let cKey in crossSec) {
                 const it = crossSec[cKey];
-                if (cKey === 'cross_act' || cKey === 'cross_is_x5' || cKey === 'item_act' || cKey === 'item_is_x5') continue;
+                if (isX5Product(cKey, it.name)) continue;
 
-                if (it.mode === 'multi' && it.subitems && it.subitems.length > 0) {
-                    let parts = it.subitems.map(sub => {
-                        const cnt = getCount(`${cKey}__${sub}`);
-                        return `${sub} - ${cnt}`;
-                    });
+                if (it.mode === 'multi' && it.subitems?.length) {
+                    const parts = it.subitems.map(sub => `${sub} - ${getCount(`${cKey}__${sub}`)}`);
                     report += `- ${it.name} ${parts.join(' / ')}\n`;
                 } else {
                     report += `- ${it.name} - ${getCount(cKey)}\n`;
@@ -2566,16 +2622,14 @@
             }
 
             // 3. ПРИЛОЖЕНИЯ
-            const iosCount = getCount('app_ios') || getCount('item_ios');
-            const androidCount = getCount('app_android') || getCount('item_android');
-            const appX5Count = getCount('app_x5') || getCount('item_app_x5');
-
-            report += `- Установка МП: МП iOS - ${iosCount}/${totalMeetingsCount || 0}\n`;
-            report += `- МП Андройд - ${androidCount}\n`;
-            report += `- МП Х5 - ${appX5Count}\n`;
+            report += `\nУстановка МП:\n`;
+            const appSec = state.sections.sec_apps?.items || {};
+            for (let aKey in appSec) {
+                report += `- ${appSec[aKey].name} - ${getCount(aKey)}\n`;
+            }
 
             // 4. ВСТРЕЧИ В АВТО
-            report += `\nВстречи в авто ${carMeetingsCount} из ${totalMeetingsCount}`;
+            report += `\nВстречи в авто ${carSuccessMeetingsCount} из ${totalSuccessCount}`;
 
             document.getElementById('day-report-preview').innerText = report;
         }
@@ -2595,7 +2649,7 @@
                     state.schedule[currentActiveDateKey].type = 'work';
                 }
             }
-            saveState();
+            saveState(true);
             showToast("Отчет скопирован!");
         }
 
@@ -2613,7 +2667,10 @@
             const grid = document.getElementById('calendar-grid');
             grid.innerHTML = '';
 
-            for (let i = 0; i < startingDay; i++) grid.appendChild(document.createElement('div'));
+            const frag = document.createDocumentFragment();
+            for (let i = 0; i < startingDay; i++) {
+                frag.appendChild(document.createElement('div'));
+            }
 
             const today = new Date();
             const todayStr = getFormattedDate(today);
@@ -2622,7 +2679,6 @@
             let tripWork = 0;
             let passedWork = 0;
             let leftWork = 0;
-            
             let totalMonthGross = 0;
             let totalMonthFuel = 0;
 
@@ -2638,17 +2694,24 @@
                 if (state.daysData[dayKey]) {
                     const dD = state.daysData[dayKey];
                     dayGross = dD.extraIncome || 0;
-                    dD.meetings.forEach(m => {
+                    for (let mIdx = 0; mIdx < dD.meetings.length; mIdx++) {
+                        const m = dD.meetings[mIdx];
                         if (m.isSuccess) {
-                            if (m.productKey) dayGross += getItemPrice('sec_main', m.productKey);
-                            if (m.checkedItems) m.checkedItems.forEach(k => dayGross += getItemPrice(null, k));
+                            if (m.productKey) dayGross += itemIndex[m.productKey]?.price || 0;
+                            if (m.checkedItems) {
+                                for (let ci = 0; ci < m.checkedItems.length; ci++) {
+                                    dayGross += itemIndex[m.checkedItems[ci]]?.price || 0;
+                                }
+                            }
                             if (m.multiCross) {
                                 for (let c in m.multiCross) {
-                                    if (Object.values(m.multiCross[c]).some(v => v)) dayGross += getItemPrice(null, c);
+                                    if (Object.values(m.multiCross[c]).some(Boolean)) {
+                                        dayGross += itemIndex[c]?.price || 0;
+                                    }
                                 }
                             }
                         }
-                    });
+                    }
                     dayFuelCost = dD.fuel?.cost || 0;
                 } else if (dayData.profit > 0) {
                     dayGross = dayData.profit;
@@ -2657,7 +2720,7 @@
                 totalMonthGross += dayGross;
                 totalMonthFuel += dayFuelCost;
 
-                let dayNet = Math.max(0, dayGross - dayFuelCost);
+                const dayNet = Math.max(0, dayGross - dayFuelCost);
 
                 const cell = document.createElement('div');
                 cell.className = 'day-cell';
@@ -2678,11 +2741,13 @@
                     }
                 }
 
-                let profitTag = dayNet > 0 ? `<span class="day-profit-tag">${dayNet >= 1000 ? (dayNet/1000).toFixed(1)+'k' : dayNet}</span>` : '';
+                const profitTag = dayNet > 0 ? `<span class="day-profit-tag">${dayNet >= 1000 ? (dayNet/1000).toFixed(1)+'k' : dayNet}</span>` : '';
                 cell.innerHTML = `<span>${day}</span>${iconHtml}${profitTag}`;
                 cell.onclick = () => openDayModal(dayKey, day, monthNames[month]);
-                grid.appendChild(cell);
+                frag.appendChild(cell);
             }
+
+            grid.appendChild(frag);
 
             const rate = state.taxRate || 0;
             const taxableAmount = Math.max(0, totalMonthGross - totalMonthFuel);
@@ -2734,20 +2799,19 @@
             document.getElementById('day-profit-input').value = defaultVal || '';
 
             const btnContainer = document.getElementById('day-categories-modal-grid');
-            btnContainer.innerHTML = '';
+            const btns = [];
 
             for (let key in state.shiftCategories) {
                 const cat = state.shiftCategories[key];
-                const btn = document.createElement('button');
-                btn.className = 'btn-day-status';
                 const bgColor = cat.color || "#EF3124";
-                btn.style.background = bgColor;
-                btn.style.color = isLightColor(bgColor) ? '#0B0F14' : '#FFFFFF';
-                btn.innerHTML = `${cat.icon || ''} ${cat.name}`;
-                btn.onclick = () => saveDayDetails(key);
-                btnContainer.appendChild(btn);
+                const textColor = isLightColor(bgColor) ? '#0B0F14' : '#FFFFFF';
+                btns.push(`
+                    <button class="btn-day-status" style="background:${bgColor}; color:${textColor};" onclick="saveDayDetails('${key}')">
+                        ${cat.icon || ''} ${cat.name}
+                    </button>
+                `);
             }
-
+            btnContainer.innerHTML = btns.join('');
             document.getElementById('day-modal').style.display = 'block';
         }
 
@@ -2758,13 +2822,13 @@
 
         function saveDayDetails(status) {
             if (!selectedDayKey) return;
-            const profitVal = parseInt(document.getElementById('day-profit-input').value) || 0;
+            const profitVal = parseInt(document.getElementById('day-profit-input').value, 10) || 0;
             if (status === 'none') {
                 delete state.schedule[selectedDayKey];
             } else {
                 state.schedule[selectedDayKey] = { type: status, profit: profitVal };
             }
-            saveState();
+            saveState(true);
             renderCalendar();
             closeDayModal();
         }
@@ -2776,7 +2840,7 @@
             const unitSelect = document.getElementById('target-prod-unit');
 
             const name = nameInput.value.trim();
-            const goal = parseInt(goalInput.value) || 0;
+            const goal = parseInt(goalInput.value, 10) || 0;
             const unit = unitSelect ? unitSelect.value : 'шт';
 
             if (!name || goal <= 0) return alert("Укажите название и цель > 0!");
@@ -2789,8 +2853,11 @@
             getDayPlanList(currentActiveDateKey);
             syncTargetToMonthArchive(newTpl, currentActiveDateKey);
 
-            nameInput.value = ''; goalInput.value = '';
-            saveState();
+            nameInput.value = ''; 
+            goalInput.value = '';
+            saveState(true);
+            renderDayPlan();
+            renderMonthPlanReport(false);
             showToast("Кастомная цель добавлена!");
         }
 
@@ -2801,6 +2868,7 @@
                 target.sold = Math.max(0, (parseInt(target.sold, 10) || 0) + delta);
                 syncTargetToMonthArchive(target, currentActiveDateKey);
                 saveState();
+                renderDayPlan();
             }
         }
 
@@ -2813,6 +2881,7 @@
                 target.sold = parsed;
                 syncTargetToMonthArchive(target, currentActiveDateKey);
                 saveState();
+                renderDayPlan();
             }
         }
 
@@ -2833,7 +2902,9 @@
             if (state.dailyPlans[currentActiveDateKey]) {
                 state.dailyPlans[currentActiveDateKey] = state.dailyPlans[currentActiveDateKey].filter(t => t.id !== id);
             }
-            saveState();
+            saveState(true);
+            renderDayPlan();
+            renderMonthPlanReport(false);
             showToast("Позиция убрана из плана!");
         }
 
@@ -2841,7 +2912,8 @@
             if (confirm(`Обнулить проданное в плане за ${formatDateDisplay(currentActiveDateKey)}?`)) {
                 const dayList = getDayPlanList(currentActiveDateKey);
                 dayList.forEach(t => t.sold = 0);
-                saveState();
+                saveState(true);
+                renderDayPlan();
                 showToast("Счетчики проданного обнулены!");
             }
         }
@@ -2849,7 +2921,6 @@
         function renderDayPlan() {
             const list = document.getElementById('day-plan-list');
             if (!list) return;
-            list.innerHTML = '';
 
             const dayList = getDayPlanList(currentActiveDateKey);
             const titleEl = document.getElementById('day-plan-card-title');
@@ -2863,34 +2934,36 @@
                 return;
             }
 
+            const html = [];
             let report = `План на ${formatDateDisplay(currentActiveDateKey)}:\n\n`;
+
             dayList.forEach((t, idx) => {
-                const item = document.createElement('div');
-                item.className = 'plan-target-item';
                 const u = t.unit || 'шт';
                 const tagType = t.isCustom ? '<span style="font-size:10px; color:var(--alfa-muted); margin-left:4px;">(кастом)</span>' : '';
 
-                item.innerHTML = `
-                    <div class="plan-target-info">
-                        <span class="plan-target-title">${t.name} ${tagType}</span>
-                        <span class="plan-target-sub">Продано за день: <b>${t.sold}</b> ${u} (цель: ${t.goal})</span>
+                html.push(`
+                    <div class="plan-target-item">
+                        <div class="plan-target-info">
+                            <span class="plan-target-title">${t.name} ${tagType}</span>
+                            <span class="plan-target-sub">Продано за день: <b>${t.sold}</b> ${u} (цель: ${t.goal})</span>
+                        </div>
+                        <div class="counter-controls">
+                            <button class="btn-counter" onclick="changeTargetSold('${t.id}', -1)">-</button>
+                            <input type="number" 
+                                   class="counter-input" 
+                                   value="${t.sold}" 
+                                   min="0"
+                                   onchange="setTargetSoldDirectly('${t.id}', this.value)"
+                                   onkeydown="if(event.key==='Enter'){ this.blur(); }">
+                            <button class="btn-counter" onclick="changeTargetSold('${t.id}', 1)">+</button>
+                            <button class="btn-remove-prod" style="margin-left:4px;" title="Убрать из плана" onclick="deleteDayPlanTarget('${t.id}')">✕</button>
+                        </div>
                     </div>
-                    <div class="counter-controls">
-                        <button class="btn-counter" onclick="changeTargetSold('${t.id}', -1)">-</button>
-                        <input type="number" 
-                               class="counter-input" 
-                               value="${t.sold}" 
-                               min="0"
-                               onchange="setTargetSoldDirectly('${t.id}', this.value)"
-                               onkeydown="if(event.key==='Enter'){ this.blur(); }">
-                        <button class="btn-counter" onclick="changeTargetSold('${t.id}', 1)">+</button>
-                        <button class="btn-remove-prod" style="margin-left:4px;" title="Убрать из плана" onclick="deleteDayPlanTarget('${t.id}')">✕</button>
-                    </div>
-                `;
-                list.appendChild(item);
+                `);
                 report += `${idx + 1}. ${t.name} - ${t.sold} ${u}\n`;
             });
 
+            list.innerHTML = html.join('');
             document.getElementById('plan-report-preview').innerText = report.trim();
         }
 
@@ -2962,8 +3035,6 @@
             previewEl.value = report.trim();
         }
 
-        function saveEditedMonthReport() {}
-
         function copyMonthPlanReport() {
             const previewEl = document.getElementById('month-plan-report-preview');
             const text = previewEl ? previewEl.value : '';
@@ -2975,7 +3046,6 @@
         function renderInventory() {
             const listEl = document.getElementById('inventory-cards-list');
             if (!listEl) return;
-            listEl.innerHTML = '';
 
             if (!state.cardInventory || state.cardInventory.length === 0) {
                 listEl.innerHTML = '<div class="empty-history">В инвентаре пока нет карт. Нажмите «➕ Добавить карту».</div>';
@@ -2983,6 +3053,7 @@
                 return;
             }
 
+            const html = [];
             let reportText = `Остатки карт на руках (${formatDateDisplay(currentActiveDateKey)}):\n\n`;
 
             state.cardInventory.forEach((card, idx) => {
@@ -2993,34 +3064,34 @@
                 const boundNames = (card.boundItems || []).map(iKey => getItemName(iKey));
                 const tagsHtml = boundNames.map(name => `<span class="stock-tag">${name}</span>`).join('');
 
-                const div = document.createElement('div');
-                div.className = 'stock-item';
-                div.innerHTML = `
-                    <div class="stock-header">
-                        <span class="stock-title">${card.name}</span>
-                        <span class="${badgeClass}">${count} шт.</span>
-                    </div>
-                    <div class="stock-bindings">
-                        ${tagsHtml || '<span style="font-size:11px; color:var(--alfa-muted);">Нет привязанных продуктов</span>'}
-                    </div>
-                    <div class="stock-actions">
-                        <div style="display:flex; gap:4px;">
-                            <button class="btn-stock-add" onclick="adjustStockCount('${card.id}', 10)">+10</button>
-                            <button class="btn-stock-add" onclick="adjustStockCount('${card.id}', 50)">+50</button>
-                            <button class="btn-stock-add" onclick="setExactStockCount('${card.id}')">Вручную</button>
+                html.push(`
+                    <div class="stock-item">
+                        <div class="stock-header">
+                            <span class="stock-title">${card.name}</span>
+                            <span class="${badgeClass}">${count} шт.</span>
                         </div>
-                        <div class="counter-controls">
-                            <button class="btn-counter" onclick="adjustStockCount('${card.id}', -1)">-</button>
-                            <button class="btn-counter" onclick="adjustStockCount('${card.id}', 1)">+</button>
-                            <button class="btn-remove-prod" title="Редактировать" onclick="editStockItem('${card.id}')">✏️</button>
-                            <button class="btn-remove-prod" title="Удалить" onclick="deleteStockItem('${card.id}')">🗑️</button>
+                        <div class="stock-bindings">
+                            ${tagsHtml || '<span style="font-size:11px; color:var(--alfa-muted);">Нет привязанных продуктов</span>'}
+                        </div>
+                        <div class="stock-actions">
+                            <div style="display:flex; gap:4px;">
+                                <button class="btn-stock-add" onclick="adjustStockCount('${card.id}', 10)">+10</button>
+                                <button class="btn-stock-add" onclick="adjustStockCount('${card.id}', 50)">+50</button>
+                                <button class="btn-stock-add" onclick="setExactStockCount('${card.id}')">Вручную</button>
+                            </div>
+                            <div class="counter-controls">
+                                <button class="btn-counter" onclick="adjustStockCount('${card.id}', -1)">-</button>
+                                <button class="btn-counter" onclick="adjustStockCount('${card.id}', 1)">+</button>
+                                <button class="btn-remove-prod" title="Редактировать" onclick="editStockItem('${card.id}')">✏️</button>
+                                <button class="btn-remove-prod" title="Удалить" onclick="deleteStockItem('${card.id}')">🗑️</button>
+                            </div>
                         </div>
                     </div>
-                `;
-                listEl.appendChild(div);
+                `);
                 reportText += `${idx + 1}. ${card.name}: ${count} шт.\n`;
             });
 
+            listEl.innerHTML = html.join('');
             document.getElementById('inventory-summary-report').innerText = reportText.trim();
         }
 
@@ -3029,6 +3100,7 @@
             if (card) {
                 card.count = Math.max(0, (parseInt(card.count, 10) || 0) + delta);
                 saveState();
+                renderInventory();
             }
         }
 
@@ -3038,7 +3110,8 @@
             const input = prompt(`Укажите точный остаток для «${card.name}» (шт):`, card.count);
             if (input !== null) {
                 card.count = Math.max(0, parseInt(input, 10) || 0);
-                saveState();
+                saveState(true);
+                renderInventory();
                 showToast("Остаток обновлен!");
             }
         }
@@ -3065,22 +3138,22 @@
                 currentBound = [];
             }
 
-            let checkHtml = '';
+            const checkHtml = [];
             for (let sKey in state.sections) {
                 const sec = state.sections[sKey];
                 if (sec.type === 'select') continue;
                 for (let iKey in sec.items) {
                     const it = sec.items[iKey];
                     const isChecked = currentBound.includes(iKey) ? 'checked' : '';
-                    checkHtml += `
+                    checkHtml.push(`
                         <label class="checkbox-item" style="padding:8px 6px;">
                             <input type="checkbox" id="bind-prod-${iKey}" value="${iKey}" ${isChecked}>
                             <span class="checkbox-label" style="font-size:12px;">${it.name}</span>
                         </label>
-                    `;
+                    `);
                 }
             }
-            checklistEl.innerHTML = checkHtml;
+            checklistEl.innerHTML = checkHtml.join('');
             document.getElementById('stock-modal').style.display = 'block';
         }
 
@@ -3105,7 +3178,7 @@
                 if (sec.type === 'select') continue;
                 for (let iKey in sec.items) {
                     const cb = document.getElementById(`bind-prod-${iKey}`);
-                    if (cb && cb.checked) selectedBindings.push(iKey);
+                    if (cb?.checked) selectedBindings.push(iKey);
                 }
             }
 
@@ -3127,15 +3200,17 @@
                 });
             }
 
-            saveState();
+            saveState(true);
             closeStockModal();
+            renderInventory();
             showToast("Карта сохранена в инвентаре!");
         }
 
         function deleteStockItem(id) {
             if (confirm("Удалить эту позицию карты из инвентаря?")) {
                 state.cardInventory = state.cardInventory.filter(c => c.id !== id);
-                saveState();
+                saveState(true);
+                renderInventory();
                 showToast("Позиция удалена!");
             }
         }
@@ -3147,15 +3222,12 @@
 
         /* ПРОСТЫЕ НАСТРОЙКИ (UI) */
         function switchSettingsTab(tab) {
-            document.getElementById('set-pane-prod').style.display = tab === 'prod' ? 'block' : 'none';
-            document.getElementById('set-pane-fails').style.display = tab === 'fails' ? 'block' : 'none';
-            document.getElementById('set-pane-shifts').style.display = tab === 'shifts' ? 'block' : 'none';
-            document.getElementById('set-pane-backup').style.display = tab === 'backup' ? 'block' : 'none';
-
-            document.getElementById('set-tab-prod').classList.toggle('active', tab === 'prod');
-            document.getElementById('set-tab-fails').classList.toggle('active', tab === 'fails');
-            document.getElementById('set-tab-shifts').classList.toggle('active', tab === 'shifts');
-            document.getElementById('set-tab-backup').classList.toggle('active', tab === 'backup');
+            ['prod', 'fails', 'shifts', 'backup'].forEach(t => {
+                const pane = document.getElementById(`set-pane-${t}`);
+                const btn = document.getElementById(`set-tab-${t}`);
+                if (pane) pane.style.display = (t === tab) ? 'block' : 'none';
+                if (btn) btn.classList.toggle('active', t === tab);
+            });
         }
 
         function openSettings() {
@@ -3167,23 +3239,31 @@
         function closeSettings() {
             saveCurrentSimpleInputs();
             document.getElementById('settings-modal').style.display = 'none';
-            saveState();
+            rebuildItemIndex();
+            updateActivationLabel();
+            saveState(true);
+            renderAll();
+            renderDynamicMeetingForms();
         }
 
         function renderSimpleSettingsLists() {
             const fioEl = document.getElementById('setting-banker-fio');
             if (fioEl) fioEl.value = state.bankerFio || "ФИО МБ";
 
-            const prodList = document.getElementById('settings-products-list');
-            let phtml = '';
+            const actTitleEl = document.getElementById('setting-act-title');
+            if (actTitleEl) actTitleEl.value = state.activationConfig?.title || "Актив(пин-код)";
+            const actShowEl = document.getElementById('setting-act-show');
+            if (actShowEl) actShowEl.checked = state.activationConfig?.enabled !== false;
 
-            // 1. Основные
-            phtml += `<div style="font-size:12px; font-weight:800; color:var(--alfa-muted); margin:8px 0 4px 4px;">Основные (выдача карт и кредитов):</div>`;
+            const prodList = document.getElementById('settings-products-list');
+            const phtml = [];
+
+            phtml.push(`<div style="font-size:12px; font-weight:800; color:var(--alfa-muted); margin:8px 0 4px 4px;">Основные (выдача карт и кредитов):</div>`);
             const mainItems = state.sections.sec_main?.items || {};
             for (let k in mainItems) {
                 const item = mainItems[k];
                 const inPlanChecked = item.inPlan ? 'checked' : '';
-                phtml += `
+                phtml.push(`
                     <div class="setting-row">
                         <div class="setting-row-main">
                             <input type="text" class="setting-name-input" id="item-name-sec_main-${k}" value="${item.name}">
@@ -3193,11 +3273,10 @@
                             <button class="btn-remove-prod" onclick="removeSimpleItem('sec_main', '${k}')">🗑️</button>
                         </div>
                     </div>
-                `;
+                `);
             }
 
-            // 2. Кросс-продажи
-            phtml += `<div style="font-size:12px; font-weight:800; color:var(--alfa-muted); margin:12px 0 4px 4px;">Кросс-продажи (настраиваемые):</div>`;
+            phtml.push(`<div style="font-size:12px; font-weight:800; color:var(--alfa-muted); margin:12px 0 4px 4px;">Кросс-продажи (настраиваемые):</div>`);
             const crossItems = state.sections.sec_cross?.items || {};
             for (let k in crossItems) {
                 const item = crossItems[k];
@@ -3205,7 +3284,7 @@
                 const subVal = (item.subitems || []).join(', ');
                 const isMulti = item.mode === 'multi';
 
-                phtml += `
+                phtml.push(`
                     <div class="setting-row">
                         <div class="setting-row-main">
                             <input type="text" class="setting-name-input" id="item-name-sec_cross-${k}" value="${item.name}">
@@ -3225,43 +3304,43 @@
                             <input type="text" class="setting-subitems-input" id="item-subs-sec_cross-${k}" value="${subVal}" placeholder="Подпункты через запятую: одобрено, выдано, транзакция">
                         </div>
                     </div>
-                `;
+                `);
             }
 
-            prodList.innerHTML = phtml || '<div class="empty-history">Список пуст.</div>';
+            prodList.innerHTML = phtml.length ? phtml.join('') : '<div class="empty-history">Список пуст.</div>';
 
             const failList = document.getElementById('settings-fails-list');
-            let fhtml = '';
+            const fhtml = [];
             const failSec = state.sections.sec_statuses;
             if (failSec && Object.keys(failSec.items).length > 0) {
                 for (let k in failSec.items) {
                     const item = failSec.items[k];
-                    fhtml += `
+                    fhtml.push(`
                         <div class="setting-row" style="flex-direction:row;">
                             <input type="text" class="setting-name-input" id="fail-name-${k}" value="${item.name}">
                             <input type="number" class="setting-price-input" id="fail-price-${k}" value="${item.price || 0}">
                             <span style="font-size:12px; font-weight:700; color:var(--alfa-muted);">₽</span>
                             <button class="btn-remove-prod" onclick="removeSimpleItem('sec_statuses', '${k}')">🗑️</button>
                         </div>
-                    `;
+                    `);
                 }
             }
-            failList.innerHTML = fhtml || '<div class="empty-history">Причин отказов пока нет</div>';
+            failList.innerHTML = fhtml.length ? fhtml.join('') : '<div class="empty-history">Причин отказов пока нет</div>';
 
             const shiftList = document.getElementById('settings-shifts-list');
-            let shtml = '';
+            const shtml = [];
             for (let cKey in state.shiftCategories) {
                 const cat = state.shiftCategories[cKey];
-                shtml += `
+                shtml.push(`
                     <div class="setting-row" style="flex-direction:row; gap:4px;">
                         <input type="color" class="color-picker-btn" id="cat-color-${cKey}" value="${cat.color || '#EF3124'}">
                         <input type="text" style="width:36px; text-align:center;" class="setting-name-input" id="cat-icon-${cKey}" value="${cat.icon || '💼'}">
                         <input type="text" class="setting-name-input" id="cat-name-${cKey}" value="${cat.name}">
                         <button class="btn-remove-prod" onclick="removeSimpleShift('${cKey}')">🗑️</button>
                     </div>
-                `;
+                `);
             }
-            shiftList.innerHTML = shtml;
+            shiftList.innerHTML = shtml.join('');
         }
 
         function toggleSubInputRow(key, mode) {
@@ -3273,6 +3352,11 @@
             const fioEl = document.getElementById('setting-banker-fio');
             if (fioEl) state.bankerFio = fioEl.value.trim() || "ФИО МБ";
 
+            const actTitleEl = document.getElementById('setting-act-title');
+            if (actTitleEl) state.activationConfig.title = actTitleEl.value.trim() || "Актив(пин-код)";
+            const actShowEl = document.getElementById('setting-act-show');
+            if (actShowEl) state.activationConfig.enabled = actShowEl.checked;
+
             for (let iKey in state.sections.sec_main?.items || {}) {
                 const nEl = document.getElementById(`item-name-sec_main-${iKey}`);
                 const pEl = document.getElementById(`item-price-sec_main-${iKey}`);
@@ -3280,9 +3364,9 @@
                 const goalEl = document.getElementById(`item-goal-sec_main-${iKey}`);
 
                 if (nEl && nEl.value.trim()) state.sections.sec_main.items[iKey].name = nEl.value.trim();
-                if (pEl) state.sections.sec_main.items[iKey].price = parseInt(pEl.value) || 0;
+                if (pEl) state.sections.sec_main.items[iKey].price = parseInt(pEl.value, 10) || 0;
                 if (planEl) state.sections.sec_main.items[iKey].inPlan = planEl.checked;
-                if (goalEl) state.sections.sec_main.items[iKey].goal = Math.max(1, parseInt(goalEl.value) || 1);
+                if (goalEl) state.sections.sec_main.items[iKey].goal = Math.max(1, parseInt(goalEl.value, 10) || 1);
             }
 
             for (let iKey in state.sections.sec_cross?.items || {}) {
@@ -3294,9 +3378,9 @@
                 const subsEl = document.getElementById(`item-subs-sec_cross-${iKey}`);
 
                 if (nEl && nEl.value.trim()) state.sections.sec_cross.items[iKey].name = nEl.value.trim();
-                if (pEl) state.sections.sec_cross.items[iKey].price = parseInt(pEl.value) || 0;
+                if (pEl) state.sections.sec_cross.items[iKey].price = parseInt(pEl.value, 10) || 0;
                 if (planEl) state.sections.sec_cross.items[iKey].inPlan = planEl.checked;
-                if (goalEl) state.sections.sec_cross.items[iKey].goal = Math.max(1, parseInt(goalEl.value) || 1);
+                if (goalEl) state.sections.sec_cross.items[iKey].goal = Math.max(1, parseInt(goalEl.value, 10) || 1);
 
                 if (modeEl) {
                     state.sections.sec_cross.items[iKey].mode = modeEl.value;
@@ -3314,7 +3398,7 @@
                     const fEl = document.getElementById(`fail-name-${k}`);
                     const fpEl = document.getElementById(`fail-price-${k}`);
                     if (fEl && fEl.value.trim()) state.sections.sec_statuses.items[k].name = fEl.value.trim();
-                    if (fpEl) state.sections.sec_statuses.items[k].price = parseInt(fpEl.value) || 0;
+                    if (fpEl) state.sections.sec_statuses.items[k].price = parseInt(fpEl.value, 10) || 0;
                 }
             }
 
@@ -3331,10 +3415,10 @@
         function addSimpleProduct() {
             saveCurrentSimpleInputs();
             const name = document.getElementById('simple-prod-name').value.trim();
-            const price = parseInt(document.getElementById('simple-prod-price').value) || 0;
+            const price = parseInt(document.getElementById('simple-prod-price').value, 10) || 0;
             const type = document.getElementById('simple-prod-type').value;
             const inPlan = document.getElementById('simple-prod-inplan').checked;
-            const goal = parseInt(document.getElementById('simple-prod-goal').value) || 1;
+            const goal = parseInt(document.getElementById('simple-prod-goal').value, 10) || 1;
             const subitemsRaw = document.getElementById('simple-prod-subitems').value.trim();
 
             if (!name) return alert("Введите название!");
@@ -3343,22 +3427,22 @@
 
             if (type === 'counter') {
                 if (!state.sections.sec_main) state.sections.sec_main = { name: "Основные продукты", type: "counter", items: {} };
-                state.sections.sec_main.items[iKey] = { name: name, price: price, assigned: 0, inPlan: inPlan, goal: goal, unit: 'шт' };
+                state.sections.sec_main.items[iKey] = { name, price, assigned: 0, inPlan, goal, unit: 'шт' };
             } else if (type === 'apps') {
                 if (!state.sections.sec_apps) state.sections.sec_apps = { name: "Приложения", type: "checkbox", items: {} };
-                state.sections.sec_apps.items[iKey] = { name: name, price: price };
+                state.sections.sec_apps.items[iKey] = { name, price };
             } else {
                 if (!state.sections.sec_cross) state.sections.sec_cross = { name: "Кросс-продажи", type: "cross_builder", items: {} };
                 const mode = (type === 'cross_multi') ? 'multi' : 'single';
                 const subitems = mode === 'multi' ? subitemsRaw.split(/[,/]/).map(s => s.trim()).filter(Boolean) : [];
 
                 state.sections.sec_cross.items[iKey] = {
-                    name: name,
-                    price: price,
-                    mode: mode,
+                    name,
+                    price,
+                    mode,
                     subitems: subitems.length > 0 ? subitems : (mode === 'multi' ? ['выдано', 'транзакция'] : []),
-                    inPlan: inPlan,
-                    goal: goal,
+                    inPlan,
+                    goal,
                     unit: 'шт'
                 };
             }
@@ -3383,7 +3467,7 @@
         function addSimpleFailReason() {
             saveCurrentSimpleInputs();
             const name = document.getElementById('simple-fail-name').value.trim();
-            const price = parseInt(document.getElementById('simple-fail-price').value) || 0;
+            const price = parseInt(document.getElementById('simple-fail-price').value, 10) || 0;
             if (!name) return alert("Введите причину отказа!");
 
             if (!state.sections.sec_statuses) {
@@ -3391,7 +3475,7 @@
             }
 
             const key = 'item_' + Date.now();
-            state.sections.sec_statuses.items[key] = { name: name, price: price };
+            state.sections.sec_statuses.items[key] = { name, price };
             document.getElementById('simple-fail-name').value = '';
             document.getElementById('simple-fail-price').value = '';
             renderSimpleSettingsLists();
@@ -3408,7 +3492,7 @@
             if (!name) return alert("Введите название смены!");
 
             const key = 'shift_' + Date.now();
-            state.shiftCategories[key] = { name: name, icon: icon, color: color, isWork: isWork };
+            state.shiftCategories[key] = { name, icon, color, isWork };
             document.getElementById('simple-shift-name').value = '';
             document.getElementById('simple-shift-icon').value = '';
             renderSimpleSettingsLists();
@@ -3424,7 +3508,7 @@
         }
 
         function applyBankerPreset() {
-            if (!confirm("Загрузить эталонный набор с готовыми мульти-пунктами для Комбо, БС, Детей и Смарта?")) return;
+            if (!confirm("Загрузить эталонный набор с готовыми мультикнопками для Комбо, БС, Детей и Смарта?")) return;
 
             saveCurrentSimpleInputs();
 
@@ -3433,23 +3517,27 @@
             state.cardInventory = JSON.parse(JSON.stringify(defaultCardInventory));
             state.fuelSettings = { consumption: 10, pricePerLiter: 64 };
             state.taxRate = 13;
+            state.activationConfig = { title: "Актив(пин-код)", enabled: true };
 
+            rebuildItemIndex();
             renderSimpleSettingsLists();
-            saveState();
+            updateActivationLabel();
+            saveState(true);
             showToast("Эталонный набор загружен!");
         }
 
         function confirmReset() {
             if (confirm(`Сбросить результаты за ${formatDateDisplay(currentActiveDateKey)}? Встречи, бензин и доп. доход обнулятся. Настройки останутся.`)) {
                 delete state.daysData[currentActiveDateKey];
-                if (state.dayAssigned && state.dayAssigned[currentActiveDateKey]) {
+                if (state.dayAssigned?.[currentActiveDateKey]) {
                     delete state.dayAssigned[currentActiveDateKey];
                 }
-                if (state.dailyPlans && state.dailyPlans[currentActiveDateKey]) {
+                if (state.dailyPlans?.[currentActiveDateKey]) {
                     state.dailyPlans[currentActiveDateKey].forEach(t => t.sold = 0);
                 }
                 loadActiveDayToUI();
-                saveState();
+                saveState(true);
+                renderAll();
                 showToast("Результаты дня обнулены!");
             }
         }
@@ -3465,10 +3553,12 @@
         function fallbackCopy(text) {
             const ta = document.createElement('textarea');
             ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
             document.body.appendChild(ta);
             ta.select();
             document.execCommand('copy');
-            document.removeChild(ta);
+            document.body.removeChild(ta);
         }
 
         function showToast(msg) {
