@@ -1203,22 +1203,23 @@
                 <input type="text" id="client-info" class="input-text" placeholder="Иванов И.И. / 1234">
             </div>
 
-            <!-- СИСТЕМНЫЕ ОПЦИИ ВСТРЕЧИ: АВТО И АКТИВАЦИЯ -->
-            <div style="display:flex; gap:8px; margin-bottom:12px;">
-                <label class="checkbox-item" style="flex:1; padding:8px 10px; font-size:12px;">
-                    <input type="checkbox" id="check-car-meeting">
-                    <span class="checkbox-label">🚗 В авто</span>
-                </label>
-                <label class="checkbox-item" id="activation-checkbox-wrap" style="flex:1; padding:8px 10px; font-size:12px;">
-                    <input type="checkbox" id="check-activated-meeting">
-                    <span class="checkbox-label" id="check-activated-label">🔑 Актив (пин-код)</span>
-                </label>
-            </div>
-
+            <!-- БЛОК ТОЛЬКО ДЛЯ УСПЕШНОЙ ВСТРЕЧИ -->
             <div id="success-block">
+                <div style="display:flex; gap:8px; margin-bottom:12px;">
+                    <label class="checkbox-item" style="flex:1; padding:8px 10px; font-size:12px;">
+                        <input type="checkbox" id="check-car-meeting">
+                        <span class="checkbox-label">🚗 В авто</span>
+                    </label>
+                    <label class="checkbox-item" id="activation-checkbox-wrap" style="flex:1; padding:8px 10px; font-size:12px;">
+                        <input type="checkbox" id="check-activated-meeting">
+                        <span class="checkbox-label" id="check-activated-label">🔑 Актив (пин-код)</span>
+                    </label>
+                </div>
+
                 <div id="dynamic-meeting-form-success"></div>
             </div>
 
+            <!-- БЛОК ТОЛЬКО ДЛЯ НЕУСПЕШНОЙ ВСТРЕЧИ -->
             <div id="fail-block" style="display:none;">
                 <div id="dynamic-meeting-form-fail"></div>
             </div>
@@ -1862,7 +1863,7 @@
                 state.activationConfig = { title: "Актив(пин-код)", enabled: true };
             }
 
-            // Очищаем старый системный дубль активации из кросс-продаж если он там был
+            // Очищаем старый дубль активации из кросс-продаж если остался в памяти
             if (state.sections.sec_cross?.items?.cross_act) {
                 delete state.sections.sec_cross.items.cross_act;
             }
@@ -2377,8 +2378,10 @@
         function saveMeeting() {
             const client = document.getElementById('client-info').value.trim() || "Клиент без имени";
             const comment = document.getElementById('meeting-comment').value.trim();
-            const inCar = document.getElementById('check-car-meeting').checked;
-            const isActivated = document.getElementById('check-activated-meeting').checked;
+            
+            // Если встреча неуспешная — принудительно выставляем false
+            const inCar = isCurrentMeetingSuccess ? document.getElementById('check-car-meeting').checked : false;
+            const isActivated = isCurrentMeetingSuccess ? document.getElementById('check-activated-meeting').checked : false;
 
             const newMeeting = {
                 id: 'meet_' + Date.now(),
@@ -2508,11 +2511,11 @@
                         }
                     }
                 }
-                if (m.isActivated && state.activationConfig.enabled) {
+                if (m.isSuccess && m.isActivated && state.activationConfig.enabled) {
                     details.push(`🔑 ${state.activationConfig.title}`);
                 }
                 if (m.comment) details.push(`<i>"${m.comment}"</i>`);
-                if (m.inCar) details.push(`🚗 В авто`);
+                if (m.isSuccess && m.inCar) details.push(`🚗 В авто`);
 
                 const badgeClass = m.isSuccess ? 'badge-success' : 'badge-fail';
                 const badgeText = m.isSuccess ? 'УСПЕШНАЯ' : 'НЕУСПЕШНАЯ';
@@ -2584,9 +2587,6 @@
                 }
                 report += `\n`;
 
-                // Системный подсчёт активации:
-                // 1) По прямому флагу m.isActivated
-                // 2) Поддержка старых записей, где активация была в checkedItems
                 if (actShow) {
                     const actCount = dayData.meetings.filter(m => {
                         if (!m.isSuccess) return false;
@@ -2628,7 +2628,7 @@
                 report += `- ${appSec[aKey].name} - ${getCount(aKey)}\n`;
             }
 
-            // 4. ВСТРЕЧИ В АВТО
+            // 4. ВСТРЕЧИ В АВТО (только успешные)
             report += `\nВстречи в авто ${carSuccessMeetingsCount} из ${totalSuccessCount}`;
 
             document.getElementById('day-report-preview').innerText = report;
