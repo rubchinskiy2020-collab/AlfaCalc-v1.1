@@ -1430,6 +1430,7 @@
                 <label style="font-size:12px; font-weight:700; color:var(--alfa-black);">Чистый заработок за день (₽):</label>
                 <input type="number" id="day-profit-input" class="input-text" style="margin-top:4px;" placeholder="0">
             </div>
+            <button class="btn-primary" style="margin-bottom:12px; background:var(--alfa-green); padding:10px;" onclick="saveDayProfitOnly()">💾 Сохранить сумму</button>
             <p style="font-size:13px; color:var(--alfa-muted); margin-bottom:6px;">Выберите статус/категорию:</p>
             <div class="day-actions-grid" id="day-categories-modal-grid"></div>
             <button class="btn-primary" style="margin-top:12px; background:var(--alfa-red);" onclick="saveDayDetails('none')">Очистить день</button>
@@ -1863,7 +1864,6 @@
                 state.activationConfig = { title: "Актив(пин-код)", enabled: true };
             }
 
-            // Очищаем старый дубль активации из кросс-продаж если остался в памяти
             if (state.sections.sec_cross?.items?.cross_act) {
                 delete state.sections.sec_cross.items.cross_act;
             }
@@ -2379,7 +2379,6 @@
             const client = document.getElementById('client-info').value.trim() || "Клиент без имени";
             const comment = document.getElementById('meeting-comment').value.trim();
             
-            // Если встреча неуспешная — принудительно выставляем false
             const inCar = isCurrentMeetingSuccess ? document.getElementById('check-car-meeting').checked : false;
             const isActivated = isCurrentMeetingSuccess ? document.getElementById('check-activated-meeting').checked : false;
 
@@ -2575,7 +2574,6 @@
 
                 report += `\n${prodName}:  назначено ${assigned} / выдано ${issued}`;
                 
-                // x5 подпункт для ДК
                 if (prodKey === 'item_dk') {
                     let x5Count = 0;
                     for (let cKey in crossSec) {
@@ -2642,9 +2640,10 @@
             const netDayProfit = Math.max(0, currentCalculatedTodayProfit - (dayData.fuel.cost || 0));
 
             if (!state.schedule[currentActiveDateKey]) {
-                state.schedule[currentActiveDateKey] = { type: 'work', profit: netDayProfit };
+                state.schedule[currentActiveDateKey] = { type: 'work', profit: netDayProfit, manualProfit: false };
             } else {
                 state.schedule[currentActiveDateKey].profit = netDayProfit;
+                state.schedule[currentActiveDateKey].manualProfit = false;
                 if (state.schedule[currentActiveDateKey].type === 'none') {
                     state.schedule[currentActiveDateKey].type = 'work';
                 }
@@ -2685,14 +2684,21 @@
             for (let day = 1; day <= lastDay.getDate(); day++) {
                 const dayDate = new Date(year, month, day);
                 const dayKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const dayData = state.schedule[dayKey] || { type: 'none', profit: 0 };
-                const cat = state.shiftCategories[dayData.type];
+                const schedData = state.schedule[dayKey] || { type: 'none', profit: 0 };
+                const cat = state.shiftCategories[schedData.type];
 
                 let dayGross = 0;
                 let dayFuelCost = 0;
 
-                if (state.daysData[dayKey]) {
-                    const dD = state.daysData[dayKey];
+                // Проверяем встречи за день
+                const dD = state.daysData[dayKey];
+                const hasMeetings = dD && dD.meetings && dD.meetings.length > 0;
+                dayFuelCost = dD?.fuel?.cost || 0;
+
+                // ИСПРАВЛЕНИЕ: если задан ручной ввод (manualProfit) или нет встреч, но задан schedData.profit - берем его!
+                if (schedData.manualProfit || (!hasMeetings && schedData.profit > 0)) {
+                    dayGross = schedData.profit || 0;
+                } else if (hasMeetings) {
                     dayGross = dD.extraIncome || 0;
                     for (let mIdx = 0; mIdx < dD.meetings.length; mIdx++) {
                         const m = dD.meetings[mIdx];
@@ -2712,9 +2718,10 @@
                             }
                         }
                     }
-                    dayFuelCost = dD.fuel?.cost || 0;
-                } else if (dayData.profit > 0) {
-                    dayGross = dayData.profit;
+                } else if (dD && dD.extraIncome > 0) {
+                    dayGross = dD.extraIncome;
+                } else if (schedData.profit > 0) {
+                    dayGross = schedData.profit;
                 }
 
                 totalMonthGross += dayGross;
@@ -2789,13 +2796,27 @@
 
         function openDayModal(dayKey, dayNum, monthName) {
             selectedDayKey = dayKey;
-            const dayData = state.schedule[dayKey] || { type: 'none', profit: 0 };
+            const schedData = state.schedule[dayKey] || { type: 'none', profit: 0 };
             document.getElementById('day-modal-title').innerText = `${dayNum} ${monthName}`;
             
-            let defaultVal = dayData.profit;
-            if (dayKey === currentActiveDateKey && (!dayData.profit || dayData.profit === 0)) {
-                defaultVal = Math.max(0, currentCalculatedTodayProfit - (getActiveDayData().fuel.cost || 0));
+            let defaultVal = schedData.profit;
+            const dD = state.daysData[dayKey];
+            if ((!defaultVal || defaultVal === 0) && dD && dD.meetings && dD.meetings.length > 0) {
+                let calc = dD.extraIncome || 0;
+                dD.meetings.forEach(m => {
+                    if (m.isSuccess) {
+                        if (m.productKey) calc += itemIndex[m.productKey]?.price || 0;
+                        if (m.checkedItems) m.checkedItems.forEach(k => calc += itemIndex[k]?.price || 0);
+                        if (m.multiCross) {
+                            for (let c in m.multiCross) {
+                                if (Object.values(m.multiCross[c]).some(Boolean)) calc += itemIndex[c]?.price || 0;
+                            }
+                        }
+                    }
+                });
+                defaultVal = Math.max(0, calc - (dD.fuel?.cost || 0));
             }
+
             document.getElementById('day-profit-input').value = defaultVal || '';
 
             const btnContainer = document.getElementById('day-categories-modal-grid');
@@ -2820,13 +2841,36 @@
             selectedDayKey = null;
         }
 
+        // Сохранение только суммы без обязательной смены статуса
+        function saveDayProfitOnly() {
+            if (!selectedDayKey) return;
+            const profitVal = parseInt(document.getElementById('day-profit-input').value, 10) || 0;
+            if (!state.schedule[selectedDayKey]) {
+                state.schedule[selectedDayKey] = { type: 'work', profit: profitVal, manualProfit: true };
+            } else {
+                state.schedule[selectedDayKey].profit = profitVal;
+                state.schedule[selectedDayKey].manualProfit = true;
+                if (state.schedule[selectedDayKey].type === 'none') {
+                    state.schedule[selectedDayKey].type = 'work';
+                }
+            }
+            saveState(true);
+            renderCalendar();
+            closeDayModal();
+            showToast("Заработок сохранен!");
+        }
+
         function saveDayDetails(status) {
             if (!selectedDayKey) return;
             const profitVal = parseInt(document.getElementById('day-profit-input').value, 10) || 0;
             if (status === 'none') {
                 delete state.schedule[selectedDayKey];
             } else {
-                state.schedule[selectedDayKey] = { type: status, profit: profitVal };
+                state.schedule[selectedDayKey] = { 
+                    type: status, 
+                    profit: profitVal, 
+                    manualProfit: profitVal > 0 
+                };
             }
             saveState(true);
             renderCalendar();
