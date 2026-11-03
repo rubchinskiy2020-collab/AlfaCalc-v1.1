@@ -668,6 +668,24 @@
             color: var(--alfa-red);
         }
 
+        .stock-include-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--alfa-text);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .stock-include-label input[type="checkbox"] {
+            accent-color: var(--alfa-red);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
         .stock-bindings {
             display: flex;
             flex-wrap: wrap;
@@ -898,15 +916,6 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-        }
-
-        .quick-preset-banner {
-            background: linear-gradient(135deg, rgba(239, 49, 36, 0.08) 0%, rgba(239, 49, 36, 0.02) 100%);
-            border: 1px dashed var(--alfa-red);
-            border-radius: 12px;
-            padding: 10px;
-            text-align: center;
-            margin-bottom: 12px;
         }
 
         .bottom-nav {
@@ -1141,8 +1150,9 @@
                 <div class="subtitle">by Kosin</div>
             </div>
             <div class="header-actions">
+                <button class="btn-icon" onclick="openNotesModal()" title="Рабочие заметки">📝</button>
                 <button class="btn-icon" id="theme-toggle-btn" onclick="toggleTheme()" title="Сменить тему">🌙</button>
-                <button class="btn-icon" onclick="openSettings()" title="Простые настройки">⚙️</button>
+                <button class="btn-icon" onclick="openSettings()" title="Настройки">⚙️</button>
                 <button class="btn-icon" onclick="confirmReset()" title="Сбросить выбранный день">🔄</button>
             </div>
         </div>
@@ -1186,7 +1196,7 @@
         <div class="card" id="plan-section-card">
             <div class="card-title">1. Назначено на смену</div>
             <div class="plan-list" id="plan-container">
-                <div class="empty-history">Добавьте основные продукты в настройках ⚙️</div>
+                <div class="empty-history">Список пуст. Загрузите пресет или настройте продукты ⚙️</div>
             </div>
         </div>
 
@@ -1311,7 +1321,7 @@
                 <span>📅 Отчет по плану за месяц</span>
                 <div style="display:flex; align-items:center; gap:6px;">
                     <button class="btn-icon" style="width:30px; height:30px; font-size:12px;" onclick="changePlanMonth(-1)">◀</button>
-                    <span id="plan-month-title" style="font-size:13px; font-weight:800; text-transform:capitalize;">Октябрь 2026</span>
+                    <span id="plan-month-title" style="font-size:13px; font-weight:800; text-transform:capitalize;">Месяц 2026</span>
                     <button class="btn-icon" style="width:30px; height:30px; font-size:12px;" onclick="changePlanMonth(1)">▶</button>
                 </div>
             </div>
@@ -1334,9 +1344,9 @@
         </div>
 
         <div class="card">
-            <div class="card-title">📋 Сводка по пластику</div>
+            <div class="card-title">📋 Сводка по пластику (только выбранное)</div>
             <div class="report-preview" id="inventory-summary-report">Данные формируются...</div>
-            <button class="btn-primary" onclick="copyInventoryReport()">Скопировать остаток карт</button>
+            <button class="btn-primary" onclick="copyInventoryReport()">Скопировать остаток выбранных карт</button>
         </div>
     </div>
 
@@ -1415,6 +1425,12 @@
                 <input type="number" id="stock-card-count" class="input-text" placeholder="25" min="0">
             </div>
             <div class="form-group">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                    <input type="checkbox" id="stock-card-include" checked style="accent-color: var(--alfa-red); width:18px; height:18px;">
+                    <span>Включать в расчет общей сводки пластика</span>
+                </label>
+            </div>
+            <div class="form-group">
                 <label>Привязать продукты (списывают эту карту при выдаче):</label>
                 <div id="stock-bindings-checklist" class="checkbox-grid" style="max-height:180px; overflow-y:auto;"></div>
             </div>
@@ -1438,7 +1454,24 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА НАСТРОЕК С КОНСТРУКТОРОМ КРОСС-ПРОДАЖ -->
+    <!-- МОДАЛКА ЗАМЕТОК -->
+    <div class="modal" id="notes-modal">
+        <div class="modal-content">
+            <div class="card-title">
+                <span>📝 Рабочие заметки</span>
+                <button class="btn-delete" style="font-size: 18px; padding: 0 4px;" onclick="closeNotesModal()">✕</button>
+            </div>
+            <div class="form-group">
+                <textarea id="work-notes-textarea" class="editable-report" style="min-height: 240px; font-family: inherit; font-size: 14px;" placeholder="Важные комментарии, адреса, номера заявок, напоминания по встречам..." oninput="saveNotesText(this.value)"></textarea>
+            </div>
+            <div style="display:flex; gap:6px;">
+                <button class="btn-primary" style="flex:1;" onclick="copyNotesText()">📋 Скопировать заметки</button>
+                <button class="btn-primary" style="flex:0.6; background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border);" onclick="clearNotesText()">Очистить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА НАСТРОЕК -->
     <div class="modal" id="settings-modal">
         <div class="modal-content">
             <div class="card-title" style="margin-bottom: 10px;">
@@ -1450,7 +1483,7 @@
                 <button class="settings-nav-btn active" id="set-tab-prod" onclick="switchSettingsTab('prod')">💳 Продукты</button>
                 <button class="settings-nav-btn" id="set-tab-fails" onclick="switchSettingsTab('fails')">❌ Отказы</button>
                 <button class="settings-nav-btn" id="set-tab-shifts" onclick="switchSettingsTab('shifts')">📅 График</button>
-                <button class="settings-nav-btn" id="set-tab-backup" onclick="switchSettingsTab('backup')">💾 Бэкап</button>
+                <button class="settings-nav-btn" id="set-tab-backup" onclick="switchSettingsTab('backup')">💾 Пресет / Бэкап</button>
             </div>
 
             <div id="set-pane-prod">
@@ -1468,12 +1501,6 @@
                             <input type="checkbox" id="setting-act-show" checked> Показывать строку активации в отчете
                         </label>
                     </div>
-                </div>
-
-                <div class="quick-preset-banner">
-                    <p style="font-size:12px; font-weight:700; color:var(--alfa-black); margin-bottom:4px;">Восстановить эталонный набор</p>
-                    <p style="font-size:11px; color:var(--alfa-muted); margin-bottom:8px;">Сетка с настроенными мультикнопками (Комбо, БС, Детская, Смарт и т.д.)</p>
-                    <button class="btn-primary" style="padding: 8px 12px; font-size:12px; width:auto;" onclick="applyBankerPreset()">🪄 Загрузить эталонный шаблон</button>
                 </div>
 
                 <div class="simple-card-box">
@@ -1542,15 +1569,21 @@
 
             <div id="set-pane-backup" style="display: none;">
                 <div class="simple-card-box">
-                    <h4>🛡 Резервное копирование</h4>
+                    <h4>🛡 Пресет конфигурации и Бэкап</h4>
+                    <p style="font-size:12px; color:var(--alfa-muted); margin-bottom:10px;">
+                        При загрузке пресета обновляются настройки продуктов, отказов и складов. Ваши личные смены и график сохраняются.
+                    </p>
                     <div style="display:flex; flex-direction:column; gap:8px;">
-                        <button class="btn-primary" style="background:var(--alfa-green); padding:12px; font-size:13px;" onclick="exportBackup()">📥 Сохранить в Файлы (меню iPhone)</button>
-                        <button class="btn-primary" style="background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border); padding:10px; font-size:13px;" onclick="copyBackupToClipboard()">📋 Скопировать бэкап как текст</button>
+                        <button class="btn-primary" style="background:var(--alfa-green); padding:12px; font-size:13px;" onclick="exportBackup()">📥 Экспорт текущей конфигурации (.json)</button>
+                        <button class="btn-primary" style="background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border); padding:10px; font-size:13px;" onclick="copyBackupToClipboard()">📋 Скопировать как текст</button>
                         <div style="display:flex; gap:6px; margin-top:6px;">
-                            <button class="btn-primary" style="flex:1; background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border); padding:10px; font-size:12px;" onclick="document.getElementById('backup-file-input').click()">📤 Из .json</button>
-                            <button class="btn-primary" style="flex:1; background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border); padding:10px; font-size:12px;" onclick="importBackupFromClipboard()">📋 Вставить текст</button>
+                            <button class="btn-primary" style="flex:1; background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border); padding:10px; font-size:12px;" onclick="document.getElementById('backup-file-input').click()">📤 Загрузить файл пресета</button>
+                            <button class="btn-primary" style="flex:1; background:var(--alfa-card); color:var(--alfa-text); border:1px solid var(--alfa-border); padding:10px; font-size:12px;" onclick="importBackupFromClipboard()">📋 Вставить текст пресета</button>
                         </div>
                         <input type="file" id="backup-file-input" style="display:none;" accept=".json" onchange="importBackup(event)">
+                        
+                        <hr style="border:none; border-top:1px dashed var(--alfa-border); margin:10px 0;">
+                        <button class="btn-primary" style="background:#570b06; color:#ffb4ae; padding:10px; font-size:12px;" onclick="hardResetApp()">🧨 Полная очистка памяти (Hard Reset)</button>
                     </div>
                 </div>
             </div>
@@ -1562,91 +1595,29 @@
     <div class="toast" id="toast-msg">Отчет скопирован!</div>
 
     <script>
-        const defaultUserSections = {
-            "sec_main": {
-                "name": "Основные продукты",
-                "type": "counter",
-                "items": {
-                    "item_dk": { "name": "ДК", "price": 330, "assigned": 0, "inPlan": true, "goal": 5 },
-                    "item_re": { "name": "Re", "price": 330, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_cc1": { "name": "CC1", "price": 570, "assigned": 0, "inPlan": true, "goal": 2 },
-                    "item_cc2": { "name": "CC2", "price": 570, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_credit": { "name": "Кредит наличными", "price": 600, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_ipoteka": { "name": "Ипотека", "price": 450, "assigned": 0, "inPlan": false, "goal": 1 },
-                    "item_sim_main": { "name": "СИМ", "price": 330, "assigned": 0, "inPlan": false, "goal": 1 }
-                }
-            },
-            "sec_cross": {
-                "name": "Кросс-продажи",
-                "type": "cross_builder",
-                "items": {
-                    "cross_is_x5": { "name": "в том числе x5", "price": 0, "mode": "single", "inPlan": false, "goal": 1 },
-                    "cross_combo": { "name": "Комбо", "price": 600, "mode": "multi", "subitems": ["одобрено", "выдано", "транзакция"], "inPlan": true, "goal": 2 },
-                    "cross_kids": { "name": "Детская", "price": 270, "mode": "multi", "subitems": ["выдано", "транзакция"], "inPlan": true, "goal": 1 },
-                    "cross_smart": { "name": "Смарт", "price": 30, "mode": "single", "inPlan": true, "goal": 100, "unit": "%" },
-                    "cross_dk": { "name": "Кросс ДК", "price": 270, "mode": "multi", "subitems": ["выдано", "транзакция"], "inPlan": false, "goal": 1 },
-                    "cross_bs": { "name": "БС", "price": 270, "mode": "multi", "subitems": ["открыто", "пополнено"], "inPlan": true, "goal": 1 },
-                    "cross_sim": { "name": "СИМ", "price": 430, "mode": "single", "inPlan": true, "goal": 1 },
-                    "cross_pds": { "name": "ПДС", "price": 200, "mode": "single", "inPlan": false, "goal": 1 },
-                    "cross_ksp": { "name": "КСП (коробочное страх)", "price": 100, "mode": "single", "inPlan": false, "goal": 1 },
-                    "cross_cp": { "name": "ЦП", "price": 20, "mode": "single", "inPlan": false, "goal": 1 },
-                    "cross_pens": { "name": "Пенсия", "price": 270, "mode": "single", "inPlan": true, "goal": 1 },
-                    "cross_selfie": { "name": "Селфи N2B", "price": 50, "mode": "single", "inPlan": false, "goal": 1 }
-                }
-            },
-            "sec_statuses": {
-                "name": "Статусы отказов",
-                "type": "select",
-                "items": {
-                    "item_ndz": { "name": "НДЗ", "price": 0 },
-                    "item_perenos": { "name": "перенос согласован", "price": 0 },
-                    "item_err_issue": { "name": "ошибка выдачи", "price": 0 },
-                    "item_bad_passport": { "name": "неактуальные паспортные данные", "price": 0 },
-                    "item_otkaz911": { "name": "отказ банка / 911", "price": 250 },
-                    "item_client_before": { "name": "отказ клиента до встречи", "price": 0 },
-                    "item_client_on": { "name": "отказ клиента на встрече", "price": 100 }
-                }
-            },
-            "sec_apps": {
-                "name": "Приложения",
-                "type": "checkbox",
-                "items": {
-                    "app_ios": { "name": "МП iOS", "price": 0 },
-                    "app_android": { "name": "МП Андройд", "price": 0 },
-                    "app_x5": { "name": "МП Х5", "price": 0 }
-                }
-            }
-        };
+        // ИЗОЛИРОВАННЫЙ КЛЮЧ: не считывает старые сохраненные настройки продуктов
+        const STORAGE_KEY = 'alfacalc_clean_v3';
 
-        const defaultShiftCategories = {
-            "work": { "name": "Рабочий (Офис/Город)", "icon": "💼", "color": "#ef3124", "isWork": true },
-            "trip": { "name": "Выезд в НП", "icon": "🚘", "color": "#6a1b9a", "isWork": true, "isTrip": true },
-            "off": { "name": "Выходной", "icon": "🏖️", "color": "#2e3846", "isWork": false }
+        const emptySections = {
+            "sec_main": { "name": "Основные продукты", "type": "counter", "items": {} },
+            "sec_cross": { "name": "Кросс-продажи", "type": "cross_builder", "items": {} },
+            "sec_statuses": { "name": "Статусы отказов", "type": "select", "items": {} },
+            "sec_apps": { "name": "Приложения", "type": "checkbox", "items": {} }
         };
-
-        const defaultCardInventory = [
-            { "id": "stock_dk", "name": "Дебетовая карта (ДК)", "count": 25, "boundItems": ["item_dk", "cross_dk"] },
-            { "id": "stock_re", "name": "Карта Re", "count": 10, "boundItems": ["item_re"] },
-            { "id": "stock_cc", "name": "Кредитная карта (CC)", "count": 15, "boundItems": ["item_cc1", "item_cc2", "cross_combo"] },
-            { "id": "stock_kids", "name": "Детская карта (Kids)", "count": 10, "boundItems": ["cross_kids"] },
-            { "id": "stock_sim", "name": "SIM-карта Альфа", "count": 30, "boundItems": ["item_sim_main", "cross_sim"] }
-        ];
 
         let state = {
             bankerFio: "ФИО МБ",
-            activationConfig: {
-                title: "Актив(пин-код)",
-                enabled: true
-            },
-            sections: JSON.parse(JSON.stringify(defaultUserSections)),
-            shiftCategories: JSON.parse(JSON.stringify(defaultShiftCategories)),
+            workNotes: "",
+            activationConfig: { title: "Актив(пин-код)", enabled: true },
+            sections: JSON.parse(JSON.stringify(emptySections)),
+            shiftCategories: {},
             schedule: {},
             daysData: {},
             dayAssigned: {},
             dayPlanTemplate: [],
             dailyPlans: {},
             monthPlanHistory: {},
-            cardInventory: JSON.parse(JSON.stringify(defaultCardInventory)),
+            cardInventory: [],
             taxRate: 13,
             fuelSettings: { consumption: 10, pricePerLiter: 64 },
             darkMode: false
@@ -1837,14 +1808,18 @@
         }
 
         function loadState() {
-            const saved = localStorage.getItem('alfacalc_customcross_v2') ||
-                          localStorage.getItem('alfacalc_structured_fails_v1');
+            // Удаляем старые ключи с дефолтными продуктами из кэша
+            localStorage.removeItem('alfacalc_customcross_v2');
+            localStorage.removeItem('alfacalc_structured_fails_v1');
+
+            const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
                     if (parsed.bankerFio) state.bankerFio = parsed.bankerFio;
+                    if (parsed.workNotes !== undefined) state.workNotes = parsed.workNotes;
                     if (parsed.activationConfig) state.activationConfig = parsed.activationConfig;
-                    if (parsed.sections && Object.keys(parsed.sections).length > 0) state.sections = parsed.sections;
+                    if (parsed.sections) state.sections = parsed.sections;
                     if (parsed.shiftCategories) state.shiftCategories = parsed.shiftCategories;
                     if (parsed.schedule) state.schedule = parsed.schedule;
                     if (parsed.daysData) state.daysData = parsed.daysData;
@@ -1862,10 +1837,6 @@
 
             if (!state.activationConfig) {
                 state.activationConfig = { title: "Актив(пин-код)", enabled: true };
-            }
-
-            if (state.sections.sec_cross?.items?.cross_act) {
-                delete state.sections.sec_cross.items.cross_act;
             }
 
             rebuildItemIndex();
@@ -1892,7 +1863,7 @@
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 if (splash) splash.classList.add('hide');
-            }, 600);
+            }, 500);
         }
 
         function updateActivationLabel() {
@@ -1904,12 +1875,12 @@
 
         function saveState(immediate = false) {
             if (immediate) {
-                localStorage.setItem('alfacalc_customcross_v2', JSON.stringify(state));
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
                 return;
             }
             if (saveDebounceTimer) clearTimeout(saveDebounceTimer);
             saveDebounceTimer = setTimeout(() => {
-                localStorage.setItem('alfacalc_customcross_v2', JSON.stringify(state));
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
             }, 250);
         }
 
@@ -1937,28 +1908,69 @@
             document.getElementById('fail-block').style.display = isSuccess ? 'none' : 'block';
         }
 
+        // БЛОК ЗАМЕТОК
+        function openNotesModal() {
+            const ta = document.getElementById('work-notes-textarea');
+            if (ta) ta.value = state.workNotes || "";
+            document.getElementById('notes-modal').style.display = 'block';
+        }
+
+        function closeNotesModal() {
+            document.getElementById('notes-modal').style.display = 'none';
+        }
+
+        function saveNotesText(val) {
+            state.workNotes = val;
+            saveState();
+        }
+
+        function copyNotesText() {
+            const val = document.getElementById('work-notes-textarea').value;
+            copyToClipboard(val);
+            showToast("Заметки скопированы!");
+        }
+
+        function clearNotesText() {
+            if (confirm("Очистить все рабочие заметки?")) {
+                document.getElementById('work-notes-textarea').value = "";
+                state.workNotes = "";
+                saveState(true);
+            }
+        }
+
+        // ПРИМЕНЕНИЕ ПРЕСЕТА БЕЗ ЗАТИРАНИЯ ДАННЫХ
+        function applyImportedPreset(parsedPreset) {
+            if (!parsedPreset || typeof parsedPreset !== 'object') {
+                throw new Error("Неверный формат пресета");
+            }
+
+            if (parsedPreset.sections) state.sections = parsedPreset.sections;
+            if (parsedPreset.shiftCategories) state.shiftCategories = parsedPreset.shiftCategories;
+            if (parsedPreset.activationConfig) state.activationConfig = parsedPreset.activationConfig;
+            if (parsedPreset.fuelSettings) state.fuelSettings = parsedPreset.fuelSettings;
+            if (parsedPreset.taxRate !== undefined) state.taxRate = parsedPreset.taxRate;
+            
+            if (parsedPreset.cardInventory && Array.isArray(parsedPreset.cardInventory)) {
+                state.cardInventory = parsedPreset.cardInventory.map(item => ({
+                    ...item,
+                    includeInTotal: item.includeInTotal !== undefined ? item.includeInTotal : true
+                }));
+            }
+
+            rebuildItemIndex();
+            updateActivationLabel();
+            saveState(true);
+            loadActiveDayToUI();
+            renderAll();
+            renderDynamicMeetingForms();
+            renderSimpleSettingsLists();
+        }
+
         async function exportBackup() {
             const now = new Date();
             const dateStr = `${now.getFullYear()}_${String(now.getMonth()+1).padStart(2,'0')}_${String(now.getDate()).padStart(2,'0')}`;
-            const fileName = `AlfaCalc_backup_${dateStr}.json`;
+            const fileName = `AlfaCalc_preset_${dateStr}.json`;
             const jsonText = JSON.stringify(state, null, 2);
-
-            if (navigator.share && navigator.canShare) {
-                try {
-                    const file = new File([jsonText], fileName, { type: 'application/json' });
-                    if (navigator.canShare({ files: [file] })) {
-                        await navigator.share({
-                            files: [file],
-                            title: 'Резервная копия AlfaCalc',
-                            text: 'Резервная копия данных AlfaCalc'
-                        });
-                        showToast("Файл передан!");
-                        return;
-                    }
-                } catch (e) {
-                    if (e.name !== 'AbortError') console.log("WebShare error:", e);
-                }
-            }
 
             try {
                 const blob = new Blob([jsonText], { type: 'application/json' });
@@ -1972,7 +1984,7 @@
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
                 }, 200);
-                showToast("Файл скачивается!");
+                showToast("Пресет скачан!");
             } catch (err) {
                 copyBackupToClipboard();
             }
@@ -1980,30 +1992,19 @@
 
         function copyBackupToClipboard() {
             copyToClipboard(JSON.stringify(state));
-            alert("Код бэкапа скопирован в буфер!");
+            alert("Пресет скопирован в буфер обмена!");
         }
 
         function importBackupFromClipboard() {
-            const text = prompt("Вставьте скопированный текст бэкапа сюда:");
+            const text = prompt("Вставьте текст пресета сюда:");
             if (!text) return;
             try {
                 const parsed = JSON.parse(text.trim());
-                if (parsed.sections) {
-                    state = parsed;
-                    if (!state.activationConfig) state.activationConfig = { title: "Актив(пин-код)", enabled: true };
-                    rebuildItemIndex();
-                    applyThemeUI();
-                    saveState(true);
-                    loadActiveDayToUI();
-                    renderAll();
-                    renderDynamicMeetingForms();
-                    closeSettings();
-                    alert("Данные успешно восстановлены!");
-                } else {
-                    alert("Некорректный формат данных!");
-                }
+                applyImportedPreset(parsed);
+                closeSettings();
+                alert("Пресет успешно применен! Ваши смены и данные сохранены.");
             } catch (e) {
-                alert("Ошибка: " + e.message);
+                alert("Ошибка применения пресета: " + e.message);
             }
         }
 
@@ -2015,26 +2016,22 @@
             reader.onload = function(e) {
                 try {
                     const parsed = JSON.parse(e.target.result);
-                    if (parsed.sections) {
-                        state = parsed;
-                        if (!state.activationConfig) state.activationConfig = { title: "Актив(пин-код)", enabled: true };
-                        rebuildItemIndex();
-                        applyThemeUI();
-                        saveState(true);
-                        loadActiveDayToUI();
-                        renderAll();
-                        renderDynamicMeetingForms();
-                        closeSettings();
-                        showToast("Данные успешно восстановлены!");
-                    } else {
-                        alert("Некорректный файл бэкапа!");
-                    }
+                    applyImportedPreset(parsed);
+                    closeSettings();
+                    showToast("Пресет загружен!");
                 } catch (err) {
-                    alert("Ошибка: " + err.message);
+                    alert("Ошибка чтения файла: " + err.message);
                 }
             };
             reader.readAsText(file);
             event.target.value = '';
+        }
+
+        function hardResetApp() {
+            if (confirm("Вы уверены? Это полностью сотрет все данные из памяти браузера и вернет абсолютно пустое приложение.")) {
+                localStorage.clear();
+                location.reload();
+            }
         }
 
         function onDateInputChange(val) {
@@ -2235,7 +2232,7 @@
                 }
             }
 
-            container.innerHTML = count > 0 ? html.join('') : '<div class="empty-history">Добавьте основные продукты в настройках ⚙️</div>';
+            container.innerHTML = count > 0 ? html.join('') : '<div class="empty-history">Добавьте продукты или загрузите пресет ⚙️</div>';
         }
 
         function renderDynamicMeetingForms() {
@@ -2690,12 +2687,10 @@
                 let dayGross = 0;
                 let dayFuelCost = 0;
 
-                // Проверяем встречи за день
                 const dD = state.daysData[dayKey];
                 const hasMeetings = dD && dD.meetings && dD.meetings.length > 0;
                 dayFuelCost = dD?.fuel?.cost || 0;
 
-                // ИСПРАВЛЕНИЕ: если задан ручной ввод (manualProfit) или нет встреч, но задан schedData.profit - берем его!
                 if (schedData.manualProfit || (!hasMeetings && schedData.profit > 0)) {
                     dayGross = schedData.profit || 0;
                 } else if (hasMeetings) {
@@ -2841,7 +2836,6 @@
             selectedDayKey = null;
         }
 
-        // Сохранение только суммы без обязательной смены статуса
         function saveDayProfitOnly() {
             if (!selectedDayKey) return;
             const profitVal = parseInt(document.getElementById('day-profit-input').value, 10) || 0;
@@ -3086,7 +3080,16 @@
             showToast("Отчет по плану за месяц скопирован!");
         }
 
-        /* ИНВЕНТАРИЗАЦИЯ КАРТ (СКЛАД) */
+        /* ИНВЕНТАРИЗАЦИЯ КАРТ (СКЛАД) - ВЫБОРОЧНЫЙ ПОДСЧЕТ */
+        function toggleStockInclude(cardId, isChecked) {
+            const card = state.cardInventory.find(c => c.id === cardId);
+            if (card) {
+                card.includeInTotal = isChecked;
+                saveState();
+                renderInventory();
+            }
+        }
+
         function renderInventory() {
             const listEl = document.getElementById('inventory-cards-list');
             if (!listEl) return;
@@ -3098,12 +3101,21 @@
             }
 
             const html = [];
-            let reportText = `Остатки карт на руках (${formatDateDisplay(currentActiveDateKey)}):\n\n`;
+            let reportText = `Остатки выбранных карт на руках (${formatDateDisplay(currentActiveDateKey)}):\n\n`;
+            let totalCardsSelected = 0;
+            let countIndex = 1;
 
-            state.cardInventory.forEach((card, idx) => {
+            state.cardInventory.forEach((card) => {
                 const count = parseInt(card.count, 10) || 0;
                 const isLow = count <= 3;
                 const badgeClass = isLow ? 'stock-count-badge low' : 'stock-count-badge';
+                const isIncluded = card.includeInTotal !== false;
+
+                if (isIncluded) {
+                    totalCardsSelected += count;
+                    reportText += `${countIndex}. ${card.name}: ${count} шт.\n`;
+                    countIndex++;
+                }
 
                 const boundNames = (card.boundItems || []).map(iKey => getItemName(iKey));
                 const tagsHtml = boundNames.map(name => `<span class="stock-tag">${name}</span>`).join('');
@@ -3111,7 +3123,15 @@
                 html.push(`
                     <div class="stock-item">
                         <div class="stock-header">
-                            <span class="stock-title">${card.name}</span>
+                            <div>
+                                <span class="stock-title">${card.name}</span>
+                                <div style="margin-top:4px;">
+                                    <label class="stock-include-label">
+                                        <input type="checkbox" ${isIncluded ? 'checked' : ''} onchange="toggleStockInclude('${card.id}', this.checked)">
+                                        <span>Считать в сводке</span>
+                                    </label>
+                                </div>
+                            </div>
                             <span class="${badgeClass}">${count} шт.</span>
                         </div>
                         <div class="stock-bindings">
@@ -3132,8 +3152,9 @@
                         </div>
                     </div>
                 `);
-                reportText += `${idx + 1}. ${card.name}: ${count} шт.\n`;
             });
+
+            reportText += `\nВсего выбранных карт: ${totalCardsSelected} шт.`;
 
             listEl.innerHTML = html.join('');
             document.getElementById('inventory-summary-report').innerText = reportText.trim();
@@ -3165,6 +3186,7 @@
             const titleEl = document.getElementById('stock-modal-title');
             const nameEl = document.getElementById('stock-card-name');
             const countEl = document.getElementById('stock-card-count');
+            const incEl = document.getElementById('stock-card-include');
             const checklistEl = document.getElementById('stock-bindings-checklist');
 
             let currentBound = [];
@@ -3174,11 +3196,13 @@
                 titleEl.innerText = "✏️ Редактировать карту";
                 nameEl.value = card.name;
                 countEl.value = card.count;
+                if (incEl) incEl.checked = card.includeInTotal !== false;
                 currentBound = card.boundItems || [];
             } else {
                 titleEl.innerText = "📦 Новая карта в инвентарь";
                 nameEl.value = '';
                 countEl.value = '20';
+                if (incEl) incEl.checked = true;
                 currentBound = [];
             }
 
@@ -3213,6 +3237,7 @@
         function saveStockItem() {
             const name = document.getElementById('stock-card-name').value.trim();
             const count = parseInt(document.getElementById('stock-card-count').value, 10) || 0;
+            const includeInTotal = document.getElementById('stock-card-include').checked;
 
             if (!name) return alert("Введите название физической карты!");
 
@@ -3233,6 +3258,7 @@
                 if (existing) {
                     existing.name = name;
                     existing.count = count;
+                    existing.includeInTotal = includeInTotal;
                     existing.boundItems = selectedBindings;
                 }
             } else {
@@ -3240,6 +3266,7 @@
                     id: 'stock_' + Date.now(),
                     name: name,
                     count: count,
+                    includeInTotal: includeInTotal,
                     boundItems: selectedBindings
                 });
             }
@@ -3261,10 +3288,10 @@
 
         function copyInventoryReport() {
             copyToClipboard(document.getElementById('inventory-summary-report').innerText);
-            showToast("Остатки карт скопированы в буфер!");
+            showToast("Остатки выбранных карт скопированы в буфер!");
         }
 
-        /* ПРОСТЫЕ НАСТРОЙКИ (UI) */
+        /* НАСТРОЙКИ (UI) */
         function switchSettingsTab(tab) {
             ['prod', 'fails', 'shifts', 'backup'].forEach(t => {
                 const pane = document.getElementById(`set-pane-${t}`);
@@ -3384,7 +3411,7 @@
                     </div>
                 `);
             }
-            shiftList.innerHTML = shtml.join('');
+            shiftList.innerHTML = shtml.length ? shtml.join('') : '<div class="empty-history">Типы смен пока не настроены</div>';
         }
 
         function toggleSubInputRow(key, mode) {
@@ -3549,25 +3576,6 @@
                 delete state.shiftCategories[key];
                 renderSimpleSettingsLists();
             }
-        }
-
-        function applyBankerPreset() {
-            if (!confirm("Загрузить эталонный набор с готовыми мультикнопками для Комбо, БС, Детей и Смарта?")) return;
-
-            saveCurrentSimpleInputs();
-
-            state.sections = JSON.parse(JSON.stringify(defaultUserSections));
-            state.shiftCategories = JSON.parse(JSON.stringify(defaultShiftCategories));
-            state.cardInventory = JSON.parse(JSON.stringify(defaultCardInventory));
-            state.fuelSettings = { consumption: 10, pricePerLiter: 64 };
-            state.taxRate = 13;
-            state.activationConfig = { title: "Актив(пин-код)", enabled: true };
-
-            rebuildItemIndex();
-            renderSimpleSettingsLists();
-            updateActivationLabel();
-            saveState(true);
-            showToast("Эталонный набор загружен!");
         }
 
         function confirmReset() {
