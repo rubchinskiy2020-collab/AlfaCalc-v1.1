@@ -500,6 +500,27 @@
             margin: 0;
         }
 
+        .btn-order-move {
+            background: var(--alfa-bg);
+            border: 1px solid var(--alfa-border);
+            color: var(--alfa-muted);
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+            transition: all 0.15s;
+        }
+        .btn-order-move:active {
+            background: var(--alfa-border);
+            color: var(--alfa-black);
+        }
+
         .btn-primary {
             width: 100%;
             background: var(--alfa-red);
@@ -1595,7 +1616,6 @@
     <div class="toast" id="toast-msg">Отчет скопирован!</div>
 
     <script>
-        // ИЗОЛИРОВАННЫЙ КЛЮЧ: не считывает старые сохраненные настройки продуктов
         const STORAGE_KEY = 'alfacalc_clean_v3';
 
         const emptySections = {
@@ -1783,7 +1803,20 @@
                 });
             }
 
-            state.dailyPlans[dKey] = activePlanItems;
+            if (currentList.length > 0) {
+                const sorted = [];
+                currentList.forEach(existing => {
+                    const found = activePlanItems.find(a => a.id === existing.id);
+                    if (found) sorted.push(found);
+                });
+                activePlanItems.forEach(item => {
+                    if (!sorted.some(s => s.id === item.id)) sorted.push(item);
+                });
+                state.dailyPlans[dKey] = sorted;
+            } else {
+                state.dailyPlans[dKey] = activePlanItems;
+            }
+
             return state.dailyPlans[dKey];
         }
 
@@ -1808,7 +1841,6 @@
         }
 
         function loadState() {
-            // Удаляем старые ключи с дефолтными продуктами из кэша
             localStorage.removeItem('alfacalc_customcross_v2');
             localStorage.removeItem('alfacalc_structured_fails_v1');
 
@@ -1908,6 +1940,33 @@
             document.getElementById('fail-block').style.display = isSuccess ? 'none' : 'block';
         }
 
+        /* УПРАВЛЕНИЕ ПОРЯДКОМ В СЕКЦИЯХ ПРОДУКТОВ */
+        function moveSectionItemOrder(sKey, itemKey, delta) {
+            saveCurrentSimpleInputs();
+            const itemsObj = state.sections[sKey]?.items;
+            if (!itemsObj) return;
+
+            const keys = Object.keys(itemsObj);
+            const idx = keys.indexOf(itemKey);
+            if (idx === -1) return;
+
+            const targetIdx = idx + delta;
+            if (targetIdx < 0 || targetIdx >= keys.length) return;
+
+            const temp = keys[idx];
+            keys[idx] = keys[targetIdx];
+            keys[targetIdx] = temp;
+
+            const newItems = {};
+            keys.forEach(k => { newItems[k] = itemsObj[k]; });
+            state.sections[sKey].items = newItems;
+
+            saveState(true);
+            renderSimpleSettingsLists();
+            renderAll();
+            renderDynamicMeetingForms();
+        }
+
         // БЛОК ЗАМЕТОК
         function openNotesModal() {
             const ta = document.getElementById('work-notes-textarea');
@@ -1938,7 +1997,6 @@
             }
         }
 
-        // ПРИМЕНЕНИЕ ПРЕСЕТА БЕЗ ЗАТИРАНИЯ ДАННЫХ
         function applyImportedPreset(parsedPreset) {
             if (!parsedPreset || typeof parsedPreset !== 'object') {
                 throw new Error("Неверный формат пресета");
@@ -2623,7 +2681,7 @@
                 report += `- ${appSec[aKey].name} - ${getCount(aKey)}\n`;
             }
 
-            // 4. ВСТРЕЧИ В АВТО (только успешные)
+            // 4. ВСТРЕЧИ В АВТО
             report += `\nВстречи в авто ${carSuccessMeetingsCount} из ${totalSuccessCount}`;
 
             document.getElementById('day-report-preview').innerText = report;
@@ -2899,6 +2957,23 @@
             showToast("Кастомная цель добавлена!");
         }
 
+        function moveDayPlanTargetOrder(id, delta) {
+            const dayList = getDayPlanList(currentActiveDateKey);
+            const idx = dayList.findIndex(t => t.id === id);
+            if (idx === -1) return;
+
+            const targetIdx = idx + delta;
+            if (targetIdx < 0 || targetIdx >= dayList.length) return;
+
+            const temp = dayList[idx];
+            dayList[idx] = dayList[targetIdx];
+            dayList[targetIdx] = temp;
+
+            state.dailyPlans[currentActiveDateKey] = dayList;
+            saveState(true);
+            renderDayPlan();
+        }
+
         function changeTargetSold(id, delta) {
             const dayList = getDayPlanList(currentActiveDateKey);
             const target = dayList.find(t => t.id === id);
@@ -2981,6 +3056,10 @@
 
                 html.push(`
                     <div class="plan-target-item">
+                        <div style="display:flex; flex-direction:column; gap:2px;">
+                            <button class="btn-order-move" title="Выше" onclick="moveDayPlanTargetOrder('${t.id}', -1)">▲</button>
+                            <button class="btn-order-move" title="Ниже" onclick="moveDayPlanTargetOrder('${t.id}', 1)">▼</button>
+                        </div>
                         <div class="plan-target-info">
                             <span class="plan-target-title">${t.name} ${tagType}</span>
                             <span class="plan-target-sub">Продано за день: <b>${t.sold}</b> ${u} (цель: ${t.goal})</span>
@@ -3080,7 +3159,7 @@
             showToast("Отчет по плану за месяц скопирован!");
         }
 
-        /* ИНВЕНТАРИЗАЦИЯ КАРТ (СКЛАД) - ВЫБОРОЧНЫЙ ПОДСЧЕТ */
+        /* ИНВЕНТАРИЗАЦИЯ КАРТ (СКЛАД) - ВЫБОРОЧНЫЙ ПОДСЧЕТ И ПОРЯДОК */
         function toggleStockInclude(cardId, isChecked) {
             const card = state.cardInventory.find(c => c.id === cardId);
             if (card) {
@@ -3088,6 +3167,22 @@
                 saveState();
                 renderInventory();
             }
+        }
+
+        function moveStockItemOrder(id, delta) {
+            if (!state.cardInventory) return;
+            const idx = state.cardInventory.findIndex(c => c.id === id);
+            if (idx === -1) return;
+
+            const targetIdx = idx + delta;
+            if (targetIdx < 0 || targetIdx >= state.cardInventory.length) return;
+
+            const temp = state.cardInventory[idx];
+            state.cardInventory[idx] = state.cardInventory[targetIdx];
+            state.cardInventory[targetIdx] = temp;
+
+            saveState(true);
+            renderInventory();
         }
 
         function renderInventory() {
@@ -3123,13 +3218,19 @@
                 html.push(`
                     <div class="stock-item">
                         <div class="stock-header">
-                            <div>
-                                <span class="stock-title">${card.name}</span>
-                                <div style="margin-top:4px;">
-                                    <label class="stock-include-label">
-                                        <input type="checkbox" ${isIncluded ? 'checked' : ''} onchange="toggleStockInclude('${card.id}', this.checked)">
-                                        <span>Считать в сводке</span>
-                                    </label>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <div style="display:flex; flex-direction:column; gap:2px;">
+                                    <button class="btn-order-move" title="Выше" onclick="moveStockItemOrder('${card.id}', -1)">▲</button>
+                                    <button class="btn-order-move" title="Ниже" onclick="moveStockItemOrder('${card.id}', 1)">▼</button>
+                                </div>
+                                <div>
+                                    <span class="stock-title">${card.name}</span>
+                                    <div style="margin-top:4px;">
+                                        <label class="stock-include-label">
+                                            <input type="checkbox" ${isIncluded ? 'checked' : ''} onchange="toggleStockInclude('${card.id}', this.checked)">
+                                            <span>Считать в сводке</span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                             <span class="${badgeClass}">${count} шт.</span>
@@ -3337,6 +3438,10 @@
                 phtml.push(`
                     <div class="setting-row">
                         <div class="setting-row-main">
+                            <div style="display:flex; gap:2px; align-items:center;">
+                                <button class="btn-order-move" title="Выше" onclick="moveSectionItemOrder('sec_main', '${k}', -1)">▲</button>
+                                <button class="btn-order-move" title="Ниже" onclick="moveSectionItemOrder('sec_main', '${k}', 1)">▼</button>
+                            </div>
                             <input type="text" class="setting-name-input" id="item-name-sec_main-${k}" value="${item.name}">
                             <input type="number" class="setting-price-input" id="item-price-sec_main-${k}" value="${item.price || 0}" title="Цена">
                             <label class="plan-toggle-badge" title="В план"><input type="checkbox" id="item-inplan-sec_main-${k}" ${inPlanChecked}>🎯</label>
@@ -3358,6 +3463,10 @@
                 phtml.push(`
                     <div class="setting-row">
                         <div class="setting-row-main">
+                            <div style="display:flex; gap:2px; align-items:center;">
+                                <button class="btn-order-move" title="Выше" onclick="moveSectionItemOrder('sec_cross', '${k}', -1)">▲</button>
+                                <button class="btn-order-move" title="Ниже" onclick="moveSectionItemOrder('sec_cross', '${k}', 1)">▼</button>
+                            </div>
                             <input type="text" class="setting-name-input" id="item-name-sec_cross-${k}" value="${item.name}">
                             <input type="number" class="setting-price-input" id="item-price-sec_cross-${k}" value="${item.price || 0}" title="Оплата">
                             <label class="plan-toggle-badge" title="В план"><input type="checkbox" id="item-inplan-sec_cross-${k}" ${inPlanChecked}>🎯</label>
